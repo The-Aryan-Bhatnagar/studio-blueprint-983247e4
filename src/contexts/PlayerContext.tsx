@@ -18,10 +18,16 @@ interface PlayerContextType {
   currentTime: number;
   duration: number;
   volume: number;
+  isMuted: boolean;
+  isRepeat: boolean;
+  isShuffle: boolean;
   playSong: (song: Song) => void;
   togglePlay: () => void;
   seekTo: (time: number) => void;
   setVolume: (volume: number) => void;
+  toggleMute: () => void;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
   playNext: () => void;
   playPrevious: () => void;
   queue: Song[];
@@ -36,6 +42,9 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(75);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isRepeat, setIsRepeat] = useState(false);
+  const [isShuffle, setIsShuffle] = useState(false);
   const [queue, setQueue] = useState<Song[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { startTracking, stopTracking } = usePlayTracking();
@@ -50,16 +59,21 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         setDuration(audioRef.current?.duration || 0);
       });
       audioRef.current.addEventListener("ended", () => {
-        playNext();
+        if (isRepeat) {
+          audioRef.current!.currentTime = 0;
+          audioRef.current!.play();
+        } else {
+          playNext();
+        }
       });
     }
   }, []);
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = volume / 100;
+      audioRef.current.volume = isMuted ? 0 : volume / 100;
     }
-  }, [volume]);
+  }, [volume, isMuted]);
 
   const playSong = (song: Song) => {
     if (audioRef.current) {
@@ -108,11 +122,33 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     setVolumeState(newVolume);
   };
 
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+  };
+
+  const toggleRepeat = () => {
+    setIsRepeat(!isRepeat);
+  };
+
+  const toggleShuffle = () => {
+    setIsShuffle(!isShuffle);
+  };
+
   const playNext = () => {
     if (!currentSong || queue.length === 0) return;
-    const currentIndex = queue.findIndex((s) => s.id === currentSong.id);
-    const nextIndex = (currentIndex + 1) % queue.length;
-    playSong(queue[nextIndex]);
+    
+    if (isShuffle) {
+      // Pick a random song that's not the current one
+      const otherSongs = queue.filter(s => s.id !== currentSong.id);
+      if (otherSongs.length > 0) {
+        const randomIndex = Math.floor(Math.random() * otherSongs.length);
+        playSong(otherSongs[randomIndex]);
+      }
+    } else {
+      const currentIndex = queue.findIndex((s) => s.id === currentSong.id);
+      const nextIndex = (currentIndex + 1) % queue.length;
+      playSong(queue[nextIndex]);
+    }
   };
 
   const playPrevious = () => {
@@ -130,10 +166,16 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         currentTime,
         duration,
         volume,
+        isMuted,
+        isRepeat,
+        isShuffle,
         playSong,
         togglePlay,
         seekTo,
         setVolume,
+        toggleMute,
+        toggleRepeat,
+        toggleShuffle,
         playNext,
         playPrevious,
         queue,
