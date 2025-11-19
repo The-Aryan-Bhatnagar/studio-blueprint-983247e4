@@ -8,8 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useCreateSong } from "@/hooks/useSongs";
 import { useNavigate } from "react-router-dom";
-import { Upload, Calendar, MessageCircle } from "lucide-react";
+import { Upload, Calendar, MessageCircle, Music, Image } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/integrations/supabase/client";
 
 const SongUpload = () => {
   const { toast } = useToast();
@@ -34,10 +35,35 @@ const SongUpload = () => {
     is_published: false,
   });
 
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const uploadFile = async (file: File, bucket: string): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+    const filePath = fileName;
+
+    const { error: uploadError, data } = await supabase.storage
+      .from(bucket)
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title || !formData.audio_url) {
+    if (!formData.title || (!formData.audio_url && !audioFile)) {
       toast({
         title: "Missing Required Fields",
         description: "Please provide song title and audio file",
@@ -46,14 +72,31 @@ const SongUpload = () => {
       return;
     }
 
-    const songData = {
-      ...formData,
-      featured_artists: formData.featured_artists ? formData.featured_artists.split(",").map(a => a.trim()) : [],
-      tags: formData.tags ? formData.tags.split(",").map(t => t.trim()) : [],
-      scheduled_release_at: formData.is_scheduled && formData.scheduled_release_at ? new Date(formData.scheduled_release_at).toISOString() : null,
-    };
+    setUploading(true);
 
     try {
+      let audioUrl = formData.audio_url;
+      let coverUrl = formData.cover_image_url;
+
+      // Upload audio file if selected
+      if (audioFile) {
+        audioUrl = await uploadFile(audioFile, 'song-audio');
+      }
+
+      // Upload cover image if selected
+      if (coverFile) {
+        coverUrl = await uploadFile(coverFile, 'song-covers');
+      }
+
+      const songData = {
+        ...formData,
+        audio_url: audioUrl,
+        cover_image_url: coverUrl,
+        featured_artists: formData.featured_artists ? formData.featured_artists.split(",").map(a => a.trim()) : [],
+        tags: formData.tags ? formData.tags.split(",").map(t => t.trim()) : [],
+        scheduled_release_at: formData.is_scheduled && formData.scheduled_release_at ? new Date(formData.scheduled_release_at).toISOString() : null,
+      };
+
       await createSong.mutateAsync(songData);
       toast({
         title: "Song Uploaded Successfully",
@@ -66,6 +109,8 @@ const SongUpload = () => {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -84,25 +129,54 @@ const SongUpload = () => {
           </h2>
           
           <div className="space-y-4">
-            <div>
-              <Label htmlFor="audio_url">Audio File URL *</Label>
+          <div>
+              <Label htmlFor="audio_file" className="flex items-center gap-2">
+                <Music className="w-4 h-4 text-primary" />
+                Audio File *
+              </Label>
               <Input
-                id="audio_url"
-                placeholder="https://example.com/song.mp3"
-                value={formData.audio_url}
-                onChange={(e) => setFormData({ ...formData, audio_url: e.target.value })}
-                required
+                id="audio_file"
+                type="file"
+                accept="audio/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setAudioFile(file);
+                    setFormData({ ...formData, audio_url: "" });
+                  }
+                }}
+                className="cursor-pointer"
               />
+              {audioFile && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Selected: {audioFile.name}
+                </p>
+              )}
             </div>
 
             <div>
-              <Label htmlFor="cover_image_url">Cover Image URL</Label>
+              <Label htmlFor="cover_file" className="flex items-center gap-2">
+                <Image className="w-4 h-4 text-primary" />
+                Cover Image
+              </Label>
               <Input
-                id="cover_image_url"
-                placeholder="https://example.com/cover.jpg"
-                value={formData.cover_image_url}
-                onChange={(e) => setFormData({ ...formData, cover_image_url: e.target.value })}
+                id="cover_file"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setCoverFile(file);
+                    setFormData({ ...formData, cover_image_url: "" });
+                  }
+                }}
+                className="cursor-pointer"
               />
+              {coverFile && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Selected: {coverFile.name}
+                </p>
+              )}
             </div>
 
             <div>
@@ -266,20 +340,25 @@ const SongUpload = () => {
           <Button
             type="submit"
             className="bg-gradient-primary"
-            disabled={createSong.isPending}
+            disabled={uploading || createSong.isPending}
             onClick={() => setFormData({ ...formData, is_draft: false, is_published: !formData.is_scheduled })}
           >
-            {formData.is_scheduled ? "Schedule Song" : "Publish Now"}
+            {uploading ? "Uploading..." : formData.is_scheduled ? "Schedule Song" : "Publish Now"}
           </Button>
           <Button
             type="submit"
             variant="outline"
-            disabled={createSong.isPending}
+            disabled={uploading || createSong.isPending}
             onClick={() => setFormData({ ...formData, is_draft: true, is_published: false })}
           >
-            Save as Draft
+            {uploading ? "Uploading..." : "Save as Draft"}
           </Button>
-          <Button type="button" variant="ghost" onClick={() => navigate("/artist/dashboard")}>
+          <Button 
+            type="button" 
+            variant="ghost" 
+            disabled={uploading}
+            onClick={() => navigate("/artist/dashboard")}
+          >
             Cancel
           </Button>
         </div>
