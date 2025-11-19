@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Layout from "./components/Layout";
 import ArtistLayout from "./components/ArtistLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Discover from "./pages/Discover";
 import Search from "./pages/Search";
@@ -39,6 +40,9 @@ const App = () => (
             <Toaster />
             <Sonner />
             <Routes>
+              {/* Public Landing Page */}
+              <Route path="/" element={<Landing />} />
+              
               {/* Auth Routes - No Layout */}
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/signup" element={<Signup />} />
@@ -50,7 +54,7 @@ const App = () => (
               <Route path="/admin/login" element={<AdminLogin />} />
               
               {/* User Routes - Regular Layout with Music Player */}
-              <Route path="/" element={<Layout><ProtectedRoute><Home /></ProtectedRoute></Layout>} />
+              <Route path="/home" element={<Layout><ProtectedRoute><Home /></ProtectedRoute></Layout>} />
               <Route path="/discover" element={<Layout><ProtectedRoute><Discover /></ProtectedRoute></Layout>} />
               <Route path="/search" element={<Layout><ProtectedRoute><Search /></ProtectedRoute></Layout>} />
               <Route path="/library" element={<Layout><ProtectedRoute><Library /></ProtectedRoute></Layout>} />
