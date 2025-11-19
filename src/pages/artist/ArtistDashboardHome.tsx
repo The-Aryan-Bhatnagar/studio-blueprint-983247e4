@@ -12,9 +12,9 @@ const ArtistDashboardHome = () => {
   // Calculate analytics
   const totalSongs = songs?.length || 0;
   const scheduledSongs = songs?.filter(s => s.is_scheduled && !s.is_published).length || 0;
-  const totalPlays = songs?.reduce((sum, song) => sum + (song.song_analytics?.[0]?.total_plays || 0), 0) || 0;
-  const totalLikes = songs?.reduce((sum, song) => sum + (song.song_analytics?.[0]?.total_likes || 0), 0) || 0;
-  const playsLast7Days = songs?.reduce((sum, song) => sum + (song.song_analytics?.[0]?.plays_last_7_days || 0), 0) || 0;
+  const totalPlays = songs?.reduce((sum, song) => sum + (song.song_analytics?.total_plays || 0), 0) || 0;
+  const totalLikes = songs?.reduce((sum, song) => sum + (song.song_analytics?.total_likes || 0), 0) || 0;
+  const playsLast7Days = songs?.reduce((sum, song) => sum + (song.song_analytics?.plays_last_7_days || 0), 0) || 0;
 
   return (
     <div className="space-y-8">
@@ -112,11 +112,11 @@ const ArtistDashboardHome = () => {
           {songs && songs.length > 0 ? (
             songs
               .filter(song => song.is_published)
-              .sort((a, b) => (b.song_analytics?.[0]?.total_plays || 0) - (a.song_analytics?.[0]?.total_plays || 0))
+              .sort((a, b) => (b.song_analytics?.total_plays || 0) - (a.song_analytics?.total_plays || 0))
               .slice(0, 5)
               .map((song) => {
-                const plays = song.song_analytics?.[0]?.total_plays || 0;
-                const likes = song.song_analytics?.[0]?.total_likes || 0;
+                const plays = song.song_analytics?.total_plays || 0;
+                const likes = song.song_analytics?.total_likes || 0;
                 return (
                   <div key={song.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors">
                     <div className="flex items-center gap-3">
