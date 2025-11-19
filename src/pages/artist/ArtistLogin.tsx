@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -12,14 +12,26 @@ import { supabase } from "@/integrations/supabase/client";
 const ArtistLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isArtist, loading } = useAuth();
 
-  const { signIn } = useAuth();
+  // Redirect if already logged in as artist
+  useEffect(() => {
+    if (!loading && user && isArtist) {
+      navigate("/artist/dashboard");
+    }
+  }, [user, isArtist, loading, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await signIn(email, password);
+    setIsLoading(true);
+    
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     
     if (error) {
       toast({
@@ -27,8 +39,12 @@ const ArtistLogin = () => {
         description: error.message,
         variant: "destructive",
       });
-    } else {
-      // Check if user has artist role
+      setIsLoading(false);
+      return;
+    }
+
+    // Wait a moment for auth state to update
+    setTimeout(async () => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
@@ -54,7 +70,8 @@ const ArtistLogin = () => {
           await supabase.auth.signOut();
         }
       }
-    }
+      setIsLoading(false);
+    }, 500);
   };
 
   return (
@@ -99,8 +116,8 @@ const ArtistLogin = () => {
             />
           </div>
 
-          <Button type="submit" className="w-full bg-gradient-primary">
-            Login as Artist
+          <Button type="submit" className="w-full bg-gradient-primary" disabled={isLoading}>
+            {isLoading ? "Logging in..." : "Login as Artist"}
           </Button>
         </form>
 
