@@ -30,10 +30,10 @@ const ArtistSignup = () => {
       });
     } else {
       toast({
-        title: "Artist Account Created",
-        description: "Welcome! Please check your email to verify your account.",
+        title: "Verification Required",
+        description: "Please check your email for the verification code.",
       });
-      navigate("/artist/dashboard");
+      navigate(`/auth/verify-otp?type=artist&email=${encodeURIComponent(email)}&stageName=${encodeURIComponent(stageName)}`);
     }
   };
 

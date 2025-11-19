@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Mic2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const ArtistLogin = () => {
   const [email, setEmail] = useState("");
@@ -27,11 +28,32 @@ const ArtistLogin = () => {
         variant: "destructive",
       });
     } else {
-      toast({
-        title: "Artist Login Successful",
-        description: "Welcome to your dashboard!",
-      });
-      navigate("/artist/dashboard");
+      // Check if user has artist role
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "artist")
+          .maybeSingle();
+        
+        if (roleData) {
+          toast({
+            title: "Artist Login Successful",
+            description: "Welcome to your dashboard!",
+          });
+          navigate("/artist/dashboard");
+        } else {
+          toast({
+            title: "Access Denied",
+            description: "You don't have artist access. Please sign up as an artist.",
+            variant: "destructive",
+          });
+          await supabase.auth.signOut();
+        }
+      }
     }
   };
 

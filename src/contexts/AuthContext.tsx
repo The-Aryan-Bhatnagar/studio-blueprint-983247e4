@@ -74,9 +74,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signUp = async (email: string, password: string, stageName: string) => {
-    const redirectUrl = `${window.location.origin}/artist/dashboard`;
+    const redirectUrl = `${window.location.origin}/auth/verify-otp`;
 
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -86,23 +86,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       },
     });
-
-    if (!error && data.user) {
-      // Create artist profile and role
-      const { error: profileError } = await supabase
-        .from("artist_profiles")
-        .insert({
-          user_id: data.user.id,
-          stage_name: stageName,
-        });
-
-      if (!profileError) {
-        await supabase.from("user_roles").insert({
-          user_id: data.user.id,
-          role: "artist",
-        });
-      }
-    }
 
     return { error };
   };
