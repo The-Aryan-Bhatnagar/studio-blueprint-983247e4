@@ -46,9 +46,21 @@ const VerifyOTP = () => {
         const result = await supabase.auth.verifyOtp({
           email: email,
           token: otp,
-          type: "signup",
+          type: type === "signup" ? "email" : "signup",
         });
         error = result.error;
+        
+        if (!error) {
+          // Create user profile after successful verification
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user && type === "signup") {
+            await supabase.from("profiles").insert({
+              user_id: user.id,
+              full_name: user.user_metadata?.full_name || "",
+              phone_number: user.user_metadata?.phone_number || "",
+            });
+          }
+        }
       } else if (phone) {
         const result = await supabase.auth.verifyOtp({
           phone: phone,
@@ -62,13 +74,13 @@ const VerifyOTP = () => {
 
       toast({
         title: "Verification Successful",
-        description: "Welcome to GreenBox!",
+        description: "Welcome to GreenBox! Your account is now active.",
       });
       navigate("/");
     } catch (error: any) {
       toast({
         title: "Verification Failed",
-        description: error.message || "Invalid or expired code",
+        description: error.message || "Invalid or expired code. Please try again or request a new code.",
         variant: "destructive",
       });
     } finally {
@@ -120,8 +132,11 @@ const VerifyOTP = () => {
         </div>
 
         <h1 className="text-2xl font-bold mb-2 text-center">Verify Your Account</h1>
-        <p className="text-muted-foreground text-center mb-6">
-          Enter the 6-digit code sent to {email || phone}
+        <p className="text-muted-foreground text-center mb-2">
+          Enter the 6-digit code sent to
+        </p>
+        <p className="text-sm font-medium text-center mb-6 text-primary">
+          {email || phone}
         </p>
 
         <div className="space-y-6">

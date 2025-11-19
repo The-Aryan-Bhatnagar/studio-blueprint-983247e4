@@ -21,6 +21,16 @@ const Signup = () => {
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (password.length < 6) {
+      toast({
+        title: "Invalid Password",
+        description: "Password must be at least 6 characters long",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -38,19 +48,12 @@ const Signup = () => {
 
       if (error) throw error;
 
-      if (data.user && !data.session) {
-        toast({
-          title: "Verification Required",
-          description: "Please check your email for the verification code",
-        });
-        navigate("/auth/verify-otp", { state: { email, type: "signup" } });
-      } else {
-        toast({
-          title: "Account Created",
-          description: "Welcome to GreenBox!",
-        });
-        navigate("/");
-      }
+      // Always show verification message for new signups
+      toast({
+        title: "Verification Email Sent",
+        description: "Please check your email for the 6-digit verification code",
+      });
+      navigate("/auth/verify-otp", { state: { email, type: "signup" } });
     } catch (error: any) {
       toast({
         title: "Signup Failed",
