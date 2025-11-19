@@ -6,34 +6,71 @@ import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { Mic2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const ArtistSignup = () => {
   const [name, setName] = useState("");
   const [stageName, setStageName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const { signUp } = useAuth();
-
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await signUp(email, password, stageName);
+    setIsLoading(true);
     
-    if (error) {
+    try {
+      // Sign up the user
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            stage_name: stageName,
+            full_name: name,
+          },
+        },
+      });
+
+      if (signUpError) throw signUpError;
+      if (!authData.user) throw new Error("No user returned from signup");
+
+      // Create artist profile
+      const { error: profileError } = await supabase
+        .from("artist_profiles")
+        .insert({
+          user_id: authData.user.id,
+          stage_name: stageName,
+        });
+
+      if (profileError) throw profileError;
+
+      // Assign artist role
+      const { error: roleError } = await supabase
+        .from("user_roles")
+        .insert({
+          user_id: authData.user.id,
+          role: "artist",
+        });
+
+      if (roleError) throw roleError;
+
+      toast({
+        title: "Account Created Successfully!",
+        description: "Welcome to the Artist Portal. You can now login.",
+      });
+
+      navigate("/artist/login");
+    } catch (error: any) {
       toast({
         title: "Signup Failed",
-        description: error.message,
+        description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Verification Required",
-        description: "Please check your email for the verification code.",
-      });
-      navigate(`/auth/verify-otp?type=artist&email=${encodeURIComponent(email)}&stageName=${encodeURIComponent(stageName)}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -103,8 +140,8 @@ const ArtistSignup = () => {
             />
           </div>
 
-          <Button type="submit" className="w-full bg-gradient-primary">
-            Create Artist Account
+          <Button type="submit" className="w-full bg-gradient-primary" disabled={isLoading}>
+            {isLoading ? "Creating Account..." : "Create Artist Account"}
           </Button>
         </form>
 
