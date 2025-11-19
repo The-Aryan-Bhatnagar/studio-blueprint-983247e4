@@ -49,18 +49,6 @@ const VerifyOTP = () => {
           type: type === "signup" ? "email" : "signup",
         });
         error = result.error;
-        
-        if (!error) {
-          // Create user profile after successful verification
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user && type === "signup") {
-            await supabase.from("profiles").insert({
-              user_id: user.id,
-              full_name: user.user_metadata?.full_name || "",
-              phone_number: user.user_metadata?.phone_number || "",
-            });
-          }
-        }
       } else if (phone) {
         const result = await supabase.auth.verifyOtp({
           phone: phone,
