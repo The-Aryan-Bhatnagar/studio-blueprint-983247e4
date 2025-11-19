@@ -52,9 +52,14 @@ const ArtistDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen pb-32 px-8">
-      <Tabs value={getActiveTab()} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="mb-8">
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-4xl font-bold mb-2">Artist Dashboard</h1>
+        <p className="text-muted-foreground">Manage your music and connect with your audience</p>
+      </div>
+
+      <Tabs value={getActiveTab()} onValueChange={handleTabChange} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="upload">Upload Song</TabsTrigger>
           <TabsTrigger value="songs">My Songs</TabsTrigger>
