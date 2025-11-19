@@ -4,11 +4,12 @@ import { Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface Artist {
-  id: number;
+  id: string | number;
   name: string;
   image: string;
-  followers: string;
-  genre: string;
+  followers: string | number;
+  genre?: string;
+  verified?: boolean;
 }
 
 interface ArtistCardProps {
@@ -30,7 +31,7 @@ const ArtistCard = ({ artist }: ArtistCardProps) => {
       </div>
       <div className="p-4">
         <h3 className="font-bold text-lg mb-1">{artist.name}</h3>
-        <p className="text-sm text-muted-foreground mb-2">{artist.genre}</p>
+        {artist.genre && <p className="text-sm text-muted-foreground mb-2">{artist.genre}</p>}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
             <Users className="w-4 h-4" />

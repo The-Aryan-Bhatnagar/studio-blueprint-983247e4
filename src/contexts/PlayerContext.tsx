@@ -1,5 +1,15 @@
 import React, { createContext, useContext, useState, useRef, useEffect } from "react";
-import { Song } from "@/lib/sampleSongs";
+
+export interface Song {
+  id: string | number;
+  title: string;
+  artist: string;
+  image: string;
+  audioUrl: string;
+  plays: number;
+  duration?: number | string;
+  genre?: string;
+}
 
 interface PlayerContextType {
   currentSong: Song | null;

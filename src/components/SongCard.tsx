@@ -1,11 +1,10 @@
 import { Play, Heart, MoreVertical } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { Song } from "@/lib/sampleSongs";
 
 interface SongCardProps {
-  song: Song;
-  onPlay?: (song: Song) => void;
+  song: any;
+  onPlay?: (song: any) => void;
 }
 
 const SongCard = ({ song, onPlay }: SongCardProps) => {
@@ -13,11 +12,15 @@ const SongCard = ({ song, onPlay }: SongCardProps) => {
     return null;
   }
 
+  const artistName = song.artist_profiles?.stage_name || song.artist || "Unknown Artist";
+  const coverImage = song.cover_image_url || song.image || "/placeholder.svg";
+  const plays = song.song_analytics?.total_plays || song.plays || 0;
+
   return (
     <Card className="group relative overflow-hidden bg-gradient-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-glow">
       <div className="relative aspect-square overflow-hidden">
         <img
-          src={song.image}
+          src={coverImage}
           alt={song.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
@@ -32,9 +35,9 @@ const SongCard = ({ song, onPlay }: SongCardProps) => {
       </div>
       <div className="p-4">
         <h3 className="font-semibold text-foreground truncate mb-1">{song.title}</h3>
-        <p className="text-sm text-muted-foreground truncate">{song.artist}</p>
+        <p className="text-sm text-muted-foreground truncate">{artistName}</p>
         <p className="text-xs text-muted-foreground mt-2">
-          {song.plays.toLocaleString()} plays
+          {plays.toLocaleString()} plays
         </p>
       </div>
       <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
