@@ -1,22 +1,26 @@
-import { Home, Mic2, Calendar, Users, Search as SearchIcon, Music, Upload, Bell, User } from "lucide-react";
+import { Home, Calendar, Users, Search as SearchIcon, Music, Bell, User, LogOut, Heart, ListMusic, Settings } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   const navItems = [
     { icon: Music, label: "Library", path: "/library" },
     { icon: Users, label: "Community", path: "/community" },
     { icon: Calendar, label: "Events", path: "/events" },
-  ];
-
-  const artistItems = [
-    { icon: Mic2, label: "Artist", path: "/artist" },
-    { icon: Upload, label: "Dashboard", path: "/artist/dashboard" },
   ];
 
   return (
@@ -53,7 +57,7 @@ const Header = () => {
 
       {/* GreenBox Brand Name */}
       <div className="flex-1 flex justify-center">
-        <h1 className="text-2xl font-bold text-foreground">GreenBox</h1>
+        <h1 className="text-2xl font-bold text-primary">GreenBox</h1>
       </div>
 
       {/* Navigation Items */}
@@ -75,38 +79,52 @@ const Header = () => {
         ))}
       </nav>
 
-      {/* Divider */}
-      <div className="h-6 w-px bg-border hidden xl:block" />
-
-      {/* Artist Section */}
-      <nav className="hidden xl:flex items-center gap-2">
-        {artistItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all",
-              location.pathname === item.path
-                ? "bg-secondary text-primary"
-                : "text-muted-foreground hover:bg-secondary/50"
-            )}
-          >
-            <item.icon className="w-4 h-4" />
-            <span>{item.label}</span>
-          </Link>
-        ))}
-      </nav>
-
       {/* Right Actions */}
       <div className="flex items-center gap-2 ml-auto">
         <Button variant="ghost" size="icon" className="rounded-full">
           <Bell className="w-5 h-5" />
         </Button>
-        <Link to="/profile">
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <User className="w-5 h-5" />
+        
+        {user ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <User className="w-5 h-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => navigate("/profile")}>
+                <User className="w-4 h-4 mr-2" />
+                My Account
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/library")}>
+                <ListMusic className="w-4 h-4 mr-2" />
+                My Playlists
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/library")}>
+                <Heart className="w-4 h-4 mr-2" />
+                My Liked Songs
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/profile")}>
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={signOut} className="text-destructive">
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Button 
+            onClick={() => navigate("/auth/login")} 
+            variant="default"
+            className="rounded-full"
+          >
+            Login
           </Button>
-        </Link>
+        )}
       </div>
     </header>
   );
