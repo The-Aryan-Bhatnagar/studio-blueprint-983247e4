@@ -3,27 +3,44 @@ import SongCard from "@/components/SongCard";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { sampleSongs } from "@/lib/sampleSongs";
-import { sampleArtists } from "@/lib/sampleArtists";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { useToast } from "@/hooks/use-toast";
+import { usePublicSongs, usePublicArtists } from "@/hooks/usePublicSongs";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Discover = () => {
   const navigate = useNavigate();
   const { playSong, setQueue } = usePlayer();
   const { toast } = useToast();
+  const { data: songs = [], isLoading: songsLoading } = usePublicSongs();
+  const { data: artists = [], isLoading: artistsLoading } = usePublicArtists();
 
-  const trendingSongs = sampleSongs.slice(0, 4);
-  const newReleases = sampleSongs.slice(4, 8);
-  const recommendedToday = sampleSongs.slice(2, 6);
-  const biggestHits = sampleSongs.slice(0, 4);
+  const trendingSongs = songs.slice(0, 4);
+  const newReleases = songs.slice(4, 8);
+  const recommendedToday = songs.slice(2, 6);
+  const biggestHits = songs.slice(0, 4);
 
-  const handlePlaySong = (song: typeof sampleSongs[0]) => {
-    setQueue(sampleSongs);
-    playSong(song);
+  const handlePlaySong = (song: any) => {
+    const formattedSongs = songs.map(s => ({
+      id: s.id,
+      title: s.title,
+      artist: s.artist_profiles?.stage_name || "Unknown Artist",
+      image: s.cover_image_url || "/placeholder.svg",
+      audioUrl: s.audio_url,
+      plays: s.song_analytics?.total_plays || 0,
+    }));
+    setQueue(formattedSongs);
+    playSong({
+      id: song.id,
+      title: song.title,
+      artist: song.artist_profiles?.stage_name || "Unknown Artist",
+      image: song.cover_image_url || "/placeholder.svg",
+      audioUrl: song.audio_url,
+      plays: song.song_analytics?.total_plays || 0,
+    });
     toast({
       title: "Now Playing",
-      description: `${song.title} by ${song.artist}`,
+      description: `${song.title} by ${song.artist_profiles?.stage_name || "Unknown Artist"}`,
     });
   };
 
@@ -68,11 +85,30 @@ const Discover = () => {
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {sampleArtists.map((artist) => (
-            <ArtistCard key={artist.id} artist={artist} />
-          ))}
-        </div>
+        {artistsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="aspect-square rounded-full" />
+            ))}
+          </div>
+        ) : artists.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {artists.map((artist) => (
+              <ArtistCard 
+                key={artist.id} 
+                artist={{
+                  id: artist.id,
+                  name: artist.stage_name,
+                  image: artist.avatar_url || "/placeholder.svg",
+                  followers: artist.total_followers?.toString() || "0",
+                  verified: false,
+                }}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-center py-8">No artists yet.</p>
+        )}
       </section>
 
       {/* Trending Section */}
@@ -84,11 +120,21 @@ const Discover = () => {
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {trendingSongs.map((song) => (
-            <SongCard key={song.id} song={song} onPlay={handlePlaySong} />
-          ))}
-        </div>
+        {songsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="aspect-square rounded-lg" />
+            ))}
+          </div>
+        ) : trendingSongs.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {trendingSongs.map((song) => (
+              <SongCard key={song.id} song={song} onPlay={handlePlaySong} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-center py-8">No songs available yet.</p>
+        )}
       </section>
 
       {/* Recommended for Today */}

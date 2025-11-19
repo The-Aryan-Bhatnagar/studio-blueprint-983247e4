@@ -3,16 +3,18 @@ import SongCard from "@/components/SongCard";
 import ArtistCard from "@/components/ArtistCard";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { sampleSongs } from "@/lib/sampleSongs";
-import { sampleArtists } from "@/lib/sampleArtists";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { usePublicSongs, usePublicArtists } from "@/hooks/usePublicSongs";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Home = () => {
   const { playSong, setQueue } = usePlayer();
   const { toast } = useToast();
   const [userName, setUserName] = useState("Guest");
+  const { data: songs = [], isLoading: songsLoading } = usePublicSongs();
+  const { data: artists = [], isLoading: artistsLoading } = usePublicArtists();
 
   useEffect(() => {
     loadUserName();
@@ -26,7 +28,7 @@ const Home = () => {
           .from("profiles")
           .select("full_name")
           .eq("user_id", user.id)
-          .single();
+          .maybeSingle();
         
         if (profile?.full_name) {
           setUserName(profile.full_name);
@@ -37,16 +39,31 @@ const Home = () => {
     }
   };
   
-  const topMixes = sampleSongs.slice(0, 4);
-  const popularArtists = sampleArtists.slice(0, 4);
-  const recentlyPlayed = sampleSongs.slice(4, 8);
+  const topMixes = songs.slice(0, 4);
+  const popularArtists = artists.slice(0, 4);
+  const recentlyPlayed = songs.slice(4, 8);
 
-  const handlePlaySong = (song: typeof sampleSongs[0]) => {
-    setQueue(sampleSongs);
-    playSong(song);
+  const handlePlaySong = (song: any) => {
+    const formattedSongs = songs.map(s => ({
+      id: s.id,
+      title: s.title,
+      artist: s.artist_profiles?.stage_name || "Unknown Artist",
+      image: s.cover_image_url || "/placeholder.svg",
+      audioUrl: s.audio_url,
+      plays: s.song_analytics?.total_plays || 0,
+    }));
+    setQueue(formattedSongs);
+    playSong({
+      id: song.id,
+      title: song.title,
+      artist: song.artist_profiles?.stage_name || "Unknown Artist",
+      image: song.cover_image_url || "/placeholder.svg",
+      audioUrl: song.audio_url,
+      plays: song.song_analytics?.total_plays || 0,
+    });
     toast({
       title: "Now Playing",
-      description: `${song.title} by ${song.artist}`,
+      description: `${song.title} by ${song.artist_profiles?.stage_name || "Unknown Artist"}`,
     });
   };
 
@@ -67,11 +84,21 @@ const Home = () => {
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {topMixes.map((song) => (
-            <SongCard key={song.id} song={song} onPlay={handlePlaySong} />
-          ))}
-        </div>
+        {songsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="aspect-square rounded-lg" />
+            ))}
+          </div>
+        ) : topMixes.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {topMixes.map((song) => (
+              <SongCard key={song.id} song={song} onPlay={handlePlaySong} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-center py-8">No songs available yet. Artists can upload music!</p>
+        )}
       </section>
 
       {/* Popular Artists */}
@@ -83,11 +110,30 @@ const Home = () => {
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {popularArtists.map((artist) => (
-            <ArtistCard key={artist.id} artist={artist} />
-          ))}
-        </div>
+        {artistsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="aspect-square rounded-full" />
+            ))}
+          </div>
+        ) : popularArtists.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {popularArtists.map((artist) => (
+              <ArtistCard 
+                key={artist.id} 
+                artist={{
+                  id: artist.id,
+                  name: artist.stage_name,
+                  image: artist.avatar_url || "/placeholder.svg",
+                  followers: artist.total_followers?.toString() || "0",
+                  verified: false,
+                }}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-center py-8">No artists yet.</p>
+        )}
       </section>
 
       {/* Recently Played */}
@@ -99,11 +145,19 @@ const Home = () => {
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {recentlyPlayed.map((song) => (
-            <SongCard key={song.id} song={song} onPlay={handlePlaySong} />
-          ))}
-        </div>
+        {songsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="aspect-square rounded-lg" />
+            ))}
+          </div>
+        ) : recentlyPlayed.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {recentlyPlayed.map((song) => (
+              <SongCard key={song.id} song={song} onPlay={handlePlaySong} />
+            ))}
+          </div>
+        ) : null}
       </section>
     </div>
   );

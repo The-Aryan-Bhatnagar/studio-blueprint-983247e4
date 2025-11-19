@@ -1,5 +1,5 @@
 export interface Song {
-  id: number;
+  id: string | number;
   title: string;
   artist: string;
   image: string;
@@ -11,7 +11,7 @@ export interface Song {
 
 export const sampleSongs: Song[] = [
   {
-    id: 1,
+    id: "1",
     title: "Desi Kalakaar",
     artist: "Honey Singh",
     image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop",
@@ -21,7 +21,7 @@ export const sampleSongs: Song[] = [
     genre: "Punjabi Pop",
   },
   {
-    id: 2,
+    id: "2",
     title: "Dheere Dheere",
     artist: "Honey Singh",
     image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop",
@@ -31,7 +31,7 @@ export const sampleSongs: Song[] = [
     genre: "Romantic",
   },
   {
-    id: 3,
+    id: "3",
     title: "Dope Shope",
     artist: "Honey Singh",
     image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=400&fit=crop",
@@ -41,7 +41,7 @@ export const sampleSongs: Song[] = [
     genre: "Hip Hop",
   },
   {
-    id: 4,
+    id: "4",
     title: "Get Up Jawani",
     artist: "Honey Singh",
     image: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&h=400&fit=crop",
@@ -51,7 +51,7 @@ export const sampleSongs: Song[] = [
     genre: "Party",
   },
   {
-    id: 5,
+    id: "5",
     title: "Haye Mera Dil",
     artist: "Honey Singh",
     image: "https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=400&h=400&fit=crop",
@@ -61,7 +61,7 @@ export const sampleSongs: Song[] = [
     genre: "Romantic",
   },
   {
-    id: 6,
+    id: "6",
     title: "High Heels",
     artist: "Honey Singh",
     image: "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=400&h=400&fit=crop",
@@ -71,7 +71,7 @@ export const sampleSongs: Song[] = [
     genre: "Party",
   },
   {
-    id: 7,
+    id: "7",
     title: "Mere Mehboob Qayamat Hogi",
     artist: "Honey Singh",
     image: "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&h=400&fit=crop",
@@ -81,7 +81,7 @@ export const sampleSongs: Song[] = [
     genre: "Romantic",
   },
   {
-    id: 8,
+    id: "8",
     title: "Raat Jashan Di",
     artist: "Honey Singh",
     image: "https://images.unsplash.com/photo-1499415479124-43c32433a620?w=400&h=400&fit=crop",
@@ -91,7 +91,7 @@ export const sampleSongs: Song[] = [
     genre: "Party",
   },
   {
-    id: 9,
+    id: "9",
     title: "Superman",
     artist: "Honey Singh",
     image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop",
@@ -101,7 +101,7 @@ export const sampleSongs: Song[] = [
     genre: "Hip Hop",
   },
   {
-    id: 10,
+    id: "10",
     title: "Yaar Bathere",
     artist: "Honey Singh",
     image: "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=400&h=400&fit=crop",
