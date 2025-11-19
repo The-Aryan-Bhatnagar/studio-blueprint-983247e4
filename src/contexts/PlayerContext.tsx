@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useRef, useEffect } from "react";
+import { usePlayTracking } from "@/hooks/usePlayTracking";
 
 export interface Song {
   id: string | number;
@@ -37,6 +38,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   const [volume, setVolumeState] = useState(75);
   const [queue, setQueue] = useState<Song[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { startTracking, stopTracking } = usePlayTracking();
 
   useEffect(() => {
     if (!audioRef.current) {
@@ -61,10 +63,18 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
   const playSong = (song: Song) => {
     if (audioRef.current) {
+      // Stop tracking previous song if any
+      if (currentSong) {
+        stopTracking(String(currentSong.id));
+      }
+      
       audioRef.current.src = song.audioUrl;
       audioRef.current.play();
       setCurrentSong(song);
       setIsPlaying(true);
+      
+      // Start tracking play count for new song
+      startTracking(String(song.id));
     }
   };
 
@@ -72,8 +82,16 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
+        // Stop tracking when paused
+        if (currentSong) {
+          stopTracking(String(currentSong.id));
+        }
       } else {
         audioRef.current.play();
+        // Resume tracking when playing again
+        if (currentSong) {
+          startTracking(String(currentSong.id));
+        }
       }
       setIsPlaying(!isPlaying);
     }
