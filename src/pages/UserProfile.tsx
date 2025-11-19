@@ -8,11 +8,13 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Phone, LogOut, Camera } from "lucide-react";
+import AvatarUpload from "@/components/AvatarUpload";
 
 const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const { toast } = useToast();
@@ -33,7 +35,7 @@ const UserProfile = () => {
 
       setUser(authUser);
 
-      const { data: profile, error } = await supabase
+      const { data: profileData, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("user_id", authUser.id)
@@ -41,9 +43,10 @@ const UserProfile = () => {
 
       if (error && error.code !== "PGRST116") throw error;
 
-      if (profile) {
-        setFullName(profile.full_name || "");
-        setPhoneNumber(profile.phone_number || "");
+      if (profileData) {
+        setProfile(profileData);
+        setFullName(profileData.full_name || "");
+        setPhoneNumber(profileData.phone_number || "");
       }
     } catch (error: any) {
       toast({
@@ -119,21 +122,10 @@ const UserProfile = () => {
         {/* Profile Picture Section */}
         <Card className="p-8 mb-6">
           <div className="flex items-center gap-6 mb-6">
-            <div className="relative">
-              <Avatar className="w-24 h-24">
-                <AvatarImage src="" />
-                <AvatarFallback className="bg-gradient-primary text-2xl">
-                  {fullName?.charAt(0) || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <Button
-                size="icon"
-                variant="secondary"
-                className="absolute -bottom-2 -right-2 rounded-full w-8 h-8"
-              >
-                <Camera className="w-4 h-4" />
-              </Button>
-            </div>
+            <AvatarUpload
+              currentAvatarUrl={profile?.avatar_url}
+              userName={fullName}
+            />
             <div>
               <h2 className="text-2xl font-bold">{fullName || "User"}</h2>
               <p className="text-muted-foreground">{user?.email}</p>
