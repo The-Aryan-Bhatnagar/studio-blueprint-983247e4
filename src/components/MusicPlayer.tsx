@@ -3,6 +3,8 @@ import { Button } from "./ui/button";
 import { Slider } from "./ui/slider";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { useToast } from "@/hooks/use-toast";
+import { useSongLikes } from "@/hooks/useSongLikes";
+import { useAuth } from "@/contexts/AuthContext";
 
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60);
@@ -30,11 +32,23 @@ const MusicPlayer = () => {
     playPrevious,
   } = usePlayer();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { isLiked, toggleLike, isLoading } = useSongLikes(currentSong?.id?.toString());
 
   const handleLike = () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to like songs",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toggleLike();
     toast({
-      title: "Added to Liked Songs",
-      description: `${currentSong?.title} has been added to your library`,
+      title: isLiked ? "Removed from Liked Songs" : "Added to Liked Songs",
+      description: `${currentSong?.title} has been ${isLiked ? "removed from" : "added to"} your library`,
     });
   };
 
@@ -64,8 +78,9 @@ const MusicPlayer = () => {
                   variant="ghost"
                   className="flex-shrink-0 hover:text-primary"
                   onClick={handleLike}
+                  disabled={isLoading}
                 >
-                  <Heart className="w-5 h-5" />
+                  <Heart className={`w-5 h-5 ${isLiked ? "fill-primary text-primary" : ""}`} />
                 </Button>
               </>
             ) : (
