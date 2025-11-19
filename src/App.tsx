@@ -40,10 +40,8 @@ const App = () => (
             <Toaster />
             <Sonner />
             <Routes>
-              {/* Public Landing Page */}
-              <Route path="/" element={<Landing />} />
-              
               {/* Auth Routes - No Layout */}
+              <Route path="/welcome" element={<Landing />} />
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/signup" element={<Signup />} />
               <Route path="/auth/verify-otp" element={<VerifyOTP />} />
@@ -54,7 +52,7 @@ const App = () => (
               <Route path="/admin/login" element={<AdminLogin />} />
               
               {/* User Routes - Regular Layout with Music Player */}
-              <Route path="/home" element={<Layout><ProtectedRoute><Home /></ProtectedRoute></Layout>} />
+              <Route path="/" element={<Layout><ProtectedRoute><Home /></ProtectedRoute></Layout>} />
               <Route path="/discover" element={<Layout><ProtectedRoute><Discover /></ProtectedRoute></Layout>} />
               <Route path="/search" element={<Layout><ProtectedRoute><Search /></ProtectedRoute></Layout>} />
               <Route path="/library" element={<Layout><ProtectedRoute><Library /></ProtectedRoute></Layout>} />
