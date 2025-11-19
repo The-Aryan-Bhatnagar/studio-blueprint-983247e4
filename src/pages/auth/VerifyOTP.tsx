@@ -46,7 +46,7 @@ const VerifyOTP = () => {
         const result = await supabase.auth.verifyOtp({
           email: email,
           token: otp,
-          type: type === "signup" ? "email" : "signup",
+          type: "email",
         });
         error = result.error;
       } else if (phone) {
