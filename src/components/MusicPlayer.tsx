@@ -17,9 +17,15 @@ const MusicPlayer = () => {
     currentTime,
     duration,
     volume,
+    isMuted,
+    isRepeat,
+    isShuffle,
     togglePlay,
     seekTo,
     setVolume,
+    toggleMute,
+    toggleRepeat,
+    toggleShuffle,
     playNext,
     playPrevious,
   } = usePlayer();
@@ -80,7 +86,13 @@ const MusicPlayer = () => {
           {/* Player Controls */}
           <div className="flex-1 max-w-2xl">
             <div className="flex items-center justify-center gap-4 mb-2">
-              <Button size="icon" variant="ghost" disabled={!currentSong}>
+              <Button 
+                size="icon" 
+                variant="ghost" 
+                disabled={!currentSong}
+                onClick={toggleShuffle}
+                className={isShuffle ? "text-primary" : ""}
+              >
                 <Shuffle className="w-4 h-4" />
               </Button>
               <Button
@@ -111,7 +123,13 @@ const MusicPlayer = () => {
               >
                 <SkipForward className="w-5 h-5" />
               </Button>
-              <Button size="icon" variant="ghost" disabled={!currentSong}>
+              <Button 
+                size="icon" 
+                variant="ghost" 
+                disabled={!currentSong}
+                onClick={toggleRepeat}
+                className={isRepeat ? "text-primary" : ""}
+              >
                 <Repeat className="w-4 h-4" />
               </Button>
             </div>
@@ -135,9 +153,16 @@ const MusicPlayer = () => {
 
           {/* Volume Control */}
           <div className="flex items-center gap-3 flex-1 justify-end">
-            <Volume2 className="w-5 h-5 text-muted-foreground" />
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={toggleMute}
+              className="flex-shrink-0"
+            >
+              <Volume2 className={`w-5 h-5 ${isMuted ? "text-muted-foreground/50" : "text-muted-foreground"}`} />
+            </Button>
             <Slider
-              value={[volume]}
+              value={[isMuted ? 0 : volume]}
               onValueChange={([value]) => setVolume(value)}
               max={100}
               step={1}
