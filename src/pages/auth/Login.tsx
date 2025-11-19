@@ -28,7 +28,19 @@ const Login = () => {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Check if it's an email not confirmed error
+        if (error.message.includes("Email not confirmed")) {
+          toast({
+            title: "Email Not Verified",
+            description: "Please verify your email before logging in. Check your inbox for the verification code.",
+            variant: "destructive",
+          });
+          navigate("/auth/verify-otp", { state: { email, type: "signup" } });
+          return;
+        }
+        throw error;
+      }
 
       toast({
         title: "Login Successful",
