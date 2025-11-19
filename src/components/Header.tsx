@@ -1,4 +1,4 @@
-import { Home, Calendar, Users, Search as SearchIcon, Music, Bell, User, LogOut, Heart, ListMusic, Settings } from "lucide-react";
+import { Home, Calendar, Users, Search as SearchIcon, Music, Bell, User, LogOut, Heart, ListMusic, Settings, Mic2 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
@@ -108,6 +108,11 @@ const Header = () => {
               <DropdownMenuItem onClick={() => navigate("/profile")}>
                 <Settings className="w-4 h-4 mr-2" />
                 Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/artist/login")}>
+                <Mic2 className="w-4 h-4 mr-2" />
+                Are you an artist?
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={signOut} className="text-destructive">

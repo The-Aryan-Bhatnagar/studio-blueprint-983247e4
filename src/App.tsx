@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { PlayerProvider } from "./contexts/PlayerContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import Layout from "./components/Layout";
+import ArtistLayout from "./components/ArtistLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Discover from "./pages/Discover";
@@ -37,30 +38,36 @@ const App = () => (
           <PlayerProvider>
             <Toaster />
             <Sonner />
-            <Layout>
-              <Routes>
-          <Route path="/auth/login" element={<Login />} />
-          <Route path="/auth/signup" element={<Signup />} />
-          <Route path="/auth/verify-otp" element={<VerifyOTP />} />
-          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-          <Route path="/auth/reset-password" element={<ResetPassword />} />
-                <Route path="/artist/login" element={<ArtistLogin />} />
-                <Route path="/artist/signup" element={<ArtistSignup />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
-                
-          <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route path="/discover" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
-          <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
-          <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
-          <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
-          <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
-                <Route path="/artist" element={<ProtectedRoute><ArtistProfile /></ProtectedRoute>} />
-                <Route path="/artist/dashboard" element={<ProtectedRoute><ArtistDashboard /></ProtectedRoute>} />
-                <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Layout>
+            <Routes>
+              {/* Auth Routes - No Layout */}
+              <Route path="/auth/login" element={<Login />} />
+              <Route path="/auth/signup" element={<Signup />} />
+              <Route path="/auth/verify-otp" element={<VerifyOTP />} />
+              <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+              <Route path="/auth/reset-password" element={<ResetPassword />} />
+              <Route path="/artist/login" element={<ArtistLogin />} />
+              <Route path="/artist/signup" element={<ArtistSignup />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              
+              {/* User Routes - Regular Layout with Music Player */}
+              <Route path="/" element={<Layout><ProtectedRoute><Home /></ProtectedRoute></Layout>} />
+              <Route path="/discover" element={<Layout><ProtectedRoute><Discover /></ProtectedRoute></Layout>} />
+              <Route path="/search" element={<Layout><ProtectedRoute><Search /></ProtectedRoute></Layout>} />
+              <Route path="/library" element={<Layout><ProtectedRoute><Library /></ProtectedRoute></Layout>} />
+              <Route path="/community" element={<Layout><ProtectedRoute><Community /></ProtectedRoute></Layout>} />
+              <Route path="/events" element={<Layout><ProtectedRoute><Events /></ProtectedRoute></Layout>} />
+              <Route path="/profile" element={<Layout><ProtectedRoute><UserProfile /></ProtectedRoute></Layout>} />
+              
+              {/* Artist Routes - Artist Layout (No Music Player) */}
+              <Route path="/artist" element={<Layout><ProtectedRoute><ArtistProfile /></ProtectedRoute></Layout>} />
+              <Route path="/artist/dashboard" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
+              
+              {/* Admin Routes - Regular Layout */}
+              <Route path="/admin" element={<Layout><ProtectedRoute><AdminDashboard /></ProtectedRoute></Layout>} />
+              
+              {/* 404 */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </PlayerProvider>
         </AuthProvider>
       </BrowserRouter>
