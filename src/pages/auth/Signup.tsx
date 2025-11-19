@@ -42,7 +42,7 @@ const Signup = () => {
             full_name: fullName,
             phone_number: phone,
           },
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/auth/verify-otp`,
         },
       });
 
