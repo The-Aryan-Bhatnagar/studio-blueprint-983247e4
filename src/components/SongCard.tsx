@@ -1,6 +1,14 @@
 import { Play, Heart, MoreVertical } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { AddToPlaylistDialog } from "@/components/AddToPlaylistDialog";
+import { useState } from "react";
 
 interface SongCardProps {
   song: any;
@@ -8,6 +16,8 @@ interface SongCardProps {
 }
 
 const SongCard = ({ song, onPlay }: SongCardProps) => {
+  const [showPlaylistDialog, setShowPlaylistDialog] = useState(false);
+  
   if (!song) {
     return null;
   }
@@ -48,13 +58,28 @@ const SongCard = ({ song, onPlay }: SongCardProps) => {
         >
           <Heart className="w-4 h-4" />
         </Button>
-        <Button
-          size="icon"
-          variant="secondary"
-          className="h-8 w-8 bg-background/80 backdrop-blur-sm"
-        >
-          <MoreVertical className="w-4 h-4" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="icon"
+              variant="secondary"
+              className="h-8 w-8 bg-background/80 backdrop-blur-sm"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setShowPlaylistDialog(true)}>
+              Add to Playlist
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        {showPlaylistDialog && (
+          <AddToPlaylistDialog 
+            songId={song.id} 
+            trigger={<div style={{ display: 'none' }} />}
+          />
+        )}
       </div>
     </Card>
   );

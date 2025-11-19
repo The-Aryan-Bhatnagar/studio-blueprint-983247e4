@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const Header = () => {
   const location = useLocation();
@@ -81,9 +82,7 @@ const Header = () => {
 
       {/* Right Actions */}
       <div className="flex items-center gap-2 ml-auto">
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <Bell className="w-5 h-5" />
-        </Button>
+        {user && <NotificationBell />}
         
         {user ? (
           <DropdownMenu>
