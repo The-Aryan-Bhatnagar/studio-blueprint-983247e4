@@ -91,7 +91,7 @@ const MusicPlayer = () => {
                 variant="ghost" 
                 disabled={!currentSong}
                 onClick={toggleShuffle}
-                className={isShuffle ? "text-primary" : ""}
+                className={isShuffle ? "text-primary bg-primary/20 border border-primary/30" : ""}
               >
                 <Shuffle className="w-4 h-4" />
               </Button>
@@ -128,7 +128,7 @@ const MusicPlayer = () => {
                 variant="ghost" 
                 disabled={!currentSong}
                 onClick={toggleRepeat}
-                className={isRepeat ? "text-primary" : ""}
+                className={isRepeat ? "text-primary bg-primary/20 border border-primary/30" : ""}
               >
                 <Repeat className="w-4 h-4" />
               </Button>
