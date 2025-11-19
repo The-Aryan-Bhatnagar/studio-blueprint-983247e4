@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Music } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,15 +18,19 @@ const VerifyOTP = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const email = location.state?.email;
   const phone = location.state?.phone;
   const type = location.state?.type || "signup";
+  const isArtist = searchParams.get("type") === "artist";
+  const artistEmail = searchParams.get("email");
+  const stageName = searchParams.get("stageName");
 
   useEffect(() => {
-    if (!email && !phone) {
+    if (!email && !phone && !artistEmail) {
       navigate("/auth/signup");
     }
-  }, [email, phone, navigate]);
+  }, [email, phone, artistEmail, navigate]);
 
   const handleVerify = async () => {
     if (otp.length !== 6) {
@@ -41,14 +45,38 @@ const VerifyOTP = () => {
     setLoading(true);
     try {
       let error;
+      const verifyEmail = email || artistEmail;
       
-      if (email) {
+      if (verifyEmail) {
         const result = await supabase.auth.verifyOtp({
-          email: email,
+          email: verifyEmail,
           token: otp,
           type: "email",
         });
         error = result.error;
+        
+        // If artist signup and verification successful, create profile and role
+        if (!error && isArtist && stageName) {
+          const { data: { user } } = await supabase.auth.getUser();
+          
+          if (user) {
+            // Create artist profile
+            const { error: profileError } = await supabase
+              .from("artist_profiles")
+              .insert({
+                user_id: user.id,
+                stage_name: stageName,
+              });
+
+            if (!profileError) {
+              // Create artist role
+              await supabase.from("user_roles").insert({
+                user_id: user.id,
+                role: "artist",
+              });
+            }
+          }
+        }
       } else if (phone) {
         const result = await supabase.auth.verifyOtp({
           phone: phone,
@@ -62,9 +90,9 @@ const VerifyOTP = () => {
 
       toast({
         title: "Verification Successful",
-        description: "Welcome to GreenBox! Your account is now active.",
+        description: isArtist ? "Welcome to your artist dashboard!" : "Welcome to GreenBox! Your account is now active.",
       });
-      navigate("/");
+      navigate(isArtist ? "/artist/dashboard" : "/");
     } catch (error: any) {
       toast({
         title: "Verification Failed",
@@ -79,10 +107,11 @@ const VerifyOTP = () => {
   const handleResend = async () => {
     setResending(true);
     try {
-      if (email) {
+      const resendEmail = email || artistEmail;
+      if (resendEmail) {
         const { error } = await supabase.auth.resend({
           type: "signup",
-          email: email,
+          email: resendEmail,
         });
         if (error) throw error;
       } else if (phone) {
@@ -115,7 +144,7 @@ const VerifyOTP = () => {
             <Music className="w-7 h-7" />
           </div>
           <span className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            GreenBox
+            {isArtist ? "Artist Portal" : "GreenBox"}
           </span>
         </div>
 
@@ -124,7 +153,7 @@ const VerifyOTP = () => {
           Enter the 6-digit code sent to
         </p>
         <p className="text-sm font-medium text-center mb-6 text-primary">
-          {email || phone}
+          {email || artistEmail || phone}
         </p>
 
         <div className="space-y-6">
