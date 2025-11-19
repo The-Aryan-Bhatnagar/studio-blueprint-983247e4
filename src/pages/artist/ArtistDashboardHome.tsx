@@ -102,6 +102,57 @@ const ArtistDashboardHome = () => {
         </Card>
       </div>
 
+      {/* Top Songs by Plays */}
+      <Card className="p-6 border-border">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <Play className="w-5 h-5 text-primary" />
+          Top Performing Songs
+        </h2>
+        <div className="space-y-3">
+          {songs && songs.length > 0 ? (
+            songs
+              .filter(song => song.is_published)
+              .sort((a, b) => (b.song_analytics?.[0]?.total_plays || 0) - (a.song_analytics?.[0]?.total_plays || 0))
+              .slice(0, 5)
+              .map((song) => {
+                const plays = song.song_analytics?.[0]?.total_plays || 0;
+                const likes = song.song_analytics?.[0]?.total_likes || 0;
+                return (
+                  <div key={song.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors">
+                    <div className="flex items-center gap-3">
+                      {song.cover_image_url ? (
+                        <img src={song.cover_image_url} alt={song.title} className="w-10 h-10 rounded object-cover" />
+                      ) : (
+                        <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center">
+                          <Music className="w-5 h-5 text-primary" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-medium">{song.title}</p>
+                        <p className="text-xs text-muted-foreground">{song.genre || 'No genre'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-1">
+                        <Play className="w-4 h-4 text-primary" />
+                        <span className="font-semibold">{plays.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Heart className="w-4 h-4 text-red-500" />
+                        <span className="text-sm text-muted-foreground">{likes.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+          ) : (
+            <div className="text-center py-6 text-muted-foreground">
+              <p className="text-sm">No published songs yet. Upload your first song to see analytics!</p>
+            </div>
+          )}
+        </div>
+      </Card>
+
       {/* Insights */}
       <Card className="p-6 border-border">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
