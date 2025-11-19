@@ -60,7 +60,7 @@ const SongUpload = () => {
     return publicUrl;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, isDraft: boolean) => {
     e.preventDefault();
 
     if (!formData.title || (!formData.audio_url && !audioFile)) {
@@ -95,12 +95,14 @@ const SongUpload = () => {
         featured_artists: formData.featured_artists ? formData.featured_artists.split(",").map(a => a.trim()) : [],
         tags: formData.tags ? formData.tags.split(",").map(t => t.trim()) : [],
         scheduled_release_at: formData.is_scheduled && formData.scheduled_release_at ? new Date(formData.scheduled_release_at).toISOString() : null,
+        is_draft: isDraft,
+        is_published: !isDraft && !formData.is_scheduled,
       };
 
       await createSong.mutateAsync(songData);
       toast({
         title: "Song Uploaded Successfully",
-        description: `${formData.title} has been saved as ${formData.is_draft ? "draft" : "published"}!`,
+        description: `${formData.title} has been saved as ${isDraft ? "draft" : "published"}!`,
       });
       navigate("/artist/dashboard/songs");
     } catch (error: any) {
@@ -121,7 +123,7 @@ const SongUpload = () => {
         <p className="text-muted-foreground">Share your music with the world</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
         <Card className="p-6 border-border">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
             <Upload className="w-5 h-5 text-primary" />
@@ -338,18 +340,18 @@ const SongUpload = () => {
 
         <div className="flex gap-3">
           <Button
-            type="submit"
+            type="button"
             className="bg-gradient-primary"
             disabled={uploading || createSong.isPending}
-            onClick={() => setFormData({ ...formData, is_draft: false, is_published: !formData.is_scheduled })}
+            onClick={(e) => handleSubmit(e as any, false)}
           >
             {uploading ? "Uploading..." : formData.is_scheduled ? "Schedule Song" : "Publish Now"}
           </Button>
           <Button
-            type="submit"
+            type="button"
             variant="outline"
             disabled={uploading || createSong.isPending}
-            onClick={() => setFormData({ ...formData, is_draft: true, is_published: false })}
+            onClick={(e) => handleSubmit(e as any, true)}
           >
             {uploading ? "Uploading..." : "Save as Draft"}
           </Button>
