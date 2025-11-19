@@ -61,6 +61,9 @@ const App = () => (
               {/* Artist Routes - Artist Layout (No Music Player) */}
               <Route path="/artist" element={<Layout><ProtectedRoute><ArtistProfile /></ProtectedRoute></Layout>} />
               <Route path="/artist/dashboard" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
+              <Route path="/artist/dashboard/upload" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
+              <Route path="/artist/dashboard/songs" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
+              <Route path="/artist/dashboard/settings" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
               
               {/* Admin Routes - Regular Layout */}
               <Route path="/admin" element={<Layout><ProtectedRoute><AdminDashboard /></ProtectedRoute></Layout>} />
