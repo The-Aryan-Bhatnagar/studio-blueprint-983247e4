@@ -101,7 +101,7 @@ const SongManagement = () => {
             </TableHeader>
             <TableBody>
               {songs.map((song) => {
-                const analytics = song.song_analytics?.[0];
+                const analytics = song.song_analytics;
                 return (
                   <TableRow key={song.id}>
                     <TableCell>
