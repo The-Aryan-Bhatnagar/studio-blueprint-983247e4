@@ -40,7 +40,7 @@ const ArtistCard = ({ artist }: ArtistCardProps) => {
           <Button
             size="sm"
             variant="secondary"
-            onClick={() => navigate("/artist")}
+            onClick={() => navigate(`/artist/${artist.id}`)}
           >
             View Profile
           </Button>
