@@ -1,10 +1,11 @@
-import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Shuffle, Repeat } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Shuffle, Repeat, MessageSquare } from "lucide-react";
 import { Button } from "./ui/button";
 import { Slider } from "./ui/slider";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSongLikes } from "@/hooks/useSongLikes";
 import { useAuth } from "@/contexts/AuthContext";
+import CommentsDialog from "./CommentsDialog";
 
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60);
@@ -82,6 +83,9 @@ const MusicPlayer = () => {
                 >
                   <Heart className={`w-5 h-5 ${isLiked ? "fill-primary text-primary" : ""}`} />
                 </Button>
+                {currentSong && (
+                  <CommentsDialog songId={currentSong.id.toString()} songTitle={currentSong.title} />
+                )}
               </>
             ) : (
               <>
