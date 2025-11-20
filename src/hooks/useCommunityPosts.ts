@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { postContentSchema } from "@/lib/validations";
 
 export const useCommunityPosts = (artistId?: string) => {
   return useQuery({
@@ -43,6 +44,12 @@ export const useCreatePost = () => {
       media_url?: string;
       media_type?: "image" | "video";
     }) => {
+      // Validate content
+      const validation = postContentSchema.safeParse({ content: post.content });
+      if (!validation.success) {
+        throw new Error(validation.error.errors[0].message);
+      }
+
       const { data, error } = await supabase
         .from("community_posts")
         .insert(post)
@@ -84,6 +91,14 @@ export const useUpdatePost = () => {
         is_popular?: boolean;
       };
     }) => {
+      // Validate content if it's being updated
+      if (updates.content) {
+        const validation = postContentSchema.safeParse({ content: updates.content });
+        if (!validation.success) {
+          throw new Error(validation.error.errors[0].message);
+        }
+      }
+
       const { data, error } = await supabase
         .from("community_posts")
         .update(updates)
