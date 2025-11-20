@@ -7,12 +7,15 @@ import { Edit, Trash2, BarChart3, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import EditSongDialog from "@/components/EditSongDialog";
+import { useState } from "react";
 
 const SongManagement = () => {
   const { data: songs, isLoading } = useSongs();
   const deleteSong = useDeleteSong();
   const updateSong = useUpdateSong();
   const { toast } = useToast();
+  const [editingSong, setEditingSong] = useState<any>(null);
 
   const handleDelete = async (id: string, title: string) => {
     if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
@@ -199,7 +202,12 @@ const SongManagement = () => {
                             <BarChart3 className="w-4 h-4" />
                           </Button>
                         </Link>
-                        <Button size="sm" variant="ghost" title="Edit song">
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          title="Edit song"
+                          onClick={() => setEditingSong(song)}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button
@@ -219,6 +227,12 @@ const SongManagement = () => {
           </Table>
         </Card>
       )}
+
+      <EditSongDialog
+        song={editingSong}
+        open={!!editingSong}
+        onOpenChange={(open) => !open && setEditingSong(null)}
+      />
     </div>
   );
 };
