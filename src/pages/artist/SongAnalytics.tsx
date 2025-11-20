@@ -4,7 +4,7 @@ import { useSongs } from "@/hooks/useSongs";
 import { usePlayHistory } from "@/hooks/usePlayHistory";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, TrendingUp, Users, MapPin, Smartphone, Play, Calendar } from "lucide-react";
+import { ArrowLeft, TrendingUp, Users, MapPin, Play, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DateRangePicker } from "@/components/DateRangePicker";
 import { DateRange } from "react-day-picker";
@@ -214,92 +214,32 @@ const SongAnalytics = () => {
             </Card>
           </div>
 
-          {/* Demographics & Devices */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Age Groups */}
-            <Card className="p-6">
-              <h2 className="text-xl font-bold mb-6">Age Groups</h2>
-              {playHistory?.ageGroupStats && playHistory.ageGroupStats.length > 0 ? (
-                <div className="space-y-4">
-                  {playHistory.ageGroupStats.map((group) => (
-                    <div key={group.range}>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="font-medium">{group.range}</span>
-                        <span className="text-muted-foreground">{group.percentage}%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-primary rounded-full"
-                          style={{ width: `${group.percentage}%` }}
-                        />
-                      </div>
+          {/* Demographics */}
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-6">Age Groups</h2>
+            {playHistory?.ageGroupStats && playHistory.ageGroupStats.length > 0 ? (
+              <div className="space-y-4">
+                {playHistory.ageGroupStats.map((group) => (
+                  <div key={group.range}>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="font-medium">{group.range}</span>
+                      <span className="text-muted-foreground">{group.percentage}%</span>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground py-8">
-                  No age group data available yet
-                </p>
-              )}
-            </Card>
-
-            {/* Devices */}
-            <Card className="p-6">
-              <div className="flex items-center gap-2 mb-6">
-                <Smartphone className="h-5 w-5 text-primary" />
-                <h2 className="text-xl font-bold">Devices</h2>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-primary rounded-full"
+                        style={{ width: `${group.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
-              {playHistory?.deviceStats && playHistory.deviceStats.length > 0 ? (
-                <div className="space-y-4">
-                  {playHistory.deviceStats.map((device) => (
-                    <div key={device.type}>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="font-medium">{device.type}</span>
-                        <span className="text-muted-foreground">{device.percentage}%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-primary rounded-full"
-                          style={{ width: `${device.percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground py-8">
-                  No device data available yet
-                </p>
-              )}
-            </Card>
-
-            {/* Traffic Sources */}
-            <Card className="p-6">
-              <h2 className="text-xl font-bold mb-6">Traffic Sources</h2>
-              {playHistory?.trafficStats && playHistory.trafficStats.length > 0 ? (
-                <div className="space-y-4">
-                  {playHistory.trafficStats.map((source) => (
-                    <div key={source.source}>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="font-medium capitalize">{source.source.replace('_', ' ')}</span>
-                        <span className="text-muted-foreground">{source.percentage}%</span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-primary rounded-full"
-                          style={{ width: `${source.percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-muted-foreground py-8">
-                  No traffic source data available yet
-                </p>
-              )}
-            </Card>
-          </div>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">
+                No age group data available yet
+              </p>
+            )}
+          </Card>
 
           {/* Total Comments */}
           <Card className="p-6">
