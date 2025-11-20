@@ -1,13 +1,39 @@
 import { Card } from "@/components/ui/card";
 import { useArtistProfile } from "@/hooks/useArtistProfile";
 import { useSongs } from "@/hooks/useSongs";
-import { Play, Users, Heart, DollarSign, TrendingUp, Music, Calendar, MessageCircle } from "lucide-react";
+import { useCommunityPosts } from "@/hooks/useCommunityPosts";
+import { useArtistEvents } from "@/hooks/useEvents";
+import { Play, Users, Heart, MessageCircle, TrendingUp, Music, Calendar, TicketIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const ArtistDashboardHome = () => {
   const { data: artistProfile } = useArtistProfile();
   const { data: songs } = useSongs();
+  const { data: communityPosts } = useCommunityPosts(artistProfile?.id);
+  const { data: events } = useArtistEvents(artistProfile?.id);
+
+  // Fetch total comments across all songs
+  const { data: totalCommentsData } = useQuery({
+    queryKey: ["totalComments", artistProfile?.id],
+    queryFn: async () => {
+      if (!artistProfile?.id) return 0;
+      
+      const songIds = songs?.map(s => s.id) || [];
+      if (songIds.length === 0) return 0;
+
+      const { count, error } = await supabase
+        .from("song_comments")
+        .select("*", { count: "exact", head: true })
+        .in("song_id", songIds);
+
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: !!artistProfile?.id && !!songs,
+  });
 
   // Calculate analytics
   const totalSongs = songs?.length || 0;
@@ -15,6 +41,9 @@ const ArtistDashboardHome = () => {
   const totalPlays = songs?.reduce((sum, song) => sum + (song.song_analytics?.total_plays || 0), 0) || 0;
   const totalLikes = songs?.reduce((sum, song) => sum + (song.song_analytics?.total_likes || 0), 0) || 0;
   const playsLast7Days = songs?.reduce((sum, song) => sum + (song.song_analytics?.plays_last_7_days || 0), 0) || 0;
+  const totalComments = totalCommentsData || 0;
+  const totalPosts = communityPosts?.length || 0;
+  const totalEvents = events?.length || 0;
 
   return (
     <div className="space-y-8">
@@ -25,23 +54,14 @@ const ArtistDashboardHome = () => {
       </div>
 
       {/* Key Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="p-6 bg-gradient-card border-border">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-muted-foreground">Total Streams</span>
-            <Play className="w-5 h-5 text-primary" />
-          </div>
-          <p className="text-3xl font-bold">{totalPlays.toLocaleString()}</p>
-          <p className="text-sm text-green-500 mt-1">+{playsLast7Days} last 7 days</p>
-        </Card>
-
-        <Card className="p-6 bg-gradient-card border-border">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-muted-foreground">Followers</span>
+            <span className="text-muted-foreground">Total Followers</span>
             <Users className="w-5 h-5 text-primary" />
           </div>
           <p className="text-3xl font-bold">{artistProfile?.total_followers?.toLocaleString() || 0}</p>
-          <p className="text-sm text-muted-foreground mt-1">From all platforms</p>
+          <p className="text-sm text-muted-foreground mt-1">Total followers</p>
         </Card>
 
         <Card className="p-6 bg-gradient-card border-border">
@@ -55,16 +75,43 @@ const ArtistDashboardHome = () => {
 
         <Card className="p-6 bg-gradient-card border-border">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-muted-foreground">Subscribers</span>
-            <DollarSign className="w-5 h-5 text-primary" />
+            <span className="text-muted-foreground">Total Streams</span>
+            <Play className="w-5 h-5 text-primary" />
           </div>
-          <p className="text-3xl font-bold">{artistProfile?.total_subscribers?.toLocaleString() || 0}</p>
-          <p className="text-sm text-muted-foreground mt-1">Personal community</p>
+          <p className="text-3xl font-bold">{totalPlays.toLocaleString()}</p>
+          <p className="text-sm text-green-500 mt-1">+{playsLast7Days} last 7 days</p>
+        </Card>
+
+        <Card className="p-6 bg-gradient-card border-border">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-muted-foreground">Total Comments</span>
+            <MessageCircle className="w-5 h-5 text-primary" />
+          </div>
+          <p className="text-3xl font-bold">{totalComments.toLocaleString()}</p>
+          <p className="text-sm text-muted-foreground mt-1">On all songs</p>
+        </Card>
+
+        <Card className="p-6 bg-gradient-card border-border">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-muted-foreground">Total Posts</span>
+            <MessageCircle className="w-5 h-5 text-primary" />
+          </div>
+          <p className="text-3xl font-bold">{totalPosts.toLocaleString()}</p>
+          <p className="text-sm text-muted-foreground mt-1">Community posts</p>
+        </Card>
+
+        <Card className="p-6 bg-gradient-card border-border">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-muted-foreground">Total Events</span>
+            <TicketIcon className="w-5 h-5 text-primary" />
+          </div>
+          <p className="text-3xl font-bold">{totalEvents.toLocaleString()}</p>
+          <p className="text-sm text-muted-foreground mt-1">Created events</p>
         </Card>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Additional Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-6 border-border">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-3 rounded-lg bg-primary/10">
@@ -85,18 +132,6 @@ const ArtistDashboardHome = () => {
             <div>
               <p className="text-2xl font-bold">{scheduledSongs}</p>
               <p className="text-sm text-muted-foreground">Scheduled Releases</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6 border-border">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 rounded-lg bg-green-500/10">
-              <MessageCircle className="w-6 h-6 text-green-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">0</p>
-              <p className="text-sm text-muted-foreground">Community Posts</p>
             </div>
           </div>
         </Card>
