@@ -404,6 +404,53 @@ export type Database = {
         }
         Relationships: []
       }
+      play_history: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          device_type: string | null
+          id: string
+          played_at: string
+          song_id: string
+          traffic_source: string | null
+          user_age_group: string | null
+          user_id: string | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          played_at?: string
+          song_id: string
+          traffic_source?: string | null
+          user_age_group?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          played_at?: string
+          song_id?: string
+          traffic_source?: string | null
+          user_age_group?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "play_history_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       playlist_songs: {
         Row: {
           added_at: string
@@ -759,6 +806,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_play_stats_by_date_range: {
+        Args: { p_end_date: string; p_song_id: string; p_start_date: string }
+        Returns: {
+          total_plays: number
+          unique_listeners: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

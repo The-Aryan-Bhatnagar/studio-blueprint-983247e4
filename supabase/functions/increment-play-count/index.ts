@@ -5,6 +5,19 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Helper to detect device type from user agent
+function getDeviceType(userAgent: string): string {
+  if (!userAgent) return 'Unknown';
+  
+  const ua = userAgent.toLowerCase();
+  if (/android/.test(ua)) return 'Android';
+  if (/iphone|ipad|ipod/.test(ua)) return 'iOS';
+  if (/windows phone/.test(ua)) return 'Windows Phone';
+  if (/mobile/.test(ua)) return 'Mobile';
+  if (/windows|mac|linux/.test(ua)) return 'Desktop';
+  return 'Web';
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -21,7 +34,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { song_id } = await req.json();
+    const { song_id, traffic_source, country, city } = await req.json();
 
     if (!song_id) {
       return new Response(
@@ -55,6 +68,27 @@ Deno.serve(async (req) => {
     // Use service role key for the actual update to bypass RLS
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Get device type from user agent
+    const userAgent = req.headers.get('user-agent') || '';
+    const deviceType = getDeviceType(userAgent);
+
+    // Insert into play_history table with detailed tracking
+    const { error: historyError } = await supabase
+      .from('play_history')
+      .insert({
+        song_id,
+        user_id: user.id,
+        device_type: deviceType,
+        country: country || null,
+        city: city || null,
+        traffic_source: traffic_source || 'direct',
+        played_at: new Date().toISOString(),
+      });
+
+    if (historyError) {
+      console.error('Error inserting play history:', historyError);
+    }
 
     // Get current analytics
     const { data: analytics, error: fetchError } = await supabase
@@ -90,10 +124,14 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`Play count incremented for song: ${song_id} by user: ${user.id}`);
+    console.log(`Play count incremented for song: ${song_id} by user: ${user.id}, device: ${deviceType}`);
 
     return new Response(
-      JSON.stringify({ success: true, message: 'Play count incremented' }),
+      JSON.stringify({ 
+        success: true, 
+        message: 'Play count incremented',
+        device_type: deviceType 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
