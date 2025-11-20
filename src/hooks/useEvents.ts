@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "./use-toast";
+import { eventDescriptionSchema } from "@/lib/validations";
 
 export interface Event {
   id: string;
@@ -106,6 +107,14 @@ export const useCreateEvent = () => {
 
   return useMutation({
     mutationFn: async (event: Omit<Event, "id" | "created_at" | "updated_at" | "artist_profiles">) => {
+      // Validate description if provided
+      if (event.description !== undefined) {
+        const validation = eventDescriptionSchema.safeParse({ description: event.description });
+        if (!validation.success) {
+          throw new Error(validation.error.errors[0].message);
+        }
+      }
+
       const { data, error } = await supabase
         .from("events")
         .insert(event)
@@ -139,6 +148,14 @@ export const useUpdateEvent = () => {
 
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Event> & { id: string }) => {
+      // Validate description if it's being updated
+      if (updates.description !== undefined) {
+        const validation = eventDescriptionSchema.safeParse({ description: updates.description });
+        if (!validation.success) {
+          throw new Error(validation.error.errors[0].message);
+        }
+      }
+
       const { data, error } = await supabase
         .from("events")
         .update(updates)

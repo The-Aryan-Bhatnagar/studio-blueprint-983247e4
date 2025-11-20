@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { bioSchema } from "@/lib/validations";
 
 export const useArtistProfile = () => {
   const { user } = useAuth();
@@ -30,6 +31,14 @@ export const useUpdateArtistProfile = () => {
   return useMutation({
     mutationFn: async (updates: any) => {
       if (!user) throw new Error("Not authenticated");
+
+      // Validate bio if it's being updated
+      if (updates.bio !== undefined) {
+        const validation = bioSchema.safeParse({ bio: updates.bio });
+        if (!validation.success) {
+          throw new Error(validation.error.errors[0].message);
+        }
+      }
 
       const { data, error } = await supabase
         .from("artist_profiles")

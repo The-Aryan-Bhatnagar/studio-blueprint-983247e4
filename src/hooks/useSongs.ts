@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useArtistProfile } from "./useArtistProfile";
+import { songDescriptionSchema } from "@/lib/validations";
 
 export const useSongs = () => {
   const { data: artistProfile } = useArtistProfile();
@@ -34,6 +35,14 @@ export const useCreateSong = () => {
     mutationFn: async (songData: any) => {
       if (!artistProfile) throw new Error("Artist profile not found");
 
+      // Validate description if provided
+      if (songData.description !== undefined) {
+        const validation = songDescriptionSchema.safeParse({ description: songData.description });
+        if (!validation.success) {
+          throw new Error(validation.error.errors[0].message);
+        }
+      }
+
       const { data, error } = await supabase
         .from("songs")
         .insert({
@@ -57,6 +66,14 @@ export const useUpdateSong = () => {
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+      // Validate description if it's being updated
+      if (updates.description !== undefined) {
+        const validation = songDescriptionSchema.safeParse({ description: updates.description });
+        if (!validation.success) {
+          throw new Error(validation.error.errors[0].message);
+        }
+      }
+
       const { data, error } = await supabase
         .from("songs")
         .update(updates)
