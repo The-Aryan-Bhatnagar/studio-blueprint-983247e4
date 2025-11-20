@@ -208,7 +208,10 @@ export type Database = {
           id: string
           number_of_tickets: number
           total_amount: number
+          user_email: string | null
           user_id: string
+          user_name: string | null
+          user_phone: string | null
         }
         Insert: {
           booking_date?: string
@@ -218,7 +221,10 @@ export type Database = {
           id?: string
           number_of_tickets?: number
           total_amount: number
+          user_email?: string | null
           user_id: string
+          user_name?: string | null
+          user_phone?: string | null
         }
         Update: {
           booking_date?: string
@@ -228,7 +234,10 @@ export type Database = {
           id?: string
           number_of_tickets?: number
           total_amount?: number
+          user_email?: string | null
           user_id?: string
+          user_name?: string | null
+          user_phone?: string | null
         }
         Relationships: [
           {
