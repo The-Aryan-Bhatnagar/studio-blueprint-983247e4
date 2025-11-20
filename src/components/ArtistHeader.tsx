@@ -4,20 +4,37 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { User, LogOut, Music2, Mic2, LayoutDashboard, Upload, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import ArtistNavLink from "./ArtistNavLink";
+import { useArtistProfile } from "@/hooks/useArtistProfile";
+import { cn } from "@/lib/utils";
 
 const ArtistHeader = () => {
   const { user, signOut } = useAuth();
+  const { data: artistProfile } = useArtistProfile();
 
   const handleSignOut = async () => {
     await signOut();
     window.location.href = "/artist/login";
   };
 
+  const getNameColorClass = (theme: string | null) => {
+    switch (theme) {
+      case 'gold':
+        return 'text-[hsl(var(--artist-name-gold))]';
+      case 'neon':
+        return 'text-[hsl(var(--artist-name-neon))]';
+      case 'gradient':
+        return 'bg-gradient-to-r from-[hsl(var(--artist-name-gold))] to-[hsl(var(--artist-name-neon))] bg-clip-text text-transparent';
+      case 'white':
+      default:
+        return 'text-[hsl(var(--artist-name-white))]';
+    }
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border">
       <div className="flex items-center justify-between px-8 py-4">
         {/* Logo & Branding */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-8 flex-1">
           <Link to="/artist/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center">
               <Mic2 className="w-6 h-6 text-white" />
@@ -49,8 +66,21 @@ const ArtistHeader = () => {
           </nav>
         </div>
 
+        {/* Artist Name - Center */}
+        {artistProfile && (
+          <div className="flex-1 flex justify-center">
+            <h2 className={cn(
+              "text-3xl font-bold transition-all duration-300",
+              getNameColorClass(artistProfile.name_color_theme)
+            )}>
+              {artistProfile.stage_name}
+            </h2>
+          </div>
+        )}
+
         {/* User Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex-1 flex justify-end">
+          <div className="flex items-center gap-4">
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -76,6 +106,7 @@ const ArtistHeader = () => {
               <Link to="/artist/login">Login</Link>
             </Button>
           )}
+          </div>
         </div>
       </div>
     </header>

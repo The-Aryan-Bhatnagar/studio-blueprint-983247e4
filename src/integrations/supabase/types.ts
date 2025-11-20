@@ -23,6 +23,7 @@ export type Database = {
           created_at: string
           id: string
           instagram_url: string | null
+          name_color_theme: string | null
           spotify_url: string | null
           stage_name: string
           total_followers: number | null
@@ -39,6 +40,7 @@ export type Database = {
           created_at?: string
           id?: string
           instagram_url?: string | null
+          name_color_theme?: string | null
           spotify_url?: string | null
           stage_name: string
           total_followers?: number | null
@@ -55,6 +57,7 @@ export type Database = {
           created_at?: string
           id?: string
           instagram_url?: string | null
+          name_color_theme?: string | null
           spotify_url?: string | null
           stage_name?: string
           total_followers?: number | null
