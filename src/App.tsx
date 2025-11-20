@@ -27,6 +27,9 @@ import ArtistLogin from "./pages/artist/ArtistLogin";
 import ArtistSignup from "./pages/artist/ArtistSignup";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import ArtistManagement from "./pages/admin/ArtistManagement";
+import UserManagement from "./pages/admin/UserManagement";
+import AdminLayout from "./components/AdminLayout";
 import PlaylistDetail from "./pages/PlaylistDetail";
 import Community from "./pages/Community";
 import SongAnalytics from "./pages/artist/SongAnalytics";
@@ -53,6 +56,11 @@ const App = () => (
               <Route path="/artist/login" element={<ArtistLogin />} />
               <Route path="/artist/signup" element={<ArtistSignup />} />
               <Route path="/admin/login" element={<AdminLogin />} />
+              
+              {/* Admin Routes - Admin Layout */}
+              <Route path="/admin" element={<AdminLayout><ProtectedRoute><AdminDashboard /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/artists" element={<AdminLayout><ProtectedRoute><ArtistManagement /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/users" element={<AdminLayout><ProtectedRoute><UserManagement /></ProtectedRoute></AdminLayout>} />
               
               {/* User Routes - Regular Layout with Music Player */}
               <Route path="/" element={<Layout><ProtectedRoute><Home /></ProtectedRoute></Layout>} />
