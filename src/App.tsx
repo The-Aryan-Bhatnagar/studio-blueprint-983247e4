@@ -13,7 +13,6 @@ import Home from "./pages/Home";
 import Discover from "./pages/Discover";
 import Search from "./pages/Search";
 import Library from "./pages/Library";
-import Community from "./pages/Community";
 import Events from "./pages/Events";
 import UserProfile from "./pages/UserProfile";
 import ArtistProfile from "./pages/ArtistProfile";
@@ -59,7 +58,7 @@ const App = () => (
               <Route path="/search" element={<Layout><ProtectedRoute><Search /></ProtectedRoute></Layout>} />
               <Route path="/library" element={<Layout><ProtectedRoute><Library /></ProtectedRoute></Layout>} />
               <Route path="/playlist/:playlistId" element={<Layout><ProtectedRoute><PlaylistDetail /></ProtectedRoute></Layout>} />
-              <Route path="/community" element={<Layout><ProtectedRoute><Community /></ProtectedRoute></Layout>} />
+              {/* Community route removed - now in artist dashboard */}
               <Route path="/events" element={<Layout><ProtectedRoute><Events /></ProtectedRoute></Layout>} />
               <Route path="/profile" element={<Layout><ProtectedRoute><UserProfile /></ProtectedRoute></Layout>} />
               <Route path="/artist/:artistId" element={<Layout><ProtectedRoute><ArtistProfilePublic /></ProtectedRoute></Layout>} />
@@ -69,6 +68,7 @@ const App = () => (
               <Route path="/artist/dashboard" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
               <Route path="/artist/dashboard/upload" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
               <Route path="/artist/dashboard/songs" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
+              <Route path="/artist/dashboard/community" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
               <Route path="/artist/dashboard/settings" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
               
               {/* Admin Routes - Regular Layout */}
