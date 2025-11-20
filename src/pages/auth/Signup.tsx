@@ -174,32 +174,50 @@ const Signup = () => {
 
               <div>
                 <Label htmlFor="dob">Date of Birth</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !dateOfBirth && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateOfBirth ? format(dateOfBirth, "PPP") : <span>Pick your date of birth</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={dateOfBirth}
-                      onSelect={setDateOfBirth}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
+                <div className="flex gap-2">
+                  <Input
+                    id="dob"
+                    type="date"
+                    value={dateOfBirth ? format(dateOfBirth, "yyyy-MM-dd") : ""}
+                    onChange={(e) => {
+                      const date = e.target.value ? new Date(e.target.value) : undefined;
+                      setDateOfBirth(date);
+                    }}
+                    max={format(new Date(), "yyyy-MM-dd")}
+                    min="1900-01-01"
+                    className="flex-1"
+                    required
+                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className={cn(
+                          !dateOfBirth && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={dateOfBirth}
+                        onSelect={setDateOfBirth}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        defaultMonth={dateOfBirth || new Date(2000, 0)}
+                        captionLayout="dropdown-buttons"
+                        fromYear={1900}
+                        toYear={new Date().getFullYear()}
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
 
               <div>
@@ -285,32 +303,50 @@ const Signup = () => {
 
               <div>
                 <Label htmlFor="dobPhone">Date of Birth</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !dateOfBirth && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateOfBirth ? format(dateOfBirth, "PPP") : <span>Pick your date of birth</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={dateOfBirth}
-                      onSelect={setDateOfBirth}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                      className="pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
+                <div className="flex gap-2">
+                  <Input
+                    id="dobPhone"
+                    type="date"
+                    value={dateOfBirth ? format(dateOfBirth, "yyyy-MM-dd") : ""}
+                    onChange={(e) => {
+                      const date = e.target.value ? new Date(e.target.value) : undefined;
+                      setDateOfBirth(date);
+                    }}
+                    max={format(new Date(), "yyyy-MM-dd")}
+                    min="1900-01-01"
+                    className="flex-1"
+                    required
+                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className={cn(
+                          !dateOfBirth && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={dateOfBirth}
+                        onSelect={setDateOfBirth}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        defaultMonth={dateOfBirth || new Date(2000, 0)}
+                        captionLayout="dropdown-buttons"
+                        fromYear={1900}
+                        toYear={new Date().getFullYear()}
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
 
               <div>
