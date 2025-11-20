@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { useCommunityPosts } from "@/hooks/useCommunityPosts";
 import CommunityPostCard from "@/components/CommunityPostCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -39,7 +38,13 @@ const Community = () => {
         .from("community_posts")
         .select(`
           *,
-          artist_profiles!inner(*)
+          artist_profiles!inner(
+            id,
+            stage_name,
+            avatar_url
+          ),
+          community_post_likes(count),
+          community_post_comments(count)
         `)
         .in("artist_id", followedArtists)
         .order("created_at", { ascending: false });
