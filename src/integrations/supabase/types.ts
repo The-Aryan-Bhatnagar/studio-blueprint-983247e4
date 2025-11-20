@@ -829,6 +829,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      trigger_scheduled_song_publish: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "user" | "artist" | "admin"
