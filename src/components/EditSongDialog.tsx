@@ -48,6 +48,9 @@ const EditSongDialog = ({ song, open, onOpenChange }: EditSongDialogProps) => {
     }
   }, [song]);
 
+  // Don't render if no song is provided
+  if (!song) return null;
+
   const uploadFile = async (file: File, bucket: string): Promise<string> => {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
