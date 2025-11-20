@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Edit, Trash2, Calendar, Users, Ticket } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Calendar, Users, Ticket, Eye } from "lucide-react";
 import { useArtistEvents, useDeleteEvent, type Event } from "@/hooks/useEvents";
 import { useArtistProfile } from "@/hooks/useArtistProfile";
 import CreateEventDialog from "@/components/CreateEventDialog";
+import EventBookingsDialog from "@/components/EventBookingsDialog";
 import { format } from "date-fns";
 import {
   AlertDialog,
@@ -23,6 +24,7 @@ const EventManagement = () => {
   const [createEventOpen, setCreateEventOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | undefined>();
   const [deletingEvent, setDeletingEvent] = useState<Event | null>(null);
+  const [viewingBookings, setViewingBookings] = useState<Event | null>(null);
 
   const { data: artistProfile } = useArtistProfile();
   const { data: events, isLoading } = useArtistEvents(artistProfile?.id);
@@ -109,26 +111,34 @@ const EventManagement = () => {
                           </span>
                           <span>{event.location}</span>
                         </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setEditingEvent(event);
-                            setCreateEventOpen(true);
-                          }}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setDeletingEvent(event)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setViewingBookings(event)}
+                                title="View Bookings"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setEditingEvent(event);
+                                  setCreateEventOpen(true);
+                                }}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setDeletingEvent(event)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                     </div>
 
                     {event.description && (
@@ -182,15 +192,25 @@ const EventManagement = () => {
       )}
 
       {artistProfile && (
-        <CreateEventDialog
-          open={createEventOpen}
-          onOpenChange={(open) => {
-            setCreateEventOpen(open);
-            if (!open) setEditingEvent(undefined);
-          }}
-          artistId={artistProfile.id}
-          event={editingEvent}
-        />
+        <>
+          <CreateEventDialog
+            open={createEventOpen}
+            onOpenChange={(open) => {
+              setCreateEventOpen(open);
+              if (!open) setEditingEvent(undefined);
+            }}
+            artistId={artistProfile.id}
+            event={editingEvent}
+          />
+
+          {viewingBookings && (
+            <EventBookingsDialog
+              event={viewingBookings}
+              open={!!viewingBookings}
+              onOpenChange={(open) => !open && setViewingBookings(null)}
+            />
+          )}
+        </>
       )}
 
       {/* Delete Confirmation Dialog */}
