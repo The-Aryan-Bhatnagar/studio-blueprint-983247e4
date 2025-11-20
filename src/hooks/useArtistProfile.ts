@@ -46,3 +46,32 @@ export const useUpdateArtistProfile = () => {
     },
   });
 };
+
+export const useUploadArtistImage = () => {
+  const { user } = useAuth();
+  const updateProfile = useUpdateArtistProfile();
+
+  return useMutation({
+    mutationFn: async ({ file, type }: { file: File; type: 'avatar' | 'cover' }) => {
+      if (!user) throw new Error("Not authenticated");
+
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${user.id}/${type}-${Date.now()}.${fileExt}`;
+      const bucketName = type === 'avatar' ? 'avatars' : 'event-banners';
+
+      const { error: uploadError } = await supabase.storage
+        .from(bucketName)
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(fileName);
+
+      const updateField = type === 'avatar' ? 'avatar_url' : 'cover_image_url';
+      await updateProfile.mutateAsync({ [updateField]: publicUrl });
+      return publicUrl;
+    },
+  });
+};
