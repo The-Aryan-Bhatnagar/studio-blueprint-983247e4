@@ -42,14 +42,18 @@ const SongAnalytics = () => {
   const statsCards = [
     {
       title: "Total Streams",
-      value: playHistory?.totalPlays || analytics?.total_plays || 0,
+      value: (playHistory?.totalPlays && playHistory.totalPlays > 0) 
+        ? playHistory.totalPlays 
+        : (analytics?.total_plays || 0),
       icon: Play,
       trend: "+12.5%",
       color: "text-primary"
     },
     {
       title: "Unique Listeners",
-      value: playHistory?.uniqueListeners || 0,
+      value: (playHistory?.uniqueListeners && playHistory.uniqueListeners > 0)
+        ? playHistory.uniqueListeners
+        : (analytics?.total_plays || 0),
       icon: Users,
       trend: "+8.3%",
       color: "text-green-500"
