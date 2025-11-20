@@ -6,25 +6,39 @@ export const usePostComments = (postId: string) => {
   return useQuery({
     queryKey: ["postComments", postId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: comments, error } = await supabase
         .from("community_post_comments")
         .select(`
           *,
-          profiles!inner(
-            full_name,
-            avatar_url
-          ),
-          artist_profiles(
-            stage_name,
-            avatar_url
-          ),
           community_comment_likes(count)
         `)
         .eq("post_id", postId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+
+      // Fetch user profiles separately
+      const userIds = comments?.map((c) => c.user_id) || [];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, avatar_url")
+        .in("user_id", userIds);
+
+      const { data: artistProfiles } = await supabase
+        .from("artist_profiles")
+        .select("user_id, stage_name, avatar_url")
+        .in("user_id", userIds);
+
+      // Merge the data
+      return comments?.map((comment) => {
+        const profile = profiles?.find((p) => p.user_id === comment.user_id);
+        const artistProfile = artistProfiles?.find((a) => a.user_id === comment.user_id);
+        return {
+          ...comment,
+          profiles: profile || null,
+          artist_profiles: artistProfile || null,
+        };
+      });
     },
   });
 };

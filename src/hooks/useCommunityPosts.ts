@@ -174,20 +174,29 @@ export const usePostLikes = (postId: string) => {
   return useQuery({
     queryKey: ["postLikes", postId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: likes, error } = await supabase
         .from("community_post_likes")
-        .select(`
-          *,
-          profiles!inner(
-            full_name,
-            avatar_url
-          )
-        `)
+        .select("*")
         .eq("post_id", postId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+
+      // Fetch user profiles separately
+      const userIds = likes?.map((l) => l.user_id) || [];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, avatar_url")
+        .in("user_id", userIds);
+
+      // Merge the data
+      return likes?.map((like) => {
+        const profile = profiles?.find((p) => p.user_id === like.user_id);
+        return {
+          ...like,
+          profiles: profile || null,
+        };
+      });
     },
   });
 };
