@@ -252,7 +252,7 @@ export const useUserBookings = () => {
   });
 };
 
-// Fetch event bookings for artist
+// Fetch event bookings for artist with user details
 export const useEventBookings = (eventId?: string) => {
   return useQuery({
     queryKey: ["event-bookings", eventId],
@@ -266,7 +266,25 @@ export const useEventBookings = (eventId?: string) => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as EventBooking[];
+
+      // Fetch user profiles for all bookings
+      if (data && data.length > 0) {
+        const userIds = data.map((booking: EventBooking) => booking.user_id);
+        const { data: profiles, error: profilesError } = await supabase
+          .from("profiles")
+          .select("user_id, full_name, phone_number, avatar_url")
+          .in("user_id", userIds);
+
+        if (profilesError) throw profilesError;
+
+        // Merge profile data with bookings
+        return data.map((booking: EventBooking) => ({
+          ...booking,
+          user_profile: profiles?.find((p: any) => p.user_id === booking.user_id),
+        }));
+      }
+
+      return data || [];
     },
     enabled: !!eventId,
   });
