@@ -29,6 +29,11 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ArtistManagement from "./pages/admin/ArtistManagement";
 import UserManagement from "./pages/admin/UserManagement";
+import SongManagement from "./pages/admin/SongManagement";
+import EventManagement from "./pages/admin/EventManagement";
+import CommentManagement from "./pages/admin/CommentManagement";
+import AnalyticsPage from "./pages/admin/AnalyticsPage";
+import SettingsPage from "./pages/admin/SettingsPage";
 import AdminLayout from "./components/AdminLayout";
 import PlaylistDetail from "./pages/PlaylistDetail";
 import Community from "./pages/Community";
@@ -61,6 +66,11 @@ const App = () => (
               <Route path="/admin" element={<AdminLayout><ProtectedRoute><AdminDashboard /></ProtectedRoute></AdminLayout>} />
               <Route path="/admin/artists" element={<AdminLayout><ProtectedRoute><ArtistManagement /></ProtectedRoute></AdminLayout>} />
               <Route path="/admin/users" element={<AdminLayout><ProtectedRoute><UserManagement /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/songs" element={<AdminLayout><ProtectedRoute><SongManagement /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/events" element={<AdminLayout><ProtectedRoute><EventManagement /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/comments" element={<AdminLayout><ProtectedRoute><CommentManagement /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/analytics" element={<AdminLayout><ProtectedRoute><AnalyticsPage /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/settings" element={<AdminLayout><ProtectedRoute><SettingsPage /></ProtectedRoute></AdminLayout>} />
               
               {/* User Routes - Regular Layout with Music Player */}
               <Route path="/" element={<Layout><ProtectedRoute><Home /></ProtectedRoute></Layout>} />
@@ -83,9 +93,6 @@ const App = () => (
               <Route path="/artist/dashboard/comments" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
               <Route path="/artist/dashboard/events" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
               <Route path="/artist/dashboard/settings" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
-              
-              {/* Admin Routes - Regular Layout */}
-              <Route path="/admin" element={<Layout><ProtectedRoute><AdminDashboard /></ProtectedRoute></Layout>} />
               
               {/* 404 */}
               <Route path="*" element={<NotFound />} />
