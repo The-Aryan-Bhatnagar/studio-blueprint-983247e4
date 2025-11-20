@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useArtistProfile } from "./useArtistProfile";
 import { useToast } from "@/hooks/use-toast";
+import { commentSchema } from "@/lib/validations";
 
 export const useArtistComments = () => {
   const { data: artistProfile } = useArtistProfile();
@@ -92,6 +93,12 @@ export const useArtistReplyComment = () => {
       parentCommentId: string;
     }) => {
       if (!artistProfile) throw new Error("Artist profile not found");
+
+      // Validate content
+      const validation = commentSchema.safeParse({ content });
+      if (!validation.success) {
+        throw new Error(validation.error.errors[0].message);
+      }
 
       const { data, error } = await supabase
         .from("song_comments")
