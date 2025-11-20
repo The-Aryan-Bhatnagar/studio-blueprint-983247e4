@@ -17,7 +17,12 @@ export const useCommunityPosts = (artistId?: string) => {
             avatar_url
           ),
           community_post_likes(count),
-          community_post_comments(count)
+          community_post_comments(count),
+          polls (
+            *,
+            poll_options (*),
+            poll_votes (*)
+          )
         `)
         .order("is_pinned", { ascending: false })
         .order("created_at", { ascending: false });
@@ -53,7 +58,14 @@ export const useCreatePost = () => {
       const { data, error } = await supabase
         .from("community_posts")
         .insert(post)
-        .select()
+        .select(`
+          *,
+          polls (
+            *,
+            poll_options (*),
+            poll_votes (*)
+          )
+        `)
         .single();
 
       if (error) throw error;

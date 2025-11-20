@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Edit, Trash2, Calendar, Users, Ticket, Eye } from "lucide-react";
-import { useArtistEvents, useDeleteEvent, type Event } from "@/hooks/useEvents";
+import { Search, Plus, Edit, Trash2, Calendar, Users, Ticket, Eye, Pin } from "lucide-react";
+import { useArtistEvents, useDeleteEvent, useUpdateEvent, type Event } from "@/hooks/useEvents";
 import { useArtistProfile } from "@/hooks/useArtistProfile";
 import CreateEventDialog from "@/components/CreateEventDialog";
 import EventBookingsDialog from "@/components/EventBookingsDialog";
@@ -29,6 +29,7 @@ const EventManagement = () => {
   const { data: artistProfile } = useArtistProfile();
   const { data: events, isLoading } = useArtistEvents(artistProfile?.id);
   const deleteEvent = useDeleteEvent();
+  const updateEvent = useUpdateEvent();
 
   const filteredEvents = events?.filter((event) =>
     event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -120,6 +121,17 @@ const EventManagement = () => {
                                 title="View Bookings"
                               >
                                 <Eye className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => updateEvent.mutate({
+                                  id: event.id,
+                                  is_pinned: !(event as any).is_pinned
+                                } as any)}
+                                title={(event as any).is_pinned ? "Unpin event" : "Pin event"}
+                              >
+                                <Pin className={`w-4 h-4 ${(event as any).is_pinned ? 'fill-current' : ''}`} />
                               </Button>
                               <Button
                                 variant="outline"

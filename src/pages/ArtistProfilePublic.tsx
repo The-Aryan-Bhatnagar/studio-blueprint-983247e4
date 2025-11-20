@@ -3,7 +3,7 @@ import { useArtistPublicProfile, useArtistSongs, useArtistFollow } from "@/hooks
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserPlus, UserMinus, Music, Heart, Play, Instagram, Youtube, MessageCircle, Headphones, Calendar, MapPin, Music2 } from "lucide-react";
+import { UserPlus, UserMinus, Music, Heart, Play, Instagram, Youtube, MessageCircle, Headphones, Calendar, MapPin, Music2, Pin } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { toast } from "@/hooks/use-toast";
@@ -22,6 +22,11 @@ const ArtistProfilePublic = () => {
   const { isFollowing, toggleFollow, isPending } = useArtistFollow(artistId);
   const { data: communityPosts, isLoading: postsLoading } = useCommunityPosts(artistId);
   const { data: events, isLoading: eventsLoading } = useArtistEvents(artistId);
+
+  const pinnedSongs = songs?.filter((song: any) => song.is_pinned) || [];
+  const pinnedEvents = events?.filter((event: any) => event.is_pinned) || [];
+  const pinnedPosts = communityPosts?.filter((post: any) => post.is_pinned) || [];
+  const hasPinnedContent = pinnedSongs.length > 0 || pinnedEvents.length > 0 || pinnedPosts.length > 0;
 
   const handleFollow = async () => {
     if (!user) {
@@ -186,6 +191,95 @@ const ArtistProfilePublic = () => {
         )}
 
         <Separator className="my-8" />
+
+        {/* Pinned Content */}
+        {hasPinnedContent && (
+          <>
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-6">
+                <Pin className="w-5 h-5" />
+                <h2 className="text-2xl font-bold">Pinned</h2>
+              </div>
+              
+              {pinnedSongs.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-4">Songs</h3>
+                  <div className="grid gap-4">
+                    {pinnedSongs.map((song: any, index) => (
+                      <Card 
+                        key={song.id}
+                        className="p-4 hover:bg-muted/50 transition-colors cursor-pointer group"
+                        onClick={() => handlePlaySong(song)}
+                      >
+                        <div className="flex items-center gap-4">
+                          <span className="text-muted-foreground w-8 text-center">{index + 1}</span>
+                          <div className="relative">
+                            <img
+                              src={song.cover_image_url || "/placeholder.svg"}
+                              alt={song.title}
+                              className="w-14 h-14 rounded object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded">
+                              <Play className="h-6 w-6 text-white" />
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold truncate">{song.title}</h3>
+                            <p className="text-sm text-muted-foreground truncate">{song.genre || "Music"}</p>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {pinnedEvents.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-4">Events</h3>
+                  <div className="grid gap-4">
+                    {pinnedEvents.map((event: any) => (
+                      <Card key={event.id} className="p-4">
+                        <div className="flex gap-4">
+                          <div className="w-24 h-24 rounded bg-muted flex-shrink-0" style={{
+                            backgroundImage: event.banner_url ? `url(${event.banner_url})` : undefined,
+                            backgroundSize: 'cover'
+                          }} />
+                          <div>
+                            <h4 className="font-semibold mb-2">{event.title}</h4>
+                            <div className="text-sm text-muted-foreground space-y-1">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4" />
+                                {format(new Date(event.event_date), "PPP")}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <MapPin className="w-4 h-4" />
+                                {event.location}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {pinnedPosts.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-4">Posts</h3>
+                  <div className="space-y-4">
+                    {pinnedPosts.map((post: any) => (
+                      <CommunityPostCard key={post.id} post={post} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <Separator className="my-8" />
+          </>
+        )}
 
         {/* Songs */}
         <div>

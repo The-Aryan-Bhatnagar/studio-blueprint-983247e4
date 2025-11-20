@@ -2,15 +2,18 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, BarChart3 } from "lucide-react";
 import { useCommunityPosts } from "@/hooks/useCommunityPosts";
 import { useArtistProfile } from "@/hooks/useArtistProfile";
 import CreatePostDialog from "@/components/CreatePostDialog";
+import CreatePollDialog from "@/components/CreatePollDialog";
 import CommunityPostCard from "@/components/CommunityPostCard";
 
 const CommunityManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [createPostOpen, setCreatePostOpen] = useState(false);
+  const [createPollOpen, setCreatePollOpen] = useState(false);
+  const [pollId, setPollId] = useState<string | null>(null);
 
   const { data: artistProfile } = useArtistProfile();
   const { data: posts, isLoading } = useCommunityPosts(artistProfile?.id);
@@ -28,10 +31,16 @@ const CommunityManagement = () => {
             Manage your community posts and engage with your fans
           </p>
         </div>
-        <Button onClick={() => setCreatePostOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Create Post
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setCreatePollOpen(true)} variant="outline">
+            <BarChart3 className="w-4 h-4 mr-2" />
+            Create Poll
+          </Button>
+          <Button onClick={() => setCreatePostOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Create Post
+          </Button>
+        </div>
       </div>
 
       <div className="relative">
@@ -69,11 +78,22 @@ const CommunityManagement = () => {
       )}
 
       {artistProfile && (
-        <CreatePostDialog
-          open={createPostOpen}
-          onOpenChange={setCreatePostOpen}
-          artistId={artistProfile.id}
-        />
+        <>
+          <CreatePostDialog
+            open={createPostOpen}
+            onOpenChange={setCreatePostOpen}
+            artistId={artistProfile.id}
+          />
+          <CreatePollDialog
+            open={createPollOpen}
+            onOpenChange={setCreatePollOpen}
+            artistId={artistProfile.id}
+            onPollCreated={(id) => {
+              setPollId(id);
+              // Optionally create a post with the poll
+            }}
+          />
+        </>
       )}
     </div>
   );
