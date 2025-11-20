@@ -7,7 +7,7 @@ import { useArtistProfile, useUpdateArtistProfile } from "@/hooks/useArtistProfi
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { User, Music, LogOut } from "lucide-react";
+import { User, Music, LogOut, Link2, ExternalLink, Copy, Check } from "lucide-react";
 import ArtistImageUpload from "@/components/ArtistImageUpload";
 
 const ArtistSettings = () => {
@@ -26,6 +26,19 @@ const ArtistSettings = () => {
     spotify_url: "",
     apple_music_url: "",
   });
+  const [copied, setCopied] = useState(false);
+
+  const profileUrl = artistProfile ? `${window.location.origin}/artist/${artistProfile.id}` : "";
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(profileUrl);
+    setCopied(true);
+    toast({
+      title: "Link Copied!",
+      description: "Your artist profile link has been copied to clipboard",
+    });
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     if (artistProfile) {
@@ -74,6 +87,62 @@ const ArtistSettings = () => {
         <h1 className="text-4xl font-bold mb-2">Profile Settings</h1>
         <p className="text-muted-foreground">Manage your artist profile and social links</p>
       </div>
+
+      {/* Smart Link Generator */}
+      <Card className="p-6 border-border bg-gradient-to-br from-primary/5 to-primary/10">
+        <div className="flex items-start gap-4 mb-4">
+          <div className="p-3 rounded-lg bg-primary/10">
+            <Link2 className="w-6 h-6 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-xl font-bold mb-2">Your Artist Profile Link</h2>
+            <p className="text-muted-foreground text-sm mb-4">
+              Share this link with your fans to showcase your music, events, and community posts
+            </p>
+            
+            <div className="flex gap-2 mb-4">
+              <Input
+                value={profileUrl}
+                readOnly
+                className="flex-1 bg-background"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={copyToClipboard}
+                className="shrink-0"
+              >
+                {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => window.open(profileUrl, '_blank')}
+                className="shrink-0"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <div className="flex flex-wrap gap-2 text-sm">
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <Music className="w-4 h-4" />
+                <span>Shows all your songs</span>
+              </div>
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <Link2 className="w-4 h-4" />
+                <span>Social media links</span>
+              </div>
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <User className="w-4 h-4" />
+                <span>Community posts</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card className="p-6 border-border">
