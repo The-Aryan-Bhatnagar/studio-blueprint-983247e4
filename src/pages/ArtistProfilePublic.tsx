@@ -49,7 +49,7 @@ const ArtistProfilePublic = () => {
       artist: artist?.stage_name || "Unknown Artist",
       image: song.cover_image_url || "/placeholder.svg",
       audioUrl: song.audio_url,
-      plays: song.song_analytics?.[0]?.total_plays || 0,
+      plays: song.song_analytics?.total_plays || 0,
     });
   };
 
@@ -213,15 +213,15 @@ const ArtistProfilePublic = () => {
                     <div className="flex items-center gap-6 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Headphones className="h-4 w-4" />
-                        <span>{song.song_analytics?.[0]?.total_plays || 0}</span>
+                        <span>{song.song_analytics?.total_plays ?? 0}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Heart className="h-4 w-4" />
-                        <span>{song.song_analytics?.[0]?.total_likes || 0}</span>
+                        <span>{song.song_analytics?.total_likes ?? 0}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <MessageCircle className="h-4 w-4" />
-                        <span>{song.song_analytics?.[0]?.total_comments || 0}</span>
+                        <span>{song.song_analytics?.total_comments ?? 0}</span>
                       </div>
                     </div>
                   </div>
