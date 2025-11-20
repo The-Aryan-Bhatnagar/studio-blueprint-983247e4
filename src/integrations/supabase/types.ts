@@ -225,6 +225,7 @@ export type Database = {
           is_popular: boolean | null
           media_type: string | null
           media_url: string | null
+          poll_id: string | null
           updated_at: string
         }
         Insert: {
@@ -236,6 +237,7 @@ export type Database = {
           is_popular?: boolean | null
           media_type?: string | null
           media_url?: string | null
+          poll_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -247,6 +249,7 @@ export type Database = {
           is_popular?: boolean | null
           media_type?: string | null
           media_url?: string | null
+          poll_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -255,6 +258,13 @@ export type Database = {
             columns: ["artist_id"]
             isOneToOne: false
             referencedRelation: "artist_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_posts_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "polls"
             referencedColumns: ["id"]
           },
         ]
@@ -319,6 +329,7 @@ export type Database = {
           event_date: string
           id: string
           is_featured: boolean | null
+          is_pinned: boolean | null
           is_published: boolean | null
           location: string
           ticket_price: number
@@ -335,6 +346,7 @@ export type Database = {
           event_date: string
           id?: string
           is_featured?: boolean | null
+          is_pinned?: boolean | null
           is_published?: boolean | null
           location: string
           ticket_price?: number
@@ -351,6 +363,7 @@ export type Database = {
           event_date?: string
           id?: string
           is_featured?: boolean | null
+          is_pinned?: boolean | null
           is_published?: boolean | null
           location?: string
           ticket_price?: number
@@ -523,6 +536,112 @@ export type Database = {
         }
         Relationships: []
       }
+      poll_options: {
+        Row: {
+          created_at: string
+          id: string
+          option_text: string
+          poll_id: string
+          vote_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          option_text: string
+          poll_id: string
+          vote_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          option_text?: string
+          poll_id?: string
+          vote_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "poll_options_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      poll_votes: {
+        Row: {
+          created_at: string
+          id: string
+          option_id: string
+          poll_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          option_id: string
+          poll_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          option_id?: string
+          poll_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "poll_votes_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "poll_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "poll_votes_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      polls: {
+        Row: {
+          artist_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          question: string
+        }
+        Insert: {
+          artist_id: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          question: string
+        }
+        Update: {
+          artist_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          question?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "polls_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -666,6 +785,7 @@ export type Database = {
           genre: string | null
           id: string
           is_draft: boolean | null
+          is_pinned: boolean | null
           is_published: boolean | null
           is_scheduled: boolean | null
           lyrics: string | null
@@ -689,6 +809,7 @@ export type Database = {
           genre?: string | null
           id?: string
           is_draft?: boolean | null
+          is_pinned?: boolean | null
           is_published?: boolean | null
           is_scheduled?: boolean | null
           lyrics?: string | null
@@ -712,6 +833,7 @@ export type Database = {
           genre?: string | null
           id?: string
           is_draft?: boolean | null
+          is_pinned?: boolean | null
           is_published?: boolean | null
           is_scheduled?: boolean | null
           lyrics?: string | null

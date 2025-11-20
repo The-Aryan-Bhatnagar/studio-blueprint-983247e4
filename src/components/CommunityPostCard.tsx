@@ -25,6 +25,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
+import PollCard from "./PollCard";
 
 interface CommunityPostCardProps {
   post: any;
@@ -218,6 +219,10 @@ const CommunityPostCard = ({ post, isArtist }: CommunityPostCardProps) => {
               <video src={post.media_url} controls className="w-full h-auto" />
             )}
           </div>
+        )}
+
+        {post.polls && post.polls.length > 0 && (
+          <PollCard poll={post.polls[0]} />
         )}
 
         <div className="flex items-center gap-6 pt-2">

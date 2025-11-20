@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useSongs, useDeleteSong, useUpdateSong } from "@/hooks/useSongs";
-import { Edit, Trash2, BarChart3, Play } from "lucide-react";
+import { Edit, Trash2, BarChart3, Play, Pin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -202,6 +202,17 @@ const SongManagement = () => {
                             <BarChart3 className="w-4 h-4" />
                           </Button>
                         </Link>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          title={song.is_pinned ? "Unpin song" : "Pin song"}
+                          onClick={() => updateSong.mutate({
+                            id: song.id,
+                            updates: { is_pinned: !song.is_pinned }
+                          })}
+                        >
+                          <Pin className={`w-4 h-4 ${song.is_pinned ? 'fill-current' : ''}`} />
+                        </Button>
                         <Button 
                           size="sm" 
                           variant="ghost" 
