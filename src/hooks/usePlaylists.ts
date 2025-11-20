@@ -168,11 +168,23 @@ export const usePlaylists = () => {
   };
 };
 
-export const usePlaylistSongs = (playlistId: string) => {
+export const usePlaylistSongs = (playlistId: string | undefined) => {
   return useQuery({
     queryKey: ["playlist-songs", playlistId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      if (!playlistId) return null;
+
+      // Fetch playlist details
+      const { data: playlist, error: playlistError } = await supabase
+        .from("playlists")
+        .select("*")
+        .eq("id", playlistId)
+        .single();
+
+      if (playlistError) throw playlistError;
+
+      // Fetch playlist songs
+      const { data: playlistSongs, error: songsError } = await supabase
         .from("playlist_songs")
         .select(`
           *,
@@ -191,8 +203,12 @@ export const usePlaylistSongs = (playlistId: string) => {
         .eq("playlist_id", playlistId)
         .order("added_at", { ascending: false });
 
-      if (error) throw error;
-      return data;
+      if (songsError) throw songsError;
+
+      return {
+        playlist,
+        songs: playlistSongs?.map((ps: any) => ps.songs) || [],
+      };
     },
     enabled: !!playlistId,
   });
