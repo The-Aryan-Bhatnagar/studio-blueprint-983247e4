@@ -18,6 +18,26 @@ function getDeviceType(userAgent: string): string {
   return 'Web';
 }
 
+// Helper to calculate age group from date of birth
+function getAgeGroup(dateOfBirth: string | null): string | null {
+  if (!dateOfBirth) return null;
+  
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  
+  if (age < 18) return 'Under 18';
+  if (age <= 24) return '18-24';
+  if (age <= 34) return '25-34';
+  if (age <= 44) return '35-44';
+  return '45+';
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -76,17 +96,19 @@ Deno.serve(async (req) => {
     // Fetch user's city and country from profile
     let userCity = city || null;
     let userCountry = country || null;
+    let ageGroup: string | null = null;
     
     if (user?.id) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('city, country')
+        .select('city, country, date_of_birth')
         .eq('user_id', user.id)
         .single();
       
       if (profile) {
         userCity = profile.city || userCity;
         userCountry = profile.country || userCountry;
+        ageGroup = getAgeGroup(profile.date_of_birth);
       }
     }
 
@@ -100,6 +122,7 @@ Deno.serve(async (req) => {
         country: userCountry,
         city: userCity,
         traffic_source: traffic_source || 'direct',
+        user_age_group: ageGroup,
         played_at: new Date().toISOString(),
       });
 
