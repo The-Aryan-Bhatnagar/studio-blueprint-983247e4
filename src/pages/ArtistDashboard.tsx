@@ -6,6 +6,7 @@ import ArtistDashboardHome from "./artist/ArtistDashboardHome";
 import SongUpload from "./artist/SongUpload";
 import SongManagement from "./artist/SongManagement";
 import ArtistSettings from "./artist/ArtistSettings";
+import CommunityManagement from "./artist/CommunityManagement";
 
 const ArtistDashboard = () => {
   const { user, loading, isArtist } = useAuth();
@@ -17,6 +18,7 @@ const ArtistDashboard = () => {
     const path = location.pathname;
     if (path.includes("/upload")) return "upload";
     if (path.includes("/songs")) return "songs";
+    if (path.includes("/community")) return "community";
     if (path.includes("/settings")) return "settings";
     return "overview";
   };
@@ -46,6 +48,7 @@ const ArtistDashboard = () => {
       overview: "/artist/dashboard",
       upload: "/artist/dashboard/upload",
       songs: "/artist/dashboard/songs",
+      community: "/artist/dashboard/community",
       settings: "/artist/dashboard/settings",
     };
     navigate(routes[value as keyof typeof routes]);
@@ -59,10 +62,11 @@ const ArtistDashboard = () => {
       </div>
 
       <Tabs value={getActiveTab()} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
+        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="upload">Upload Song</TabsTrigger>
           <TabsTrigger value="songs">My Songs</TabsTrigger>
+          <TabsTrigger value="community">Community</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
@@ -76,6 +80,10 @@ const ArtistDashboard = () => {
 
         <TabsContent value="songs">
           <SongManagement />
+        </TabsContent>
+
+        <TabsContent value="community">
+          <CommunityManagement />
         </TabsContent>
 
         <TabsContent value="settings">

@@ -20,7 +20,6 @@ const Header = () => {
 
   const navItems = [
     { icon: Music, label: "Library", path: "/library" },
-    { icon: Users, label: "Community", path: "/community" },
     { icon: Calendar, label: "Events", path: "/events" },
   ];
 
