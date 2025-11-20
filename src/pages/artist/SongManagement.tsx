@@ -141,20 +141,24 @@ const SongManagement = () => {
                             size="sm"
                             variant="ghost"
                             onClick={() => handlePublish(song.id, song.title)}
+                            title="Publish song"
                           >
                             <Play className="w-4 h-4" />
                           </Button>
                         )}
-                        <Button size="sm" variant="ghost">
-                          <BarChart3 className="w-4 h-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost">
+                        <Link to={`/artist/dashboard/songs/${song.id}/analytics`}>
+                          <Button size="sm" variant="ghost" title="View analytics">
+                            <BarChart3 className="w-4 h-4" />
+                          </Button>
+                        </Link>
+                        <Button size="sm" variant="ghost" title="Edit song">
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button
                           size="sm"
                           variant="ghost"
                           onClick={() => handleDelete(song.id, song.title)}
+                          title="Delete song"
                         >
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
