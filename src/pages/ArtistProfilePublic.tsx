@@ -8,6 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { toast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
+import { useCommunityPosts } from "@/hooks/useCommunityPosts";
+import CommunityPostCard from "@/components/CommunityPostCard";
 
 const ArtistProfilePublic = () => {
   const { artistId } = useParams<{ artistId: string }>();
@@ -16,6 +18,7 @@ const ArtistProfilePublic = () => {
   const { data: artist, isLoading: artistLoading } = useArtistPublicProfile(artistId);
   const { data: songs, isLoading: songsLoading } = useArtistSongs(artistId);
   const { isFollowing, toggleFollow, isPending } = useArtistFollow(artistId);
+  const { data: communityPosts, isLoading: postsLoading } = useCommunityPosts(artistId);
 
   const handleFollow = async () => {
     if (!user) {
@@ -228,6 +231,26 @@ const ArtistProfilePublic = () => {
                 </Card>
               ))}
             </div>
+          )}
+        </div>
+
+        {/* Community Posts Section */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-6">Community</h2>
+          {postsLoading ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Loading posts...
+            </div>
+          ) : communityPosts && communityPosts.length > 0 ? (
+            <div className="space-y-6">
+              {communityPosts.map((post) => (
+                <CommunityPostCard key={post.id} post={post} isArtist={false} />
+              ))}
+            </div>
+          ) : (
+            <Card className="p-8 text-center text-muted-foreground">
+              No community posts yet
+            </Card>
           )}
         </div>
       </div>
