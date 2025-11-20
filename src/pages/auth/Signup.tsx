@@ -4,10 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
-import { Music } from "lucide-react";
+import { Music, CalendarIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const Signup = () => {
   const [fullName, setFullName] = useState("");
@@ -16,6 +20,7 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState<Date>();
   const [loading, setLoading] = useState(false);
   const [signupMethod, setSignupMethod] = useState<"email" | "phone">("email");
   const navigate = useNavigate();
@@ -45,6 +50,7 @@ const Signup = () => {
             phone_number: phone,
             city: city,
             country: country,
+            date_of_birth: dateOfBirth?.toISOString().split('T')[0],
           },
           emailRedirectTo: `${window.location.origin}/auth/verify-otp`,
         },
@@ -81,6 +87,7 @@ const Signup = () => {
             full_name: fullName,
             city: city,
             country: country,
+            date_of_birth: dateOfBirth?.toISOString().split('T')[0],
           },
         },
       });
@@ -166,6 +173,36 @@ const Signup = () => {
               </div>
 
               <div>
+                <Label htmlFor="dob">Date of Birth</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !dateOfBirth && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dateOfBirth ? format(dateOfBirth, "PPP") : <span>Pick your date of birth</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dateOfBirth}
+                      onSelect={setDateOfBirth}
+                      disabled={(date) =>
+                        date > new Date() || date < new Date("1900-01-01")
+                      }
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
@@ -244,6 +281,36 @@ const Signup = () => {
                     required
                   />
                 </div>
+              </div>
+
+              <div>
+                <Label htmlFor="dobPhone">Date of Birth</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !dateOfBirth && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dateOfBirth ? format(dateOfBirth, "PPP") : <span>Pick your date of birth</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dateOfBirth}
+                      onSelect={setDateOfBirth}
+                      disabled={(date) =>
+                        date > new Date() || date < new Date("1900-01-01")
+                      }
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <div>
