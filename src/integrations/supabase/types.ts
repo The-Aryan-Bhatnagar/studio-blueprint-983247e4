@@ -199,6 +199,103 @@ export type Database = {
           },
         ]
       }
+      event_bookings: {
+        Row: {
+          booking_date: string
+          booking_status: string
+          created_at: string
+          event_id: string
+          id: string
+          number_of_tickets: number
+          total_amount: number
+          user_id: string
+        }
+        Insert: {
+          booking_date?: string
+          booking_status?: string
+          created_at?: string
+          event_id: string
+          id?: string
+          number_of_tickets?: number
+          total_amount: number
+          user_id: string
+        }
+        Update: {
+          booking_date?: string
+          booking_status?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          number_of_tickets?: number
+          total_amount?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_bookings_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          artist_id: string
+          available_seats: number
+          banner_url: string | null
+          created_at: string
+          description: string | null
+          event_date: string
+          id: string
+          is_published: boolean | null
+          location: string
+          ticket_price: number
+          title: string
+          total_seats: number
+          updated_at: string
+        }
+        Insert: {
+          artist_id: string
+          available_seats: number
+          banner_url?: string | null
+          created_at?: string
+          description?: string | null
+          event_date: string
+          id?: string
+          is_published?: boolean | null
+          location: string
+          ticket_price?: number
+          title: string
+          total_seats: number
+          updated_at?: string
+        }
+        Update: {
+          artist_id?: string
+          available_seats?: number
+          banner_url?: string | null
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          id?: string
+          is_published?: boolean | null
+          location?: string
+          ticket_price?: number
+          title?: string
+          total_seats?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_artist_id_fkey"
+            columns: ["artist_id"]
+            isOneToOne: false
+            referencedRelation: "artist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
