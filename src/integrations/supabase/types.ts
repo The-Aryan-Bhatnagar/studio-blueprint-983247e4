@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      ads: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          link_url: string | null
+          position: string
+          priority: string
+          start_date: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          link_url?: string | null
+          position: string
+          priority?: string
+          start_date?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          link_url?: string | null
+          position?: string
+          priority?: string
+          start_date?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       artist_profiles: {
         Row: {
           apple_music_url: string | null
@@ -65,6 +107,36 @@ export type Database = {
           updated_at?: string
           user_id?: string
           youtube_url?: string | null
+        }
+        Relationships: []
+      }
+      banned_entities: {
+        Row: {
+          banned_at: string
+          banned_by: string | null
+          entity_type: string
+          entity_value: string
+          expires_at: string | null
+          id: string
+          reason: string
+        }
+        Insert: {
+          banned_at?: string
+          banned_by?: string | null
+          entity_type: string
+          entity_value: string
+          expires_at?: string | null
+          id?: string
+          reason: string
+        }
+        Update: {
+          banned_at?: string
+          banned_by?: string | null
+          entity_type?: string
+          entity_value?: string
+          expires_at?: string | null
+          id?: string
+          reason?: string
         }
         Relationships: []
       }
@@ -381,6 +453,36 @@ export type Database = {
           },
         ]
       }
+      login_history: {
+        Row: {
+          browser: string | null
+          device_type: string | null
+          id: string
+          ip_address: string | null
+          location: string | null
+          logged_in_at: string
+          user_id: string
+        }
+        Insert: {
+          browser?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          location?: string | null
+          logged_in_at?: string
+          user_id: string
+        }
+        Update: {
+          browser?: string | null
+          device_type?: string | null
+          id?: string
+          ip_address?: string | null
+          location?: string | null
+          logged_in_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -678,6 +780,48 @@ export type Database = {
           phone_number?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          action_taken: string | null
+          admin_notes: string | null
+          created_at: string
+          description: string | null
+          id: string
+          reason: string
+          reported_id: string
+          reported_type: string
+          reporter_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          action_taken?: string | null
+          admin_notes?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason: string
+          reported_id: string
+          reported_type: string
+          reporter_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          action_taken?: string | null
+          admin_notes?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason?: string
+          reported_id?: string
+          reported_type?: string
+          reporter_id?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
