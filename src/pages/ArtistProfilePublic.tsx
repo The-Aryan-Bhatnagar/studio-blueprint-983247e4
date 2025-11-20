@@ -8,7 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { toast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
-import { useMemo } from "react";
 
 const ArtistProfilePublic = () => {
   const { artistId } = useParams<{ artistId: string }>();
@@ -17,20 +16,6 @@ const ArtistProfilePublic = () => {
   const { data: artist, isLoading: artistLoading } = useArtistPublicProfile(artistId);
   const { data: songs, isLoading: songsLoading } = useArtistSongs(artistId);
   const { isFollowing, toggleFollow, isPending } = useArtistFollow(artistId);
-
-  // Calculate total stats from all songs
-  const stats = useMemo(() => {
-    if (!songs) return { totalPlays: 0, totalLikes: 0, totalComments: 0 };
-    
-    return songs.reduce((acc, song) => {
-      const analytics = song.song_analytics?.[0];
-      return {
-        totalPlays: acc.totalPlays + (analytics?.total_plays || 0),
-        totalLikes: acc.totalLikes + (analytics?.total_likes || 0),
-        totalComments: acc.totalComments + (analytics?.total_comments || 0),
-      };
-    }, { totalPlays: 0, totalLikes: 0, totalComments: 0 });
-  }, [songs]);
 
   const handleFollow = async () => {
     if (!user) {
@@ -111,38 +96,9 @@ const ArtistProfilePublic = () => {
 
           <div className="flex-1">
             <h1 className="text-4xl md:text-5xl font-bold mb-2">{artist.stage_name}</h1>
-            
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-              <div className="flex flex-col">
-                <span className="text-2xl font-bold">{artist.total_followers || 0}</span>
-                <span className="text-sm text-muted-foreground">Followers</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-2xl font-bold">{songs?.length || 0}</span>
-                <span className="text-sm text-muted-foreground">Songs</span>
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1">
-                  <Headphones className="h-4 w-4 text-primary" />
-                  <span className="text-2xl font-bold">{stats.totalPlays.toLocaleString()}</span>
-                </div>
-                <span className="text-sm text-muted-foreground">Streams</span>
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1">
-                  <Heart className="h-4 w-4 text-primary" />
-                  <span className="text-2xl font-bold">{stats.totalLikes.toLocaleString()}</span>
-                </div>
-                <span className="text-sm text-muted-foreground">Likes</span>
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1">
-                  <MessageCircle className="h-4 w-4 text-primary" />
-                  <span className="text-2xl font-bold">{stats.totalComments.toLocaleString()}</span>
-                </div>
-                <span className="text-sm text-muted-foreground">Comments</span>
-              </div>
+            <div className="flex gap-4 text-muted-foreground mb-4">
+              <span>{artist.total_followers || 0} followers</span>
+              <span>{songs?.length || 0} songs</span>
             </div>
 
             <div className="flex gap-3 mb-4">
@@ -256,12 +212,16 @@ const ArtistProfilePublic = () => {
 
                     <div className="flex items-center gap-6 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
-                        <Play className="h-4 w-4" />
+                        <Headphones className="h-4 w-4" />
                         <span>{song.song_analytics?.[0]?.total_plays || 0}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Heart className="h-4 w-4" />
                         <span>{song.song_analytics?.[0]?.total_likes || 0}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <MessageCircle className="h-4 w-4" />
+                        <span>{song.song_analytics?.[0]?.total_comments || 0}</span>
                       </div>
                     </div>
                   </div>
