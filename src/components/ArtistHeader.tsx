@@ -31,7 +31,7 @@ const ArtistHeader = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b-2 border-border shadow-sm">
       <div className="flex items-center justify-between px-8 py-4">
         {/* Logo */}
         <div className="flex-1">
