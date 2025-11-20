@@ -8,6 +8,7 @@ import SongManagement from "./artist/SongManagement";
 import ArtistSettings from "./artist/ArtistSettings";
 import CommunityManagement from "./artist/CommunityManagement";
 import EventManagement from "./artist/EventManagement";
+import CommentManagement from "./artist/CommentManagement";
 
 const ArtistDashboard = () => {
   const { user, loading, isArtist } = useAuth();
@@ -20,6 +21,7 @@ const ArtistDashboard = () => {
     if (path.includes("/upload")) return "upload";
     if (path.includes("/songs")) return "songs";
     if (path.includes("/community")) return "community";
+    if (path.includes("/comments")) return "comments";
     if (path.includes("/events")) return "events";
     if (path.includes("/settings")) return "settings";
     return "overview";
@@ -51,6 +53,7 @@ const ArtistDashboard = () => {
       upload: "/artist/dashboard/upload",
       songs: "/artist/dashboard/songs",
       community: "/artist/dashboard/community",
+      comments: "/artist/dashboard/comments",
       events: "/artist/dashboard/events",
       settings: "/artist/dashboard/settings",
     };
@@ -65,11 +68,12 @@ const ArtistDashboard = () => {
       </div>
 
       <Tabs value={getActiveTab()} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-grid">
+        <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-grid">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="upload">Upload Song</TabsTrigger>
           <TabsTrigger value="songs">My Songs</TabsTrigger>
           <TabsTrigger value="community">Community</TabsTrigger>
+          <TabsTrigger value="comments">Comments</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
@@ -88,6 +92,10 @@ const ArtistDashboard = () => {
 
         <TabsContent value="community">
           <CommunityManagement />
+        </TabsContent>
+
+        <TabsContent value="comments">
+          <CommentManagement />
         </TabsContent>
 
         <TabsContent value="events">
