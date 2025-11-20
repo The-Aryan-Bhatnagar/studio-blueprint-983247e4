@@ -7,9 +7,8 @@ import { useArtistProfile, useUpdateArtistProfile } from "@/hooks/useArtistProfi
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { User, Music, LogOut, Palette } from "lucide-react";
+import { User, Music, LogOut } from "lucide-react";
 import ArtistImageUpload from "@/components/ArtistImageUpload";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const ArtistSettings = () => {
   const { data: artistProfile, isLoading } = useArtistProfile();
@@ -26,7 +25,6 @@ const ArtistSettings = () => {
     youtube_url: "",
     spotify_url: "",
     apple_music_url: "",
-    name_color_theme: "white",
   });
 
   useEffect(() => {
@@ -40,7 +38,6 @@ const ArtistSettings = () => {
         youtube_url: artistProfile.youtube_url || "",
         spotify_url: artistProfile.spotify_url || "",
         apple_music_url: artistProfile.apple_music_url || "",
-        name_color_theme: artistProfile.name_color_theme || "white",
       });
     }
   }, [artistProfile]);
@@ -126,56 +123,6 @@ const ArtistSettings = () => {
                 rows={4}
               />
             </div>
-          </div>
-        </Card>
-
-        <Card className="p-6 border-border">
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <Palette className="w-5 h-5 text-primary" />
-            Artist Name Color Theme
-          </h2>
-
-          <div className="space-y-4">
-            <Label>Choose how your name appears in the dashboard header</Label>
-            <RadioGroup 
-              value={formData.name_color_theme} 
-              onValueChange={(value) => setFormData({ ...formData, name_color_theme: value })}
-              className="grid grid-cols-2 gap-4"
-            >
-              <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-muted/50">
-                <RadioGroupItem value="white" id="white" />
-                <Label htmlFor="white" className="cursor-pointer flex-1">
-                  <div className="text-white font-bold">White</div>
-                  <div className="text-xs text-muted-foreground">Classic clean look</div>
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-muted/50">
-                <RadioGroupItem value="gold" id="gold" />
-                <Label htmlFor="gold" className="cursor-pointer flex-1">
-                  <div className="text-[hsl(45_100%_51%)] font-bold">Gold</div>
-                  <div className="text-xs text-muted-foreground">Premium shine</div>
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-muted/50">
-                <RadioGroupItem value="neon" id="neon" />
-                <Label htmlFor="neon" className="cursor-pointer flex-1">
-                  <div className="text-[hsl(271_91%_65%)] font-bold">Neon</div>
-                  <div className="text-xs text-muted-foreground">Electric vibe</div>
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2 border rounded-lg p-4 cursor-pointer hover:bg-muted/50">
-                <RadioGroupItem value="gradient" id="gradient" />
-                <Label htmlFor="gradient" className="cursor-pointer flex-1">
-                  <div className="bg-gradient-to-r from-[hsl(45_100%_51%)] to-[hsl(271_91%_65%)] bg-clip-text text-transparent font-bold">
-                    Gradient
-                  </div>
-                  <div className="text-xs text-muted-foreground">Dynamic multi-color</div>
-                </Label>
-              </div>
-            </RadioGroup>
           </div>
         </Card>
 
