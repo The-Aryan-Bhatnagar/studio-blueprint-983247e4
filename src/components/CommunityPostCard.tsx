@@ -3,7 +3,7 @@ import { Card } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
-import { Heart, MessageCircle, Share2, Pin, Trash2, Edit2, MoreVertical, Reply, Send } from "lucide-react";
+import { Heart, MessageCircle, Share2, Pin, Trash2, Edit2, MoreVertical, Reply, Send, TrendingUp, Eye } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import {
   useTogglePostLike,
@@ -107,6 +107,13 @@ const CommunityPostCard = ({ post, isArtist }: CommunityPostCardProps) => {
     });
   };
 
+  const handleMarkPopular = () => {
+    updatePost.mutate({
+      postId: post.id,
+      updates: { is_popular: !post.is_popular },
+    });
+  };
+
   const handleEdit = () => {
     updatePost.mutate(
       {
@@ -158,6 +165,10 @@ const CommunityPostCard = ({ post, isArtist }: CommunityPostCardProps) => {
                 <DropdownMenuItem onClick={handlePin}>
                   <Pin className="w-4 h-4 mr-2" />
                   {post.is_pinned ? "Unpin" : "Pin"}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleMarkPopular}>
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  {post.is_popular ? "Unmark as Popular" : "Mark as Popular"}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleDelete} className="text-destructive">
                   <Trash2 className="w-4 h-4 mr-2" />
