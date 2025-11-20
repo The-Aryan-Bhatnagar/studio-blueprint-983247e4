@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageSquare, Trash2, Send } from "lucide-react";
+import { MessageSquare, Trash2, Send, Reply } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +24,8 @@ interface CommentsDialogProps {
 const CommentsDialog = ({ songId, songTitle }: CommentsDialogProps) => {
   const [open, setOpen] = useState(false);
   const [comment, setComment] = useState("");
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyContent, setReplyContent] = useState("");
   const { user } = useAuth();
   const { data: comments, isLoading } = useComments(songId);
   const createComment = useCreateComment();
@@ -54,6 +56,39 @@ const CommentsDialog = ({ songId, songTitle }: CommentsDialogProps) => {
       toast({
         title: "Error",
         description: "Failed to post comment",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReply = async (parentCommentId: string) => {
+    if (!user) {
+      toast({
+        title: "Login required",
+        description: "Please login to reply to comments",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!replyContent.trim()) return;
+
+    try {
+      await createComment.mutateAsync({ 
+        songId, 
+        content: replyContent.trim(),
+        parentCommentId 
+      });
+      setReplyContent("");
+      setReplyingTo(null);
+      toast({
+        title: "Reply posted",
+        description: "Your reply has been added",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to post reply",
         variant: "destructive",
       });
     }
@@ -111,34 +146,114 @@ const CommentsDialog = ({ songId, songTitle }: CommentsDialogProps) => {
             ) : (
               <div className="space-y-4">
                 {comments?.map((comment) => (
-                  <div key={comment.id} className="flex gap-3 p-3 rounded-lg bg-muted/50">
-                    <Avatar>
-                      <AvatarImage src={comment.profile?.avatar_url || undefined} />
-                      <AvatarFallback>
-                        {comment.profile?.full_name?.charAt(0) || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="font-medium">{comment.profile?.full_name || "Anonymous"}</p>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                          </span>
-                          {user?.id === comment.user_id && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() => handleDelete(comment.id)}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          )}
+                  <div key={comment.id} className="space-y-3">
+                    <div className="flex gap-3 p-3 rounded-lg bg-muted/50">
+                      <Avatar>
+                        <AvatarImage src={comment.profile?.avatar_url || undefined} />
+                        <AvatarFallback>
+                          {comment.profile?.full_name?.charAt(0) || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="font-medium">{comment.profile?.full_name || "Anonymous"}</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">
+                              {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                            </span>
+                            {user?.id === comment.user_id && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => handleDelete(comment.id)}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-sm mb-2">{comment.content}</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 text-xs"
+                          onClick={() => setReplyingTo(comment.id)}
+                        >
+                          <Reply className="h-3 w-3 mr-1" />
+                          Reply
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Reply form */}
+                    {replyingTo === comment.id && (
+                      <div className="ml-12 flex gap-2">
+                        <Textarea
+                          value={replyContent}
+                          onChange={(e) => setReplyContent(e.target.value)}
+                          placeholder="Write a reply..."
+                          className="flex-1 min-h-[60px]"
+                          autoFocus
+                        />
+                        <div className="flex flex-col gap-1">
+                          <Button 
+                            size="sm"
+                            onClick={() => handleReply(comment.id)}
+                            disabled={!replyContent.trim() || createComment.isPending}
+                          >
+                            <Send className="h-3 w-3" />
+                          </Button>
+                          <Button 
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              setReplyingTo(null);
+                              setReplyContent("");
+                            }}
+                          >
+                            Cancel
+                          </Button>
                         </div>
                       </div>
-                      <p className="text-sm">{comment.content}</p>
-                    </div>
+                    )}
+
+                    {/* Replies */}
+                    {comment.replies && comment.replies.length > 0 && (
+                      <div className="ml-12 space-y-3">
+                        {comment.replies.map((reply) => (
+                          <div key={reply.id} className="flex gap-3 p-3 rounded-lg bg-muted/30">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={reply.profile?.avatar_url || undefined} />
+                              <AvatarFallback className="text-xs">
+                                {reply.profile?.full_name?.charAt(0) || "U"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-1">
+                                <p className="font-medium text-sm">{reply.profile?.full_name || "Anonymous"}</p>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-muted-foreground">
+                                    {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true })}
+                                  </span>
+                                  {user?.id === reply.user_id && (
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-5 w-5"
+                                      onClick={() => handleDelete(reply.id)}
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                              <p className="text-sm">{reply.content}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

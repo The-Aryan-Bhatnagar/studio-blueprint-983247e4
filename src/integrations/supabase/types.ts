@@ -492,6 +492,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          parent_comment_id: string | null
           song_id: string
           updated_at: string
           user_id: string
@@ -500,6 +501,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          parent_comment_id?: string | null
           song_id: string
           updated_at?: string
           user_id: string
@@ -508,11 +510,19 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          parent_comment_id?: string | null
           song_id?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "song_comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "song_comments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "song_comments_song_id_fkey"
             columns: ["song_id"]

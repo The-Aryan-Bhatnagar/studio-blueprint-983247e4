@@ -23,13 +23,33 @@ export const useComments = (songId: string | undefined) => {
         .select("user_id, full_name, avatar_url")
         .in("user_id", userIds);
 
-      // Map profiles to comments
+      // Map profiles to comments and organize into parent-child structure
       const commentsWithProfiles = data.map(comment => ({
         ...comment,
-        profile: profiles?.find(p => p.user_id === comment.user_id)
+        profile: profiles?.find(p => p.user_id === comment.user_id),
+        replies: [] as any[]
       }));
 
-      return commentsWithProfiles;
+      // Organize comments: separate parent comments and replies
+      const parentComments = commentsWithProfiles.filter(c => !c.parent_comment_id);
+      const replies = commentsWithProfiles.filter(c => c.parent_comment_id);
+
+      // Attach replies to their parent comments
+      replies.forEach(reply => {
+        const parent = parentComments.find(p => p.id === reply.parent_comment_id);
+        if (parent) {
+          parent.replies.push(reply);
+        }
+      });
+
+      // Sort replies by created_at ascending (oldest first)
+      parentComments.forEach(parent => {
+        parent.replies.sort((a, b) => 
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+      });
+
+      return parentComments;
     },
     enabled: !!songId,
   });
@@ -40,7 +60,15 @@ export const useCreateComment = () => {
   const { user } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ songId, content }: { songId: string; content: string }) => {
+    mutationFn: async ({ 
+      songId, 
+      content, 
+      parentCommentId 
+    }: { 
+      songId: string; 
+      content: string; 
+      parentCommentId?: string;
+    }) => {
       if (!user) throw new Error("Must be logged in to comment");
 
       const { data, error } = await supabase
@@ -49,6 +77,7 @@ export const useCreateComment = () => {
           user_id: user.id,
           song_id: songId,
           content,
+          parent_comment_id: parentCommentId || null,
         })
         .select()
         .single();
