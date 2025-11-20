@@ -81,6 +81,7 @@ export const useUpdatePost = () => {
         media_url?: string;
         media_type?: "image" | "video";
         is_pinned?: boolean;
+        is_popular?: boolean;
       };
     }) => {
       const { data, error } = await supabase

@@ -97,6 +97,50 @@ export type Database = {
           },
         ]
       }
+      community_post_analytics: {
+        Row: {
+          created_at: string | null
+          id: string
+          post_id: string
+          total_comments: number | null
+          total_likes: number | null
+          total_views: number | null
+          updated_at: string | null
+          views_last_30_days: number | null
+          views_last_7_days: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          post_id: string
+          total_comments?: number | null
+          total_likes?: number | null
+          total_views?: number | null
+          updated_at?: string | null
+          views_last_30_days?: number | null
+          views_last_7_days?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          total_comments?: number | null
+          total_likes?: number | null
+          total_views?: number | null
+          updated_at?: string | null
+          views_last_30_days?: number | null
+          views_last_7_days?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_post_analytics_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: true
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_post_comments: {
         Row: {
           content: string
@@ -178,6 +222,7 @@ export type Database = {
           created_at: string
           id: string
           is_pinned: boolean | null
+          is_popular: boolean | null
           media_type: string | null
           media_url: string | null
           updated_at: string
@@ -188,6 +233,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_pinned?: boolean | null
+          is_popular?: boolean | null
           media_type?: string | null
           media_url?: string | null
           updated_at?: string
@@ -198,6 +244,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_pinned?: boolean | null
+          is_popular?: boolean | null
           media_type?: string | null
           media_url?: string | null
           updated_at?: string
@@ -271,6 +318,7 @@ export type Database = {
           description: string | null
           event_date: string
           id: string
+          is_featured: boolean | null
           is_published: boolean | null
           location: string
           ticket_price: number
@@ -286,6 +334,7 @@ export type Database = {
           description?: string | null
           event_date: string
           id?: string
+          is_featured?: boolean | null
           is_published?: boolean | null
           location: string
           ticket_price?: number
@@ -301,6 +350,7 @@ export type Database = {
           description?: string | null
           event_date?: string
           id?: string
+          is_featured?: boolean | null
           is_published?: boolean | null
           location?: string
           ticket_price?: number

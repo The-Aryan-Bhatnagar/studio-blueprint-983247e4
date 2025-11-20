@@ -29,6 +29,7 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import PlaylistDetail from "./pages/PlaylistDetail";
 import Community from "./pages/Community";
+import SongAnalytics from "./pages/artist/SongAnalytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -69,7 +70,9 @@ const App = () => (
               <Route path="/artist/dashboard" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
               <Route path="/artist/dashboard/upload" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
               <Route path="/artist/dashboard/songs" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
+              <Route path="/artist/dashboard/songs/:songId/analytics" element={<ArtistLayout><ProtectedRoute><SongAnalytics /></ProtectedRoute></ArtistLayout>} />
               <Route path="/artist/dashboard/community" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
+              <Route path="/artist/dashboard/comments" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
               <Route path="/artist/dashboard/events" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
               <Route path="/artist/dashboard/settings" element={<ArtistLayout><ProtectedRoute><ArtistDashboard /></ProtectedRoute></ArtistLayout>} />
               
