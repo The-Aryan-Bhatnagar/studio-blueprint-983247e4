@@ -22,7 +22,8 @@ const SongAnalytics = () => {
   });
   
   const song = songs?.find(s => s.id === songId);
-  const analytics = song?.song_analytics?.[0];
+  const songAnalytics: any = song && (song as any).song_analytics;
+  const analytics = Array.isArray(songAnalytics) ? songAnalytics[0] : songAnalytics;
   
   // Fetch play history with date range
   const { data: playHistory, isLoading } = usePlayHistory(
