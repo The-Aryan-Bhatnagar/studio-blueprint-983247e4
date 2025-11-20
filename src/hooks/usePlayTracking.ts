@@ -5,7 +5,10 @@ export const usePlayTracking = () => {
   const trackedSongs = useRef<Set<string>>(new Set());
   const playTimers = useRef<Map<string, number>>(new Map());
 
-  const startTracking = useCallback((songId: string) => {
+  const startTracking = useCallback((
+    songId: string, 
+    trafficSource?: string
+  ) => {
     // Clear any existing timer for this song
     const existingTimer = playTimers.current.get(songId);
     if (existingTimer) {
@@ -22,7 +25,10 @@ export const usePlayTracking = () => {
       try {
         // Call edge function to increment play count
         const { error } = await supabase.functions.invoke('increment-play-count', {
-          body: { song_id: songId },
+          body: { 
+            song_id: songId,
+            traffic_source: trafficSource || 'direct',
+          },
         });
 
         if (error) {
@@ -30,7 +36,7 @@ export const usePlayTracking = () => {
         } else {
           // Mark as tracked for this session
           trackedSongs.current.add(songId);
-          console.log(`Play tracked for song: ${songId}`);
+          console.log(`Play tracked for song: ${songId}, source: ${trafficSource || 'direct'}`);
         }
       } catch (error) {
         console.error('Error tracking play:', error);
