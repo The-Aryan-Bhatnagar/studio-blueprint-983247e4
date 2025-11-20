@@ -60,8 +60,8 @@ const SongManagement = () => {
           await supabase.from('community_posts').insert({
             artist_id: artistProfile.id,
             content: `🎵 New Release Alert! "${title}" is now available! Check it out now!`,
-            media_type: 'image',
-            media_url: song.cover_image_url,
+            media_type: song.cover_image_url ? 'image' : null,
+            media_url: song.cover_image_url || null,
           });
 
           // Notify followers
