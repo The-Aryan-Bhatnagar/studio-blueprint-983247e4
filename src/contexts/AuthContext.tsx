@@ -11,6 +11,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, stageName: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   isArtist: boolean;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,6 +21,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isArtist, setIsArtist] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,12 +32,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Check if user is an artist
+          // Check user roles
           setTimeout(() => {
-            checkArtistRole(session.user.id);
+            checkUserRoles(session.user.id);
           }, 0);
         } else {
           setIsArtist(false);
+          setIsAdmin(false);
         }
       }
     );
@@ -46,7 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        checkArtistRole(session.user.id);
+        checkUserRoles(session.user.id);
       }
       setLoading(false);
     });
@@ -54,15 +57,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const checkArtistRole = async (userId: string) => {
+  const checkUserRoles = async (userId: string) => {
     const { data } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId)
-      .eq("role", "artist")
-      .maybeSingle();
+      .eq("user_id", userId);
     
-    setIsArtist(!!data);
+    const roles = data?.map(r => r.role) || [];
+    setIsArtist(roles.includes("artist"));
+    setIsAdmin(roles.includes("admin"));
   };
 
   const signIn = async (email: string, password: string) => {
@@ -96,7 +99,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut, isArtist }}>
+    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut, isArtist, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );

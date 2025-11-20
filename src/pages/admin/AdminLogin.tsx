@@ -6,20 +6,65 @@ import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signIn, isAdmin } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: "Admin Login Successful",
-      description: "Welcome to admin panel!",
-    });
+  // Redirect if already admin
+  if (isAdmin) {
     navigate("/admin");
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const { error } = await signIn(email, password);
+
+    if (error) {
+      toast({
+        title: "Login Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
+    // Check if user is admin - the role check happens in AuthContext
+    // We'll navigate if they're admin, otherwise show error
+    setTimeout(() => {
+      // This check happens after the auth state updates
+      const checkAdminAndNavigate = setInterval(() => {
+        if (isAdmin) {
+          clearInterval(checkAdminAndNavigate);
+          toast({
+            title: "Admin Login Successful",
+            description: "Welcome to admin panel!",
+          });
+          navigate("/admin");
+        }
+      }, 100);
+
+      // Timeout after 3 seconds
+      setTimeout(() => {
+        clearInterval(checkAdminAndNavigate);
+        if (!isAdmin) {
+          toast({
+            title: "Access Denied",
+            description: "You don't have admin privileges",
+            variant: "destructive",
+          });
+          setLoading(false);
+        }
+      }, 3000);
+    }, 500);
   };
 
   return (
@@ -64,8 +109,8 @@ const AdminLogin = () => {
             />
           </div>
 
-          <Button type="submit" className="w-full bg-gradient-primary">
-            Login to Admin Panel
+          <Button type="submit" className="w-full bg-gradient-primary" disabled={loading}>
+            {loading ? "Logging in..." : "Login to Admin Panel"}
           </Button>
         </form>
       </Card>
