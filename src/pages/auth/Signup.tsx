@@ -14,6 +14,8 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("");
   const [loading, setLoading] = useState(false);
   const [signupMethod, setSignupMethod] = useState<"email" | "phone">("email");
   const navigate = useNavigate();
@@ -41,6 +43,8 @@ const Signup = () => {
           data: {
             full_name: fullName,
             phone_number: phone,
+            city: city,
+            country: country,
           },
           emailRedirectTo: `${window.location.origin}/auth/verify-otp`,
         },
@@ -75,6 +79,8 @@ const Signup = () => {
         options: {
           data: {
             full_name: fullName,
+            city: city,
+            country: country,
           },
         },
       });
@@ -134,6 +140,31 @@ const Signup = () => {
                 />
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="city">City</Label>
+                  <Input
+                    id="city"
+                    type="text"
+                    placeholder="Your city"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="country">Country</Label>
+                  <Input
+                    id="country"
+                    type="text"
+                    placeholder="Your country"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
               <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -188,6 +219,31 @@ const Signup = () => {
                   onChange={(e) => setFullName(e.target.value)}
                   required
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="cityPhone">City</Label>
+                  <Input
+                    id="cityPhone"
+                    type="text"
+                    placeholder="Your city"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="countryPhone">Country</Label>
+                  <Input
+                    id="countryPhone"
+                    type="text"
+                    placeholder="Your country"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
 
               <div>
