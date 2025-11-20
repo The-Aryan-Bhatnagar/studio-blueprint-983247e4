@@ -7,6 +7,7 @@ import { PlayerProvider } from "./contexts/PlayerContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import Layout from "./components/Layout";
 import ArtistLayout from "./components/ArtistLayout";
+import UserLayout from "./components/UserLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
@@ -15,6 +16,7 @@ import Search from "./pages/Search";
 import Library from "./pages/Library";
 import Events from "./pages/Events";
 import UserProfile from "./pages/UserProfile";
+import UserDashboard from "./pages/user/UserDashboard";
 import ArtistProfile from "./pages/ArtistProfile";
 import ArtistProfilePublic from "./pages/ArtistProfilePublic";
 import ArtistDashboard from "./pages/ArtistDashboard";
@@ -72,6 +74,10 @@ const App = () => (
               <Route path="/admin/analytics" element={<AdminLayout><ProtectedRoute><AnalyticsPage /></ProtectedRoute></AdminLayout>} />
               <Route path="/admin/settings" element={<AdminLayout><ProtectedRoute><SettingsPage /></ProtectedRoute></AdminLayout>} />
               
+              {/* User Dashboard Routes - User Layout */}
+              <Route path="/user/dashboard" element={<UserLayout><ProtectedRoute><UserDashboard /></ProtectedRoute></UserLayout>} />
+              <Route path="/profile" element={<UserLayout><ProtectedRoute><UserProfile /></ProtectedRoute></UserLayout>} />
+              
               {/* User Routes - Regular Layout with Music Player */}
               <Route path="/" element={<Layout><ProtectedRoute><Home /></ProtectedRoute></Layout>} />
               <Route path="/discover" element={<Layout><ProtectedRoute><Discover /></ProtectedRoute></Layout>} />
@@ -80,7 +86,6 @@ const App = () => (
               <Route path="/playlist/:playlistId" element={<Layout><ProtectedRoute><PlaylistDetail /></ProtectedRoute></Layout>} />
               <Route path="/community" element={<Layout><ProtectedRoute><Community /></ProtectedRoute></Layout>} />
               <Route path="/events" element={<Layout><ProtectedRoute><Events /></ProtectedRoute></Layout>} />
-              <Route path="/profile" element={<Layout><ProtectedRoute><UserProfile /></ProtectedRoute></Layout>} />
               <Route path="/artist/:artistId" element={<Layout><ProtectedRoute><ArtistProfilePublic /></ProtectedRoute></Layout>} />
               
               {/* Artist Routes - Artist Layout (No Music Player) */}
