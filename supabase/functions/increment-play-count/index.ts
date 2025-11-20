@@ -12,6 +12,15 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Get authorization header
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { song_id } = await req.json();
 
     if (!song_id) {
@@ -21,8 +30,29 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Create Supabase client with service role key for bypassing RLS
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    
+    // Create client with user's JWT to verify authentication
+    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        headers: {
+          authorization: authHeader,
+        },
+      },
+    });
+
+    // Verify user is authenticated
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Use service role key for the actual update to bypass RLS
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -60,7 +90,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`Play count incremented for song: ${song_id}`);
+    console.log(`Play count incremented for song: ${song_id} by user: ${user.id}`);
 
     return new Response(
       JSON.stringify({ success: true, message: 'Play count incremented' }),
