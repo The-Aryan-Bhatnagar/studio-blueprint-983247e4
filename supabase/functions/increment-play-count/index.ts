@@ -73,6 +73,23 @@ Deno.serve(async (req) => {
     const userAgent = req.headers.get('user-agent') || '';
     const deviceType = getDeviceType(userAgent);
 
+    // Fetch user's city and country from profile
+    let userCity = city || null;
+    let userCountry = country || null;
+    
+    if (user?.id) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('city, country')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (profile) {
+        userCity = profile.city || userCity;
+        userCountry = profile.country || userCountry;
+      }
+    }
+
     // Insert into play_history table with detailed tracking
     const { error: historyError } = await supabase
       .from('play_history')
@@ -80,8 +97,8 @@ Deno.serve(async (req) => {
         song_id,
         user_id: user.id,
         device_type: deviceType,
-        country: country || null,
-        city: city || null,
+        country: userCountry,
+        city: userCity,
         traffic_source: traffic_source || 'direct',
         played_at: new Date().toISOString(),
       });
