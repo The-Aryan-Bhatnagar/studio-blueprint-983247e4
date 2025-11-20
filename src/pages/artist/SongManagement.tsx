@@ -6,6 +6,7 @@ import { useSongs, useDeleteSong, useUpdateSong } from "@/hooks/useSongs";
 import { Edit, Trash2, BarChart3, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const SongManagement = () => {
   const { data: songs, isLoading } = useSongs();
@@ -33,13 +34,60 @@ const SongManagement = () => {
 
   const handlePublish = async (id: string, title: string) => {
     try {
+      // Get song and artist info
+      const song = songs?.find(s => s.id === id);
+      if (!song) throw new Error('Song not found');
+
+      // Publish the song
       await updateSong.mutateAsync({
         id,
         updates: { is_published: true, is_draft: false, published_at: new Date().toISOString() },
       });
+
+      // Auto-post to community
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: artistProfile } = await supabase
+          .from('artist_profiles')
+          .select('id, stage_name')
+          .eq('user_id', user.id)
+          .single();
+
+        if (artistProfile) {
+          await supabase.from('community_posts').insert({
+            artist_id: artistProfile.id,
+            content: `🎵 New Release Alert! "${title}" is now available! Check it out now!`,
+            media_type: 'image',
+            media_url: song.cover_image_url,
+          });
+
+          // Notify followers
+          const { data: followers } = await supabase
+            .from('user_follows')
+            .select('user_id')
+            .eq('artist_id', artistProfile.id);
+
+          if (followers && followers.length > 0) {
+            const notifications = followers.map(follower => ({
+              user_id: follower.user_id,
+              type: 'new_release',
+              title: 'New Song Release',
+              message: `${artistProfile.stage_name} just released "${title}"!`,
+              link: `/artist/${artistProfile.id}`,
+              metadata: {
+                song_id: id,
+                artist_id: artistProfile.id,
+              },
+            }));
+
+            await supabase.from('notifications').insert(notifications);
+          }
+        }
+      }
+
       toast({
         title: "Song Published",
-        description: `${title} is now live!`,
+        description: `${title} is now live and your followers have been notified!`,
       });
     } catch (error: any) {
       toast({
