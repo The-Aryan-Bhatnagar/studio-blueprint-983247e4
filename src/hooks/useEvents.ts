@@ -30,6 +30,9 @@ export interface EventBooking {
   number_of_tickets: number;
   total_amount: number;
   booking_status: string;
+  user_email?: string;
+  user_name?: string;
+  user_phone?: string;
   created_at: string;
 }
 
@@ -266,25 +269,7 @@ export const useEventBookings = (eventId?: string) => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-
-      // Fetch user profiles for all bookings
-      if (data && data.length > 0) {
-        const userIds = data.map((booking: EventBooking) => booking.user_id);
-        const { data: profiles, error: profilesError } = await supabase
-          .from("profiles")
-          .select("user_id, full_name, phone_number, avatar_url")
-          .in("user_id", userIds);
-
-        if (profilesError) throw profilesError;
-
-        // Merge profile data with bookings
-        return data.map((booking: EventBooking) => ({
-          ...booking,
-          user_profile: profiles?.find((p: any) => p.user_id === booking.user_id),
-        }));
-      }
-
-      return data || [];
+      return data as EventBooking[];
     },
     enabled: !!eventId,
   });

@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { useEventBookings, type Event } from "@/hooks/useEvents";
 import { Card, CardContent } from "./ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback } from "./ui/avatar";
 import { User, Mail, Phone, Ticket, DollarSign, Calendar } from "lucide-react";
 import { format } from "date-fns";
 
@@ -65,15 +65,14 @@ const EventBookingsDialog = ({ event, open, onOpenChange }: EventBookingsDialogP
               </Card>
             ) : (
               <div className="space-y-3">
-                {bookings.map((booking: any) => (
+                {bookings.map((booking) => (
                   <Card key={booking.id}>
                     <CardContent className="p-4">
                       <div className="flex items-start gap-4">
                         {/* Avatar */}
                         <Avatar className="w-12 h-12">
-                          <AvatarImage src={booking.user_profile?.avatar_url} />
                           <AvatarFallback>
-                            {booking.user_profile?.full_name?.charAt(0) || "U"}
+                            {booking.user_name?.charAt(0) || "U"}
                           </AvatarFallback>
                         </Avatar>
 
@@ -83,12 +82,18 @@ const EventBookingsDialog = ({ event, open, onOpenChange }: EventBookingsDialogP
                             <div>
                               <h4 className="font-semibold flex items-center gap-2">
                                 <User className="w-4 h-4 text-muted-foreground" />
-                                {booking.user_profile?.full_name || "Anonymous User"}
+                                {booking.user_name || "Anonymous User"}
                               </h4>
-                              {booking.user_profile?.phone_number && (
+                              {booking.user_email && (
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                                  <Mail className="w-3 h-3" />
+                                  <span className="truncate">{booking.user_email}</span>
+                                </div>
+                              )}
+                              {booking.user_phone && (
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                                   <Phone className="w-3 h-3" />
-                                  <span>{booking.user_profile.phone_number}</span>
+                                  <span>{booking.user_phone}</span>
                                 </div>
                               )}
                             </div>

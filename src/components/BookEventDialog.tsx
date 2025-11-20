@@ -6,6 +6,7 @@ import { Label } from "./ui/label";
 import { useBookEvent, type Event } from "@/hooks/useEvents";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { Calendar, MapPin, Ticket, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 
@@ -44,12 +45,22 @@ const BookEventDialog = ({ event, open, onOpenChange }: BookEventDialogProps) =>
       return;
     }
 
+    // Fetch user profile for additional info
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name, phone_number")
+      .eq("user_id", user.id)
+      .single();
+
     await bookEvent.mutateAsync({
       event_id: event.id,
       user_id: user.id,
       number_of_tickets: numberOfTickets,
       total_amount: totalAmount,
       booking_status: "confirmed",
+      user_email: user.email || "",
+      user_name: profile?.full_name || "",
+      user_phone: profile?.phone_number || "",
     });
 
     onOpenChange(false);
