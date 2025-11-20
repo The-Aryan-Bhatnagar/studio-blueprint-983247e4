@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { User, Music, LogOut } from "lucide-react";
+import ArtistImageUpload from "@/components/ArtistImageUpload";
 
 const ArtistSettings = () => {
   const { data: artistProfile, isLoading } = useArtistProfile();
@@ -81,7 +82,27 @@ const ArtistSettings = () => {
             Basic Information
           </h2>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
+            <div>
+              <Label className="mb-4 block">Profile Picture</Label>
+              <ArtistImageUpload
+                currentImageUrl={formData.avatar_url}
+                artistName={formData.stage_name}
+                type="avatar"
+                onRemove={() => setFormData({ ...formData, avatar_url: "" })}
+              />
+            </div>
+
+            <div>
+              <Label className="mb-4 block">Cover Image</Label>
+              <ArtistImageUpload
+                currentImageUrl={formData.cover_image_url}
+                artistName={formData.stage_name}
+                type="cover"
+                onRemove={() => setFormData({ ...formData, cover_image_url: "" })}
+              />
+            </div>
+
             <div>
               <Label htmlFor="stage_name">Stage Name *</Label>
               <Input
@@ -100,26 +121,6 @@ const ArtistSettings = () => {
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 rows={4}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="avatar_url">Profile Picture URL</Label>
-              <Input
-                id="avatar_url"
-                placeholder="https://example.com/avatar.jpg"
-                value={formData.avatar_url}
-                onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="cover_image_url">Cover Image URL</Label>
-              <Input
-                id="cover_image_url"
-                placeholder="https://example.com/cover.jpg"
-                value={formData.cover_image_url}
-                onChange={(e) => setFormData({ ...formData, cover_image_url: e.target.value })}
               />
             </div>
           </div>
