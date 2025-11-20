@@ -46,6 +46,13 @@ All colors MUST be HSL.
     --shadow-card: 0 10px 30px -10px hsl(0 0% 0% / 0.5);
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Artist name color themes */
+    --artist-name-white: 0 0% 100%;
+    --artist-name-gold: 45 100% 51%;
+    --artist-name-neon: 271 91% 65%;
+    --gradient-artist-gold: linear-gradient(135deg, hsl(45 100% 51%), hsl(35 100% 45%));
+    --gradient-artist-neon: linear-gradient(135deg, hsl(271 91% 65%), hsl(180 100% 50%));
   }
 }
 

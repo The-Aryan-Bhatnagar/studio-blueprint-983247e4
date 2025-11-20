@@ -47,11 +47,18 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        'artist-name': {
+          white: "hsl(var(--artist-name-white))",
+          gold: "hsl(var(--artist-name-gold))",
+          neon: "hsl(var(--artist-name-neon))",
+        },
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
         'gradient-card': 'var(--gradient-card)',
         'gradient-hero': 'var(--gradient-hero)',
+        'gradient-artist-gold': 'var(--gradient-artist-gold)',
+        'gradient-artist-neon': 'var(--gradient-artist-neon)',
       },
       boxShadow: {
         'glow': 'var(--shadow-glow)',
