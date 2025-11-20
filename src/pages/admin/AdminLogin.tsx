@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -17,9 +17,11 @@ const AdminLogin = () => {
   const { signIn, isAdmin } = useAuth();
 
   // Redirect if already admin
-  if (isAdmin) {
-    navigate("/admin");
-  }
+  useEffect(() => {
+    if (isAdmin) {
+      navigate("/admin");
+    }
+  }, [isAdmin, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,34 +39,14 @@ const AdminLogin = () => {
       return;
     }
 
-    // Check if user is admin - the role check happens in AuthContext
-    // We'll navigate if they're admin, otherwise show error
-    setTimeout(() => {
-      // This check happens after the auth state updates
-      const checkAdminAndNavigate = setInterval(() => {
-        if (isAdmin) {
-          clearInterval(checkAdminAndNavigate);
-          toast({
-            title: "Admin Login Successful",
-            description: "Welcome to admin panel!",
-          });
-          navigate("/admin");
-        }
-      }, 100);
-
-      // Timeout after 3 seconds
-      setTimeout(() => {
-        clearInterval(checkAdminAndNavigate);
-        if (!isAdmin) {
-          toast({
-            title: "Access Denied",
-            description: "You don't have admin privileges",
-            variant: "destructive",
-          });
-          setLoading(false);
-        }
-      }, 3000);
-    }, 500);
+    // Auth state will update automatically, and the redirect will happen via the effect in AdminDashboard
+    toast({
+      title: "Login Successful",
+      description: "Checking admin privileges...",
+    });
+    
+    // Navigate to admin panel - AdminDashboard will handle the authorization check
+    navigate("/admin");
   };
 
   return (
