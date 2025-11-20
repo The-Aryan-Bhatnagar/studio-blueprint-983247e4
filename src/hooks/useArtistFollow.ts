@@ -93,7 +93,8 @@ export const useArtistSongs = (artistId: string | undefined) => {
           *,
           song_analytics (
             total_plays,
-            total_likes
+            total_likes,
+            total_comments
           )
         `)
         .eq("artist_id", artistId)
