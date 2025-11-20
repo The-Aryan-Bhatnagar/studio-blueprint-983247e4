@@ -28,6 +28,7 @@ import ArtistLogin from "./pages/artist/ArtistLogin";
 import ArtistSignup from "./pages/artist/ArtistSignup";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import PlaylistDetail from "./pages/PlaylistDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,7 @@ const App = () => (
               <Route path="/discover" element={<Layout><ProtectedRoute><Discover /></ProtectedRoute></Layout>} />
               <Route path="/search" element={<Layout><ProtectedRoute><Search /></ProtectedRoute></Layout>} />
               <Route path="/library" element={<Layout><ProtectedRoute><Library /></ProtectedRoute></Layout>} />
+              <Route path="/playlist/:playlistId" element={<Layout><ProtectedRoute><PlaylistDetail /></ProtectedRoute></Layout>} />
               <Route path="/community" element={<Layout><ProtectedRoute><Community /></ProtectedRoute></Layout>} />
               <Route path="/events" element={<Layout><ProtectedRoute><Events /></ProtectedRoute></Layout>} />
               <Route path="/profile" element={<Layout><ProtectedRoute><UserProfile /></ProtectedRoute></Layout>} />
