@@ -5,6 +5,7 @@ import { User, LogOut, Music2, Mic2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useArtistProfile } from "@/hooks/useArtistProfile";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const ArtistHeader = () => {
   const { user, signOut } = useAuth();
@@ -56,6 +57,7 @@ const ArtistHeader = () => {
         {/* User Actions */}
         <div className="flex-1 flex justify-end">
           <div className="flex items-center gap-4">
+          <ThemeToggle />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
