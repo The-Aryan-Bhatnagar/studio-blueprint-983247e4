@@ -29,16 +29,38 @@ export const usePostComments = (postId: string) => {
         .select("user_id, stage_name, avatar_url")
         .in("user_id", userIds);
 
-      // Merge the data
-      return comments?.map((comment) => {
+      // Merge the data and organize into parent-child structure
+      const commentsWithProfiles = comments?.map((comment) => {
         const profile = profiles?.find((p) => p.user_id === comment.user_id);
         const artistProfile = artistProfiles?.find((a) => a.user_id === comment.user_id);
         return {
           ...comment,
           profiles: profile || null,
           artist_profiles: artistProfile || null,
+          replies: [] as any[],
         };
+      }) || [];
+
+      // Organize comments: separate parent comments and replies
+      const parentComments = commentsWithProfiles.filter(c => !c.parent_comment_id);
+      const replies = commentsWithProfiles.filter(c => c.parent_comment_id);
+
+      // Attach replies to their parent comments
+      replies.forEach(reply => {
+        const parent = parentComments.find(p => p.id === reply.parent_comment_id);
+        if (parent) {
+          parent.replies.push(reply);
+        }
       });
+
+      // Sort replies by created_at ascending (oldest first)
+      parentComments.forEach(parent => {
+        parent.replies.sort((a, b) => 
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+      });
+
+      return parentComments;
     },
   });
 };
@@ -52,10 +74,16 @@ export const useCreateComment = () => {
       post_id: string;
       user_id: string;
       content: string;
+      parent_comment_id?: string;
     }) => {
       const { data, error } = await supabase
         .from("community_post_comments")
-        .insert(comment)
+        .insert({
+          post_id: comment.post_id,
+          user_id: comment.user_id,
+          content: comment.content,
+          parent_comment_id: comment.parent_comment_id || null,
+        })
         .select()
         .single();
 
