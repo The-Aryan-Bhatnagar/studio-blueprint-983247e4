@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { commentSchema } from "@/lib/validations";
 
 export const useComments = (songId: string | undefined) => {
   return useQuery({
@@ -70,6 +71,12 @@ export const useCreateComment = () => {
       parentCommentId?: string;
     }) => {
       if (!user) throw new Error("Must be logged in to comment");
+
+      // Validate content
+      const validation = commentSchema.safeParse({ content });
+      if (!validation.success) {
+        throw new Error(validation.error.errors[0].message);
+      }
 
       const { data, error } = await supabase
         .from("song_comments")

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { commentSchema } from "@/lib/validations";
 
 export const usePostComments = (postId: string) => {
   return useQuery({
@@ -76,6 +77,12 @@ export const useCreateComment = () => {
       content: string;
       parent_comment_id?: string;
     }) => {
+      // Validate content
+      const validation = commentSchema.safeParse({ content: comment.content });
+      if (!validation.success) {
+        throw new Error(validation.error.errors[0].message);
+      }
+
       const { data, error } = await supabase
         .from("community_post_comments")
         .insert({
@@ -118,6 +125,12 @@ export const useUpdateComment = () => {
       content: string;
       postId: string;
     }) => {
+      // Validate content
+      const validation = commentSchema.safeParse({ content });
+      if (!validation.success) {
+        throw new Error(validation.error.errors[0].message);
+      }
+
       const { data, error } = await supabase
         .from("community_post_comments")
         .update({ content })
