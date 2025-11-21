@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import logo from "@/assets/greenbox-logo.png";
+import { useTransparentLogo } from "@/hooks/useTransparentLogo";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -17,6 +17,7 @@ const Login = () => {
   const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const logo = useTransparentLogo();
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();

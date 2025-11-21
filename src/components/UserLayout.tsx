@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Home, Library, Music, Calendar, User, LogOut } from "lucide-react";
-import logo from "@/assets/greenbox-logo.png";
+import { useTransparentLogo } from "@/hooks/useTransparentLogo";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,6 +12,7 @@ interface UserLayoutProps {
 const UserLayout = ({ children }: UserLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const logo = useTransparentLogo();
   const { toast } = useToast();
 
   const handleLogout = async () => {

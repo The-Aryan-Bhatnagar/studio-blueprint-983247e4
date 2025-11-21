@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { User, LogOut, Music2 } from "lucide-react";
-import logo from "@/assets/greenbox-logo.png";
+import { useTransparentLogo } from "@/hooks/useTransparentLogo";
 import { useAuth } from "@/contexts/AuthContext";
 import { useArtistProfile } from "@/hooks/useArtistProfile";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const ArtistHeader = () => {
   const { user, signOut } = useAuth();
   const { data: artistProfile } = useArtistProfile();
+  const logo = useTransparentLogo();
 
   const handleSignOut = async () => {
     await signOut();

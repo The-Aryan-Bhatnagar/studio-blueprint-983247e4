@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import logo from "@/assets/greenbox-logo.png";
+import { useTransparentLogo } from "@/hooks/useTransparentLogo";
 import { supabase } from "@/integrations/supabase/client";
 import {
   InputOTP,
@@ -25,6 +25,7 @@ const VerifyOTP = () => {
   const isArtist = searchParams.get("type") === "artist";
   const artistEmail = searchParams.get("email");
   const stageName = searchParams.get("stageName");
+  const logo = useTransparentLogo();
 
   useEffect(() => {
     if (!email && !phone && !artistEmail) {

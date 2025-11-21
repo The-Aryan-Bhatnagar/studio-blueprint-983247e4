@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import logo from "@/assets/greenbox-logo.png";
+import { useTransparentLogo } from "@/hooks/useTransparentLogo";
 import { supabase } from "@/integrations/supabase/client";
 
 const ForgotPassword = () => {
@@ -14,6 +14,7 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const { toast } = useToast();
+  const logo = useTransparentLogo();
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();

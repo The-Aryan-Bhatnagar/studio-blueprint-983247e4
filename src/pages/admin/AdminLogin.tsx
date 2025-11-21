@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import logo from "@/assets/greenbox-logo.png";
+import { useTransparentLogo } from "@/hooks/useTransparentLogo";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +15,7 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { signIn, isAdmin } = useAuth();
+  const logo = useTransparentLogo();
 
   // Redirect if already admin
   useEffect(() => {
