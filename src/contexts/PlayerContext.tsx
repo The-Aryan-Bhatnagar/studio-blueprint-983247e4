@@ -57,7 +57,12 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   }, [volume, isMuted]);
 
   const playSong = (song: Song) => {
-    if (!audioRef.current) return;
+    if (!audioRef.current) {
+      console.log("playSong: audioRef is null");
+      return;
+    }
+
+    console.log("playSong: starting", { song, src: song.audioUrl });
 
     const previousSong = currentSong;
 
@@ -71,9 +76,16 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     audioRef.current.src = song.audioUrl;
     audioRef.current.currentTime = 0;
 
+    console.log("playSong: audio after src set", {
+      src: audioRef.current.src,
+      readyState: audioRef.current.readyState,
+      networkState: audioRef.current.networkState,
+    });
+
     audioRef.current
       .play()
       .then(() => {
+        console.log("playSong: playback started");
         setIsPlaying(true);
         // Start tracking play count for new song only when playback actually starts
         startTracking(String(song.id));
