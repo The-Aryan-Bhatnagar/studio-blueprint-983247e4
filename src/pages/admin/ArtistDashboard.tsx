@@ -21,20 +21,21 @@ const ArtistDashboard = () => {
   const recentArtists = artists?.slice(0, 4) || [];
 
   return (
-    <div className="p-8">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">Artist Dashboard</h1>
-          <p className="text-muted-foreground">Manage and monitor artist activities</p>
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Artist Dashboard</h1>
+            <p className="text-muted-foreground">Manage and monitor artist activities</p>
+          </div>
         </div>
-      </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Artists</CardTitle>
@@ -78,10 +79,10 @@ const ArtistDashboard = () => {
             <p className="text-xs text-emerald-500 mt-1">+9.8% from last month</p>
           </CardContent>
         </Card>
-      </div>
+        </div>
 
-      {/* Recent Artists Table */}
-      <Card>
+        {/* Recent Artists Table */}
+        <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Recent Artists</CardTitle>
         </CardHeader>
@@ -131,7 +132,8 @@ const ArtistDashboard = () => {
             </TableBody>
           </Table>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };
