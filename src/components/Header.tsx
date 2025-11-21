@@ -34,7 +34,7 @@ const Header = () => {
         <img 
           src={logo} 
           alt="GreenBox Logo" 
-          className="w-12 h-12 object-contain drop-shadow-lg" 
+          className="w-20 h-20 object-contain drop-shadow-2xl" 
         />
       </Link>
 
