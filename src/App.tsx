@@ -66,8 +66,8 @@ const App = () => (
               <Route path="/artist/signup" element={<ArtistSignup />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               
-              {/* Admin Routes - Admin Layout */}
-              <Route path="/admin" element={<AdminLayout><ProtectedRoute><AdminDashboard /></ProtectedRoute></AdminLayout>} />
+              {/* Admin Routes - No Layout for main dashboard, AdminLayout for sub-pages */}
+              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/artists" element={<AdminLayout><ProtectedRoute><AdminArtistDashboard /></ProtectedRoute></AdminLayout>} />
               <Route path="/admin/users" element={<AdminLayout><ProtectedRoute><AdminUserDashboard /></ProtectedRoute></AdminLayout>} />
               <Route path="/admin/ads" element={<AdminLayout><ProtectedRoute><AdsDashboard /></ProtectedRoute></AdminLayout>} />
