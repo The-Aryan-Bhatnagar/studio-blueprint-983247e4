@@ -45,15 +45,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Get authorization header
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Missing authorization header' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     const { song_id, traffic_source, country, city } = await req.json();
 
     if (!song_id) {
@@ -65,28 +56,26 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     
-    // Create client with user's JWT to verify authentication
-    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
-      global: {
-        headers: {
-          authorization: authHeader,
+    // Try to get authenticated user if token is provided
+    const authHeader = req.headers.get('authorization');
+    let userId: string | null = null;
+    
+    if (authHeader) {
+      const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+        global: {
+          headers: {
+            authorization: authHeader,
+          },
         },
-      },
-    });
+      });
 
-    // Verify user is authenticated
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-    
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      userId = user?.id || null;
     }
 
     // Use service role key for the actual update to bypass RLS
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get device type from user agent
@@ -98,12 +87,12 @@ Deno.serve(async (req) => {
     let userCountry = country || null;
     let ageGroup: string | null = null;
     
-    if (user?.id) {
+    if (userId) {
       const { data: profile } = await supabase
         .from('profiles')
         .select('city, country, date_of_birth')
-        .eq('user_id', user.id)
-        .single();
+        .eq('user_id', userId)
+        .maybeSingle();
       
       if (profile) {
         userCity = profile.city || userCity;
@@ -117,7 +106,7 @@ Deno.serve(async (req) => {
       .from('play_history')
       .insert({
         song_id,
-        user_id: user.id,
+        user_id: userId,
         device_type: deviceType,
         country: userCountry,
         city: userCity,
@@ -164,7 +153,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`Play count incremented for song: ${song_id} by user: ${user.id}, device: ${deviceType}`);
+    console.log(`Play count incremented for song: ${song_id} by user: ${userId || 'anonymous'}, device: ${deviceType}`);
 
     return new Response(
       JSON.stringify({ 
