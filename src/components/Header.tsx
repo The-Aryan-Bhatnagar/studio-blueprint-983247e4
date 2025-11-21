@@ -1,4 +1,5 @@
 import { Home, Calendar, Users, Search as SearchIcon, Music, Bell, User, LogOut, Heart, ListMusic, Settings, Mic2 } from "lucide-react";
+import logo from "@/assets/greenbox-logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
@@ -29,9 +30,7 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 h-16 bg-card/95 backdrop-blur-md border-b-2 border-border shadow-sm px-6 flex items-center gap-6 z-50">
       {/* Logo - Links to Discover */}
       <Link to="/discover" className="flex items-center gap-2">
-        <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center">
-          <Music className="w-6 h-6" />
-        </div>
+        <img src={logo} alt="GreenBox Logo" className="w-10 h-10 object-contain" />
       </Link>
 
       {/* Home Button */}

@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
-import { Music, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import logo from "@/assets/greenbox-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 
 const ForgotPassword = () => {
@@ -45,9 +46,7 @@ const ForgotPassword = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md p-8">
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-lg bg-gradient-primary flex items-center justify-center">
-            <Music className="w-7 h-7" />
-          </div>
+          <img src={logo} alt="GreenBox Logo" className="w-16 h-16 object-contain" />
           <span className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             GreenBox
           </span>

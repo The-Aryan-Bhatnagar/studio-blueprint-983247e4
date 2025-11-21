@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Home, Library, Music, Calendar, User, LogOut } from "lucide-react";
+import logo from "@/assets/greenbox-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -41,9 +42,10 @@ const UserLayout = ({ children }: UserLayoutProps) => {
       {/* Sidebar */}
       <aside className="w-64 bg-card border-r border-border flex flex-col">
         <div className="p-6 border-b border-border">
-          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            User Dashboard
-          </h1>
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="GreenBox Logo" className="w-10 h-10 object-contain" />
+            <h1 className="text-xl font-bold">Dashboard</h1>
+          </div>
         </div>
 
         <nav className="flex-1 p-4 space-y-2">
