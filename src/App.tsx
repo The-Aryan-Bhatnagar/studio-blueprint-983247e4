@@ -40,8 +40,8 @@ import AdminLayout from "./components/AdminLayout";
 import PlaylistDetail from "./pages/PlaylistDetail";
 import Community from "./pages/Community";
 import SongAnalytics from "./pages/artist/SongAnalytics";
-import ProcessLogo from "./pages/ProcessLogo";
 import NotFound from "./pages/NotFound";
+import ProcessLogo from "./pages/ProcessLogo";
 
 const queryClient = new QueryClient();
 
