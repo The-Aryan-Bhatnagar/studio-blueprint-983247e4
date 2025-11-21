@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Music, Headphones, Radio, Users } from "lucide-react";
+import { Headphones, Radio, Users } from "lucide-react";
+import logo from "@/assets/greenbox-logo.png";
 
 const Landing = () => {
   return (
@@ -9,9 +10,7 @@ const Landing = () => {
       <header className="border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center">
-              <Music className="w-6 h-6" />
-            </div>
+            <img src={logo} alt="GreenBox Logo" className="w-12 h-12 object-contain" />
             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               GreenBox
             </span>

@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { User, LogOut, Music2, Mic2 } from "lucide-react";
+import { User, LogOut, Music2 } from "lucide-react";
+import logo from "@/assets/greenbox-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { useArtistProfile } from "@/hooks/useArtistProfile";
 import { cn } from "@/lib/utils";
@@ -36,9 +37,7 @@ const ArtistHeader = () => {
         {/* Logo */}
         <div className="flex-1">
           <Link to="/artist/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center">
-              <Mic2 className="w-6 h-6 text-white" />
-            </div>
+            <img src={logo} alt="GreenBox Logo" className="w-10 h-10 object-contain" />
           </Link>
         </div>
 

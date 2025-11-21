@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Music2, LayoutDashboard, Users, Mic2, MessageSquare, Calendar, Settings, LogOut, BarChart3 } from "lucide-react";
+import logo from "@/assets/greenbox-logo.png";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,9 +44,9 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       <aside className="w-64 bg-card border-r border-border flex flex-col">
         {/* Logo */}
         <div className="p-6 border-b border-border">
-          <div className="flex items-center gap-2">
-            <Music2 className="w-8 h-8 text-primary" />
-            <span className="text-xl font-bold">Music Admin</span>
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="GreenBox Logo" className="w-10 h-10 object-contain" />
+            <span className="text-xl font-bold">Admin</span>
           </div>
         </div>
 
