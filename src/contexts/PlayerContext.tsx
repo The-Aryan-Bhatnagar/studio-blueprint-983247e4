@@ -49,25 +49,6 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { startTracking, stopTracking } = usePlayTracking();
 
-  useEffect(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.addEventListener("timeupdate", () => {
-        setCurrentTime(audioRef.current?.currentTime || 0);
-      });
-      audioRef.current.addEventListener("loadedmetadata", () => {
-        setDuration(audioRef.current?.duration || 0);
-      });
-      audioRef.current.addEventListener("ended", () => {
-        if (isRepeat) {
-          audioRef.current!.currentTime = 0;
-          audioRef.current!.play();
-        } else {
-          playNext();
-        }
-      });
-    }
-  }, []);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -76,38 +57,57 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   }, [volume, isMuted]);
 
   const playSong = (song: Song) => {
-    if (audioRef.current) {
-      // Stop tracking previous song if any
-      if (currentSong) {
-        stopTracking(String(currentSong.id));
-      }
-      
-      audioRef.current.src = song.audioUrl;
-      audioRef.current.play();
-      setCurrentSong(song);
-      setIsPlaying(true);
-      
-      // Start tracking play count for new song
-      startTracking(String(song.id));
+    if (!audioRef.current) return;
+
+    const previousSong = currentSong;
+
+    // Stop tracking previous song if any
+    if (previousSong) {
+      stopTracking(String(previousSong.id));
     }
+
+    // Update current song and reset playback
+    setCurrentSong(song);
+    audioRef.current.src = song.audioUrl;
+    audioRef.current.currentTime = 0;
+
+    audioRef.current
+      .play()
+      .then(() => {
+        setIsPlaying(true);
+        // Start tracking play count for new song only when playback actually starts
+        startTracking(String(song.id));
+      })
+      .catch((error) => {
+        console.error("Error playing audio:", error);
+        setIsPlaying(false);
+      });
   };
 
   const togglePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-        // Stop tracking when paused
-        if (currentSong) {
-          stopTracking(String(currentSong.id));
-        }
-      } else {
-        audioRef.current.play();
-        // Resume tracking when playing again
-        if (currentSong) {
-          startTracking(String(currentSong.id));
-        }
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      // Stop tracking when paused
+      if (currentSong) {
+        stopTracking(String(currentSong.id));
       }
-      setIsPlaying(!isPlaying);
+      setIsPlaying(false);
+    } else {
+      audioRef.current
+        .play()
+        .then(() => {
+          // Resume tracking when playing again
+          if (currentSong) {
+            startTracking(String(currentSong.id));
+          }
+          setIsPlaying(true);
+        })
+        .catch((error) => {
+          console.error("Error resuming audio:", error);
+          setIsPlaying(false);
+        });
     }
   };
 
@@ -182,6 +182,30 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         setQueue,
       }}
     >
+      <audio
+        ref={audioRef}
+        onTimeUpdate={() => {
+          if (audioRef.current) {
+            setCurrentTime(audioRef.current.currentTime || 0);
+          }
+        }}
+        onLoadedMetadata={() => {
+          if (audioRef.current) {
+            setDuration(audioRef.current.duration || 0);
+          }
+        }}
+        onEnded={() => {
+          if (isRepeat && audioRef.current) {
+            audioRef.current.currentTime = 0;
+            audioRef.current
+              .play()
+              .catch((error) => console.error("Error replaying audio:", error));
+          } else {
+            playNext();
+          }
+        }}
+        className="hidden"
+      />
       {children}
     </PlayerContext.Provider>
   );
