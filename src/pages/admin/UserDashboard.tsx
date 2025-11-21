@@ -19,20 +19,21 @@ const UserDashboard = () => {
   }
 
   return (
-    <div className="p-8">
-      {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">User Dashboard</h1>
-          <p className="text-muted-foreground">Monitor and manage user activities</p>
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">User Dashboard</h1>
+            <p className="text-muted-foreground">Monitor and manage user activities</p>
+          </div>
         </div>
-      </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
@@ -76,10 +77,10 @@ const UserDashboard = () => {
             <p className="text-xs text-destructive mt-1">-25.0% from last month</p>
           </CardContent>
         </Card>
-      </div>
+        </div>
 
-      {/* Recent User Activity Table */}
-      <Card>
+        {/* Recent User Activity Table */}
+        <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Recent User Activity</CardTitle>
         </CardHeader>
@@ -129,7 +130,8 @@ const UserDashboard = () => {
             </TableBody>
           </Table>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };

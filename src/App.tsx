@@ -66,19 +66,19 @@ const App = () => (
               <Route path="/artist/signup" element={<ArtistSignup />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               
-              {/* Admin Routes - No Layout for main dashboard, AdminLayout for sub-pages */}
+              {/* Admin Routes - All without sidebar layout */}
               <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-              <Route path="/admin/artists" element={<AdminLayout><ProtectedRoute><AdminArtistDashboard /></ProtectedRoute></AdminLayout>} />
-              <Route path="/admin/users" element={<AdminLayout><ProtectedRoute><AdminUserDashboard /></ProtectedRoute></AdminLayout>} />
-              <Route path="/admin/ads" element={<AdminLayout><ProtectedRoute><AdsDashboard /></ProtectedRoute></AdminLayout>} />
-              <Route path="/admin/artists/manage" element={<AdminLayout><ProtectedRoute><ArtistManagement /></ProtectedRoute></AdminLayout>} />
-              <Route path="/admin/users/manage" element={<AdminLayout><ProtectedRoute><UserManagement /></ProtectedRoute></AdminLayout>} />
-              <Route path="/admin/songs" element={<AdminLayout><ProtectedRoute><SongManagement /></ProtectedRoute></AdminLayout>} />
-              <Route path="/admin/events" element={<AdminLayout><ProtectedRoute><EventManagement /></ProtectedRoute></AdminLayout>} />
-              <Route path="/admin/comments" element={<AdminLayout><ProtectedRoute><CommentManagement /></ProtectedRoute></AdminLayout>} />
-              <Route path="/admin/analytics" element={<AdminLayout><ProtectedRoute><AnalyticsPage /></ProtectedRoute></AdminLayout>} />
-              <Route path="/admin/settings" element={<AdminLayout><ProtectedRoute><SettingsPage /></ProtectedRoute></AdminLayout>} />
-              <Route path="/admin/ads/manage" element={<AdminLayout><ProtectedRoute><AdsManagement /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/artists" element={<ProtectedRoute><AdminArtistDashboard /></ProtectedRoute>} />
+              <Route path="/admin/users" element={<ProtectedRoute><AdminUserDashboard /></ProtectedRoute>} />
+              <Route path="/admin/ads" element={<ProtectedRoute><AdsDashboard /></ProtectedRoute>} />
+              <Route path="/admin/artists/manage" element={<ProtectedRoute><ArtistManagement /></ProtectedRoute>} />
+              <Route path="/admin/users/manage" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+              <Route path="/admin/songs" element={<ProtectedRoute><SongManagement /></ProtectedRoute>} />
+              <Route path="/admin/events" element={<ProtectedRoute><EventManagement /></ProtectedRoute>} />
+              <Route path="/admin/comments" element={<ProtectedRoute><CommentManagement /></ProtectedRoute>} />
+              <Route path="/admin/analytics" element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
+              <Route path="/admin/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+              <Route path="/admin/ads/manage" element={<ProtectedRoute><AdsManagement /></ProtectedRoute>} />
               
               {/* User Dashboard Routes - User Layout */}
               <Route path="/user/dashboard" element={<UserLayout><ProtectedRoute><UserDashboard /></ProtectedRoute></UserLayout>} />
