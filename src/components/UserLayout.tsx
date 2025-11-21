@@ -29,7 +29,7 @@ const UserLayout = ({ children }: UserLayoutProps) => {
   };
 
   const menuItems = [
-    { icon: Home, label: "Home", path: "/user/dashboard" },
+    { icon: Home, label: "Home", path: "/" },
     { icon: Library, label: "My Library", path: "/library" },
     { icon: Music, label: "Discover", path: "/discover" },
     { icon: Calendar, label: "Events", path: "/events" },
