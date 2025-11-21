@@ -22,7 +22,6 @@ import ArtistProfilePublic from "./pages/ArtistProfilePublic";
 import ArtistDashboard from "./pages/ArtistDashboard";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
-import VerifyOTP from "./pages/auth/VerifyOTP";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import ArtistLogin from "./pages/artist/ArtistLogin";
@@ -57,7 +56,6 @@ const App = () => (
               <Route path="/welcome" element={<Landing />} />
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/signup" element={<Signup />} />
-              <Route path="/auth/verify-otp" element={<VerifyOTP />} />
               <Route path="/auth/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/reset-password" element={<ResetPassword />} />
               <Route path="/artist/login" element={<ArtistLogin />} />

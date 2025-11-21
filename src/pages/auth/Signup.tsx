@@ -54,18 +54,36 @@ const Signup = () => {
             country: country,
             date_of_birth: dateOfBirth?.toISOString().split('T')[0],
           },
-          emailRedirectTo: `${window.location.origin}/auth/verify-otp`,
+          emailRedirectTo: `${window.location.origin}/`,
         },
       });
 
       if (error) throw error;
 
-      // Always show verification message for new signups
+      // Create user profile
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: data.user.id,
+            full_name: fullName,
+            phone_number: phone,
+            city: city,
+            country: country,
+            date_of_birth: dateOfBirth?.toISOString().split('T')[0],
+          });
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+        }
+      }
+
       toast({
-        title: "Verification Email Sent",
-        description: "Please check your email for the 6-digit verification code",
+        title: "Account Created Successfully",
+        description: "Welcome to GreenBox! Redirecting to home...",
       });
-      navigate("/auth/verify-otp", { state: { email, type: "signup" } });
+      
+      navigate("/");
     } catch (error: any) {
       toast({
         title: "Signup Failed",
