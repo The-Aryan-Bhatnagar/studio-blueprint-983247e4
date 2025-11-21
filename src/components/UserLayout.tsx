@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Library, Music, Calendar, User, LogOut } from "lucide-react";
+import { Home, LayoutDashboard, User, LogOut } from "lucide-react";
 import { useTransparentLogo } from "@/hooks/useTransparentLogo";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -30,9 +30,7 @@ const UserLayout = ({ children }: UserLayoutProps) => {
 
   const menuItems = [
     { icon: Home, label: "Home", path: "/" },
-    { icon: Library, label: "My Library", path: "/library" },
-    { icon: Music, label: "Discover", path: "/discover" },
-    { icon: Calendar, label: "Events", path: "/events" },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/user/dashboard" },
     { icon: User, label: "Profile", path: "/profile" },
   ];
 
