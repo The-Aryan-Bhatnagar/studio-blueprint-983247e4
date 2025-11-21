@@ -31,7 +31,7 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 h-16 bg-card/95 backdrop-blur-md border-b-2 border-border shadow-sm px-6 flex items-center gap-6 z-50">
       {/* Logo - Links to Discover */}
       <Link to="/discover" className="flex items-center gap-2">
-        <img src={logo} alt="GreenBox Logo" className="w-10 h-10 object-contain" />
+        <img src={logo} alt="GreenBox Logo" className="w-16 h-16 object-contain" />
       </Link>
 
       {/* Home Button */}
