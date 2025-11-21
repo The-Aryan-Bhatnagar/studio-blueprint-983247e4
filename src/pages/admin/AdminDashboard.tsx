@@ -4,10 +4,12 @@ import { Users, Music, Megaphone, ChevronRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useTransparentLogo } from "@/hooks/useTransparentLogo";
 
 const AdminDashboard = () => {
   const { isAdmin, loading } = useAuth();
   const navigate = useNavigate();
+  const logo = useTransparentLogo();
 
   useEffect(() => {
     if (!loading && !isAdmin) {
@@ -55,7 +57,10 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-background p-8">
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold text-primary mb-4">Admin Panel</h1>
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <img src={logo} alt="GREENBOXX Logo" className="w-14 h-14 object-contain" />
+          <h1 className="text-5xl font-bold text-primary">GREENBOXX Admin</h1>
+        </div>
         <p className="text-muted-foreground text-lg">Select a dashboard to manage</p>
       </div>
 
