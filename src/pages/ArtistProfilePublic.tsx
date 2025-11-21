@@ -16,7 +16,7 @@ import { format } from "date-fns";
 const ArtistProfilePublic = () => {
   const { artistId } = useParams<{ artistId: string }>();
   const { user } = useAuth();
-  const { playSong } = usePlayer();
+  const { playSong, setQueue } = usePlayer();
   const { data: artist, isLoading: artistLoading } = useArtistPublicProfile(artistId);
   const { data: songs, isLoading: songsLoading } = useArtistSongs(artistId);
   const { isFollowing, toggleFollow, isPending } = useArtistFollow(artistId);
@@ -54,6 +54,19 @@ const ArtistProfilePublic = () => {
   };
 
   const handlePlaySong = (song: any) => {
+    if (!songs || songs.length === 0) return;
+
+    const queue = songs.map((s: any) => ({
+      id: s.id,
+      title: s.title,
+      artist: artist?.stage_name || "Unknown Artist",
+      image: s.cover_image_url || "/placeholder.svg",
+      audioUrl: s.audio_url,
+      plays: s.song_analytics?.total_plays || 0,
+    }));
+
+    setQueue(queue);
+
     playSong({
       id: song.id,
       title: song.title,
