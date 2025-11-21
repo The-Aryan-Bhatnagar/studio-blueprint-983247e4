@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useRef, useEffect } from "react";
 import { usePlayTracking } from "@/hooks/usePlayTracking";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface Song {
   id: string | number;
@@ -47,6 +48,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   const [isShuffle, setIsShuffle] = useState(false);
   const [queue, setQueue] = useState<Song[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioObjectUrlRef = useRef<string | null>(null);
   const { startTracking, stopTracking } = usePlayTracking();
 
 
@@ -56,54 +58,100 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [volume, isMuted]);
 
-  // Automatically load & play when currentSong changes
-  useEffect(() => {
-    if (!audioRef.current || !currentSong) return;
-
-    const audio = audioRef.current;
-
-    console.log("audio effect: new currentSong", {
-      id: currentSong.id,
-      title: currentSong.title,
-      audioUrl: currentSong.audioUrl,
-    });
-
-    // Reset audio element and load the new source
-    audio.pause();
-    audio.currentTime = 0;
-
-    // Calling load() ensures the browser picks up the updated src attribute
-    audio.load();
-
-    const playPromise = audio.play();
-
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          console.log("audio effect: playback started");
-          setIsPlaying(true);
-          startTracking(String(currentSong.id));
-        })
-        .catch((error) => {
-          console.error("audio effect: error starting playback", error);
-          setIsPlaying(false);
-        });
-    }
-  }, [currentSong, startTracking]);
-
   const playSong = (song: Song) => {
     console.log("playSong called", { song });
 
-    const previousSong = currentSong;
+    void (async () => {
+      if (!audioRef.current) {
+        console.log("playSong: no audio element");
+        return;
+      }
 
-    // Stop tracking previous song if any
-    if (previousSong) {
-      stopTracking(String(previousSong.id));
-    }
+      const audio = audioRef.current;
+      const previousSong = currentSong;
 
-    // Setting currentSong triggers the effect above which will
-    // load the audio element and start playback
-    setCurrentSong(song);
+      // Stop tracking previous song if any
+      if (previousSong) {
+        stopTracking(String(previousSong.id));
+      }
+
+      setCurrentSong(song);
+      setIsPlaying(false);
+
+      let sourceUrl = song.audioUrl;
+      let finalSrc = sourceUrl;
+
+      try {
+        // If this is a Supabase Storage URL, try downloading via the client
+        if (sourceUrl.includes("/storage/v1/object/")) {
+          try {
+            const url = new URL(sourceUrl);
+            const parts = url.pathname.split("/");
+            // e.g. /storage/v1/object/public/song-audio/file.mp3
+            const publicIndex = parts.findIndex((p) => p === "public" || p === "sign");
+            const bucket = parts[publicIndex + 1];
+            const filePath = decodeURIComponent(parts.slice(publicIndex + 2).join("/"));
+
+            console.log("Downloading from storage", { bucket, filePath });
+
+            const { data, error } = await supabase.storage
+              .from(bucket)
+              .download(filePath);
+
+            if (error) {
+              console.error("Error downloading audio from storage", error);
+            } else if (data) {
+              if (audioObjectUrlRef.current) {
+                URL.revokeObjectURL(audioObjectUrlRef.current);
+              }
+              const blobUrl = URL.createObjectURL(data);
+              audioObjectUrlRef.current = blobUrl;
+              finalSrc = blobUrl;
+            }
+          } catch (storageError) {
+            console.error("Error parsing storage URL", storageError);
+          }
+        }
+
+        // Fallback: direct fetch when not a storage URL or storage download failed
+        if (finalSrc === sourceUrl && !sourceUrl.startsWith("/audio/")) {
+          try {
+            const response = await fetch(sourceUrl);
+            if (response.ok) {
+              const blob = await response.blob();
+              if (audioObjectUrlRef.current) {
+                URL.revokeObjectURL(audioObjectUrlRef.current);
+              }
+              const blobUrl = URL.createObjectURL(blob);
+              audioObjectUrlRef.current = blobUrl;
+              finalSrc = blobUrl;
+            } else {
+              console.error("Direct fetch failed", response.status, response.statusText);
+            }
+          } catch (fetchError) {
+            console.error("Error fetching audio directly", fetchError);
+          }
+        }
+
+        console.log("Using audio src", finalSrc);
+
+        audio.pause();
+        audio.currentTime = 0;
+        audio.src = finalSrc;
+        audio.load();
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          await playPromise;
+        }
+
+        setIsPlaying(true);
+        startTracking(String(song.id));
+      } catch (error) {
+        console.error("Error in playSong pipeline", error);
+        setIsPlaying(false);
+      }
+    })();
   };
 
   const togglePlay = () => {
@@ -180,6 +228,14 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     playSong(queue[prevIndex]);
   };
 
+  useEffect(() => {
+    return () => {
+      if (audioObjectUrlRef.current) {
+        URL.revokeObjectURL(audioObjectUrlRef.current);
+      }
+    };
+  }, []);
+
   return (
     <PlayerContext.Provider
       value={{
@@ -206,16 +262,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     >
       <audio
         ref={audioRef}
-        src={currentSong?.audioUrl || ""}
         preload="auto"
-        onCanPlay={() => {
-          if (audioRef.current) {
-            console.log("audio canplay", {
-              src: audioRef.current.src,
-              readyState: audioRef.current.readyState,
-            });
-          }
-        }}
         onTimeUpdate={() => {
           if (audioRef.current) {
             setCurrentTime(audioRef.current.currentTime || 0);
