@@ -56,13 +56,43 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [volume, isMuted]);
 
-  const playSong = (song: Song) => {
-    if (!audioRef.current) {
-      console.log("playSong: audioRef is null");
-      return;
-    }
+  // Automatically load & play when currentSong changes
+  useEffect(() => {
+    if (!audioRef.current || !currentSong) return;
 
-    console.log("playSong: starting", { song, src: song.audioUrl });
+    const audio = audioRef.current;
+
+    console.log("audio effect: new currentSong", {
+      id: currentSong.id,
+      title: currentSong.title,
+      audioUrl: currentSong.audioUrl,
+    });
+
+    // Reset audio element and load the new source
+    audio.pause();
+    audio.currentTime = 0;
+
+    // Calling load() ensures the browser picks up the updated src attribute
+    audio.load();
+
+    const playPromise = audio.play();
+
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          console.log("audio effect: playback started");
+          setIsPlaying(true);
+          startTracking(String(currentSong.id));
+        })
+        .catch((error) => {
+          console.error("audio effect: error starting playback", error);
+          setIsPlaying(false);
+        });
+    }
+  }, [currentSong, startTracking]);
+
+  const playSong = (song: Song) => {
+    console.log("playSong called", { song });
 
     const previousSong = currentSong;
 
@@ -71,29 +101,9 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
       stopTracking(String(previousSong.id));
     }
 
-    // Update current song and reset playback
+    // Setting currentSong triggers the effect above which will
+    // load the audio element and start playback
     setCurrentSong(song);
-    audioRef.current.src = song.audioUrl;
-    audioRef.current.currentTime = 0;
-
-    console.log("playSong: audio after src set", {
-      src: audioRef.current.src,
-      readyState: audioRef.current.readyState,
-      networkState: audioRef.current.networkState,
-    });
-
-    audioRef.current
-      .play()
-      .then(() => {
-        console.log("playSong: playback started");
-        setIsPlaying(true);
-        // Start tracking play count for new song only when playback actually starts
-        startTracking(String(song.id));
-      })
-      .catch((error) => {
-        console.error("Error playing audio:", error);
-        setIsPlaying(false);
-      });
   };
 
   const togglePlay = () => {
@@ -196,6 +206,16 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     >
       <audio
         ref={audioRef}
+        src={currentSong?.audioUrl || ""}
+        preload="auto"
+        onCanPlay={() => {
+          if (audioRef.current) {
+            console.log("audio canplay", {
+              src: audioRef.current.src,
+              readyState: audioRef.current.readyState,
+            });
+          }
+        }}
         onTimeUpdate={() => {
           if (audioRef.current) {
             setCurrentTime(audioRef.current.currentTime || 0);
