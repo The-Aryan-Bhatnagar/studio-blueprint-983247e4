@@ -40,14 +40,16 @@ const AdminLogin = () => {
       return;
     }
 
-    // Auth state will update automatically, and the redirect will happen via the effect in AdminDashboard
     toast({
       title: "Login Successful",
-      description: "Checking admin privileges...",
+      description: "Verifying admin access...",
     });
     
-    // Navigate to admin panel - AdminDashboard will handle the authorization check
-    navigate("/admin");
+    // Wait a moment for role check to complete and state to update
+    setTimeout(() => {
+      setLoading(false);
+      // The useEffect will handle the redirect once isAdmin is true
+    }, 100);
   };
 
   return (

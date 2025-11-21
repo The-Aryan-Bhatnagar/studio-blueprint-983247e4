@@ -66,13 +66,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const roles = data?.map(r => r.role) || [];
     setIsArtist(roles.includes("artist"));
     setIsAdmin(roles.includes("admin"));
+    return roles;
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    
+    if (!error && data.user) {
+      // Wait for role check to complete before returning
+      await checkUserRoles(data.user.id);
+    }
+    
     return { error };
   };
 
