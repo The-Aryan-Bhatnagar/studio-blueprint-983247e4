@@ -36,6 +36,9 @@ import CommentManagement from "./pages/admin/CommentManagement";
 import AnalyticsPage from "./pages/admin/AnalyticsPage";
 import SettingsPage from "./pages/admin/SettingsPage";
 import AdsManagement from "./pages/admin/AdsManagement";
+import AdminArtistDashboard from "./pages/admin/ArtistDashboard";
+import AdminUserDashboard from "./pages/admin/UserDashboard";
+import AdsDashboard from "./pages/admin/AdsDashboard";
 import AdminLayout from "./components/AdminLayout";
 import PlaylistDetail from "./pages/PlaylistDetail";
 import Community from "./pages/Community";
@@ -65,14 +68,17 @@ const App = () => (
               
               {/* Admin Routes - Admin Layout */}
               <Route path="/admin" element={<AdminLayout><ProtectedRoute><AdminDashboard /></ProtectedRoute></AdminLayout>} />
-              <Route path="/admin/artists" element={<AdminLayout><ProtectedRoute><ArtistManagement /></ProtectedRoute></AdminLayout>} />
-              <Route path="/admin/users" element={<AdminLayout><ProtectedRoute><UserManagement /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/artists" element={<AdminLayout><ProtectedRoute><AdminArtistDashboard /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/users" element={<AdminLayout><ProtectedRoute><AdminUserDashboard /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/ads" element={<AdminLayout><ProtectedRoute><AdsDashboard /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/artists/manage" element={<AdminLayout><ProtectedRoute><ArtistManagement /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/users/manage" element={<AdminLayout><ProtectedRoute><UserManagement /></ProtectedRoute></AdminLayout>} />
               <Route path="/admin/songs" element={<AdminLayout><ProtectedRoute><SongManagement /></ProtectedRoute></AdminLayout>} />
               <Route path="/admin/events" element={<AdminLayout><ProtectedRoute><EventManagement /></ProtectedRoute></AdminLayout>} />
               <Route path="/admin/comments" element={<AdminLayout><ProtectedRoute><CommentManagement /></ProtectedRoute></AdminLayout>} />
               <Route path="/admin/analytics" element={<AdminLayout><ProtectedRoute><AnalyticsPage /></ProtectedRoute></AdminLayout>} />
               <Route path="/admin/settings" element={<AdminLayout><ProtectedRoute><SettingsPage /></ProtectedRoute></AdminLayout>} />
-              <Route path="/admin/ads" element={<AdminLayout><ProtectedRoute><AdsManagement /></ProtectedRoute></AdminLayout>} />
+              <Route path="/admin/ads/manage" element={<AdminLayout><ProtectedRoute><AdsManagement /></ProtectedRoute></AdminLayout>} />
               
               {/* User Dashboard Routes - User Layout */}
               <Route path="/user/dashboard" element={<UserLayout><ProtectedRoute><UserDashboard /></ProtectedRoute></UserLayout>} />
