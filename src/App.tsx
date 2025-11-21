@@ -40,6 +40,7 @@ import AdminLayout from "./components/AdminLayout";
 import PlaylistDetail from "./pages/PlaylistDetail";
 import Community from "./pages/Community";
 import SongAnalytics from "./pages/artist/SongAnalytics";
+import ProcessLogo from "./pages/ProcessLogo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ const App = () => (
             <Routes>
               {/* Auth Routes - No Layout */}
               <Route path="/welcome" element={<Landing />} />
+              <Route path="/process-logo" element={<ProcessLogo />} />
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/signup" element={<Signup />} />
               <Route path="/auth/verify-otp" element={<VerifyOTP />} />

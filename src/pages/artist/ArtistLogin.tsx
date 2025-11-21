@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import logo from "@/assets/greenbox-logo.png";
+import { useTransparentLogo } from "@/hooks/useTransparentLogo";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -16,6 +16,7 @@ const ArtistLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, isArtist, loading } = useAuth();
+  const logo = useTransparentLogo();
 
   // Redirect if already logged in as artist
   useEffect(() => {

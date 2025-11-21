@@ -1,5 +1,5 @@
 import { Home, Calendar, Users, Search as SearchIcon, Music, Bell, User, LogOut, Heart, ListMusic, Settings, Mic2 } from "lucide-react";
-import logo from "@/assets/greenbox-logo.png";
+import { useTransparentLogo } from "@/hooks/useTransparentLogo";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
@@ -19,6 +19,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const logo = useTransparentLogo();
 
   const navItems = [
     { icon: Music, label: "Library", path: "/library" },

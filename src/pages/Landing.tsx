@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Headphones, Radio, Users } from "lucide-react";
-import logo from "@/assets/greenbox-logo.png";
+import { useTransparentLogo } from "@/hooks/useTransparentLogo";
 
 const Landing = () => {
+  const logo = useTransparentLogo();
+  
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
