@@ -8,10 +8,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { useAdminArtists } from "@/hooks/useAdminData";
+import { useTransparentLogo } from "@/hooks/useTransparentLogo";
 
 const ArtistDashboard = () => {
   const navigate = useNavigate();
   const { data: artists, isLoading } = useAdminArtists();
+  const logo = useTransparentLogo();
 
   if (isLoading) {
     return (
@@ -29,9 +31,12 @@ const ArtistDashboard = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Artist Dashboard</h1>
-            <p className="text-muted-foreground">Manage and monitor artist activities</p>
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="GREENBOXX Logo" className="w-10 h-10 object-contain" />
+            <div>
+              <h1 className="text-3xl font-bold">Artist Dashboard</h1>
+              <p className="text-muted-foreground">Manage and monitor artist activities</p>
+            </div>
           </div>
         </div>
 
