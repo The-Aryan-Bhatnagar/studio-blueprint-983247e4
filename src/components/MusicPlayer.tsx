@@ -1,10 +1,12 @@
-import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Shuffle, Repeat, ListMusic, Maximize2, VolumeX } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Shuffle, Repeat, ListMusic, Maximize2, VolumeX, MessageSquare } from "lucide-react";
 import { Button } from "./ui/button";
 import { Slider } from "./ui/slider";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSongLikes } from "@/hooks/useSongLikes";
 import { useAuth } from "@/contexts/AuthContext";
+import CommentsDialog from "./CommentsDialog";
+import { useState } from "react";
 
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60);
@@ -34,6 +36,7 @@ const MusicPlayer = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { isLiked, toggleLike, isLoading } = useSongLikes(currentSong?.id?.toString());
+  const [showComments, setShowComments] = useState(false);
 
   const handleLike = () => {
     if (!user) {
@@ -178,6 +181,15 @@ const MusicPlayer = () => {
               variant="ghost"
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
               disabled={!currentSong}
+              onClick={() => setShowComments(true)}
+            >
+              <MessageSquare className="w-4 h-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              disabled={!currentSong}
             >
               <ListMusic className="w-4 h-4" />
             </Button>
@@ -212,6 +224,16 @@ const MusicPlayer = () => {
           </div>
         </div>
       </div>
+      
+      {/* Comments Dialog */}
+      {currentSong && showComments && (
+        <CommentsDialog 
+          songId={currentSong.id.toString()} 
+          songTitle={currentSong.title}
+          open={showComments}
+          onOpenChange={setShowComments}
+        />
+      )}
     </div>
   );
 };

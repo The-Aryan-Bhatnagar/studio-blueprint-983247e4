@@ -19,15 +19,21 @@ import { formatDistanceToNow } from "date-fns";
 interface CommentsDialogProps {
   songId: string;
   songTitle: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-const CommentsDialog = ({ songId, songTitle }: CommentsDialogProps) => {
-  const [open, setOpen] = useState(false);
+const CommentsDialog = ({ songId, songTitle, open: externalOpen, onOpenChange }: CommentsDialogProps) => {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [comment, setComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState("");
   const { user } = useAuth();
   const { data: comments, isLoading } = useComments(songId);
+  
+  // Use external open state if provided, otherwise use internal
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
   const createComment = useCreateComment();
   const deleteComment = useDeleteComment();
 
