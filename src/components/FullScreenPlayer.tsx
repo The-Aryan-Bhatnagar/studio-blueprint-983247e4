@@ -111,12 +111,12 @@ export function FullScreenPlayer() {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 flex items-center px-12 lg:px-20">
-          <div className="flex items-center gap-8 lg:gap-16 w-full max-w-7xl mx-auto">
-            {/* Album Art */}
+        {/* Main Content - Centered Layout */}
+        <div className="flex-1 flex items-center justify-center px-12 lg:px-20">
+          <div className="flex items-start gap-8 w-full max-w-7xl">
+            {/* Left Side - Album Art (Small) */}
             <div className="flex-shrink-0">
-              <div className="w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-2xl overflow-hidden shadow-2xl">
+              <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden shadow-2xl">
                 <img
                   src={currentSong.image}
                   alt={currentSong.title}
@@ -125,51 +125,51 @@ export function FullScreenPlayer() {
               </div>
             </div>
 
-            {/* Right Side - Song Info & Controls */}
-            <div className="flex-1 flex flex-col gap-8">
+            {/* Center - Song Info & Controls */}
+            <div className="flex-1 flex flex-col items-center justify-center gap-8 max-w-2xl mx-auto">
               {/* Song Info */}
-              <div>
-                <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-2">
+              <div className="text-center">
+                <h1 className="text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-3">
                   {currentSong.title}
                 </h1>
-                <p className="text-lg lg:text-xl text-pink-400/90">
+                <p className="text-xl lg:text-2xl text-pink-400/90">
                   {currentSong.artist}
                 </p>
               </div>
 
               {/* Playback Controls */}
-              <div className="flex items-center gap-6">
+              <div className="flex items-center gap-8">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={playPrevious}
-                  className="h-12 w-12 text-white hover:bg-white/10"
+                  className="h-14 w-14 text-white hover:bg-white/10"
                 >
-                  <SkipBack className="h-6 w-6" fill="white" />
+                  <SkipBack className="h-7 w-7" fill="white" />
                 </Button>
                 <Button
                   size="icon"
                   onClick={togglePlay}
-                  className="h-16 w-16 rounded-full bg-pink-500 hover:bg-pink-600 shadow-lg"
+                  className="h-20 w-20 rounded-full bg-pink-500 hover:bg-pink-600 shadow-lg"
                 >
                   {isPlaying ? (
-                    <Pause className="h-7 w-7 text-white" fill="white" />
+                    <Pause className="h-8 w-8 text-white" fill="white" />
                   ) : (
-                    <Play className="h-7 w-7 text-white ml-1" fill="white" />
+                    <Play className="h-8 w-8 text-white ml-1" fill="white" />
                   )}
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={playNext}
-                  className="h-12 w-12 text-white hover:bg-white/10"
+                  className="h-14 w-14 text-white hover:bg-white/10"
                 >
-                  <SkipForward className="h-6 w-6" fill="white" />
+                  <SkipForward className="h-7 w-7" fill="white" />
                 </Button>
               </div>
 
               {/* Volume Control */}
-              <div className="flex items-center gap-4 max-w-xs">
+              <div className="flex items-center gap-4 w-full max-w-md">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -191,18 +191,79 @@ export function FullScreenPlayer() {
                 />
               </div>
             </div>
+
+            {/* Right Sidebar - Ad Space & Actions */}
+            <div className="flex-shrink-0 flex flex-col gap-6 items-center">
+              {/* Ad Showcase Area - Responsive 9cm × 10cm */}
+              <div 
+                className="rounded-xl border border-white/20 bg-background/10 backdrop-blur-md overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:border-pink-500/50"
+                style={{
+                  width: '9cm',
+                  height: '10cm',
+                  maxWidth: '28vw',
+                  maxHeight: '40vh',
+                  minWidth: '150px',
+                  minHeight: '180px',
+                }}
+              >
+                <a 
+                  href={activeAd.link_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block w-full h-full relative"
+                >
+                  <img 
+                    src={activeAd.image_url} 
+                    alt={activeAd.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                    <div className="flex items-center gap-2 text-white">
+                      <span className="text-sm font-medium">{activeAd.title}</span>
+                      <ExternalLink className="w-4 h-4" />
+                    </div>
+                  </div>
+                </a>
+              </div>
+              
+              {/* Action Buttons */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleLike}
+                disabled={isLoading}
+                className={cn(
+                  "h-12 w-12 rounded-full hover:bg-white/10",
+                  isLiked ? "text-pink-500" : "text-white/70"
+                )}
+              >
+                <Heart className={cn("h-6 w-6", isLiked && "fill-pink-500")} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-12 w-12 rounded-full text-white/70 hover:bg-white/10"
+              >
+                <Share2 className="h-6 w-6" />
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Bottom Section - Progress Bar & Controls */}
         <div className="px-12 lg:px-20 pb-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center gap-6 mb-4">
-              {/* Progress Bar */}
-              <div className="flex-1">
+          <div className="max-w-7xl mx-auto space-y-4">
+            {/* Progress Bar with Labels */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 text-sm text-white/60">
+                <span>Start Slide</span>
+                <span className="flex-1"></span>
+                <span>End of Slide</span>
+              </div>
+              <div className="flex items-center gap-4">
                 <div 
                   onClick={handleProgressClick} 
-                  className="relative h-1 bg-white/20 rounded-full cursor-pointer group"
+                  className="flex-1 relative h-1 bg-white/20 rounded-full cursor-pointer group"
                 >
                   <div 
                     className="absolute h-full bg-white rounded-full transition-all"
@@ -213,12 +274,10 @@ export function FullScreenPlayer() {
                     style={{ left: `${progress}%`, transform: 'translate(-50%, -50%)' }}
                   />
                 </div>
+                <span className="text-sm text-pink-400 font-medium min-w-[40px] text-right">
+                  {formatTime(currentTime)}
+                </span>
               </div>
-              
-              {/* Time Display */}
-              <span className="text-sm text-pink-400 font-medium min-w-[40px] text-right">
-                {formatTime(currentTime)}
-              </span>
             </div>
 
             {/* Bottom Controls */}
@@ -256,62 +315,6 @@ export function FullScreenPlayer() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Right Sidebar - Ad Space & Actions */}
-        <div className="absolute right-20 top-1/2 -translate-y-1/2 flex flex-col gap-6 items-center">
-          {/* Ad Showcase Area - Responsive 9cm × 10cm */}
-          <div 
-            className="rounded-xl border border-white/20 bg-background/10 backdrop-blur-md overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:border-pink-500/50"
-            style={{
-              width: '9cm',
-              height: '10cm',
-              maxWidth: '28vw',
-              maxHeight: '40vh',
-              minWidth: '150px',
-              minHeight: '180px',
-            }}
-          >
-            <a 
-              href={activeAd.link_url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="block w-full h-full relative"
-            >
-              <img 
-                src={activeAd.image_url} 
-                alt={activeAd.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                <div className="flex items-center gap-2 text-white">
-                  <span className="text-sm font-medium">{activeAd.title}</span>
-                  <ExternalLink className="w-4 h-4" />
-                </div>
-              </div>
-            </a>
-          </div>
-          
-          {/* Action Buttons */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleLike}
-            disabled={isLoading}
-            className={cn(
-              "h-12 w-12 rounded-full hover:bg-white/10",
-              isLiked ? "text-pink-500" : "text-white/70"
-            )}
-          >
-            <Heart className={cn("h-6 w-6", isLiked && "fill-pink-500")} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-12 w-12 rounded-full text-white/70 hover:bg-white/10"
-          >
-            <Share2 className="h-6 w-6" />
-          </Button>
         </div>
       </div>
 
