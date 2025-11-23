@@ -92,9 +92,7 @@ export function MiniPlayer() {
 
           {/* Right: Volume & Expand */}
           <div className="flex items-center gap-1 sm:gap-2 justify-end flex-1">
-            <div className="hidden lg:block">
-              <VolumeControl />
-            </div>
+            <VolumeControl />
             <Button
               variant="ghost"
               size="icon"
