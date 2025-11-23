@@ -119,8 +119,8 @@ export function FullScreenPlayer() {
                 </Button>
               </div>
 
-              {/* Volume - Hidden on mobile */}
-              <div className="hidden md:flex justify-center">
+              {/* Volume */}
+              <div className="flex justify-center">
                 <VolumeControl />
               </div>
             </div>
