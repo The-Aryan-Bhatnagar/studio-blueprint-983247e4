@@ -264,39 +264,34 @@ const FullScreenPlayer = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 container mx-auto px-8 h-[calc(100vh-180px)] flex flex-col items-center justify-center">
-        <div className="w-full max-w-2xl space-y-8">
-          {/* Album Art with Enhanced Shadow Effect */}
-          <div className="relative mx-auto max-w-md">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-primary/30 to-secondary/40 rounded-3xl blur-3xl" />
-            <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-2xl animate-scale-in ring-1 ring-white/10">
+      <div className="relative z-10 flex flex-col items-center justify-center h-[calc(100vh-100px)] px-8">
+        <div className="flex flex-col items-center justify-center flex-1 w-full max-w-3xl">
+          {/* Album Art - Large and Centered */}
+          <div className="relative w-full max-w-xl aspect-square mb-12">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-secondary/30 rounded-3xl blur-3xl" />
+            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl animate-scale-in ring-1 ring-white/10">
               <img
                 src={currentSong.image}
                 alt={currentSong.title}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             </div>
           </div>
 
-          {/* Song Info with Genre Badge */}
-          <div className="text-center space-y-3 px-4">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              {currentSong.genre && (
-                <Badge variant="secondary" className="text-xs font-medium px-3 py-1">
-                  {currentSong.genre}
-                </Badge>
-              )}
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight leading-tight">
+          {/* Song Info - Centered below album art */}
+          <div className="text-center space-y-2 mb-8">
+            <h1 className="text-5xl md:text-6xl font-bold text-foreground tracking-tight">
               {currentSong.title}
             </h1>
-            <p className="text-xl text-muted-foreground font-medium">
+            <p className="text-2xl text-muted-foreground font-medium">
               {currentSong.artist}
             </p>
           </div>
+        </div>
 
-          {/* Progress Bar with Enhanced Styling */}
+        {/* Player Controls - Bottom section */}
+        <div className="w-full max-w-4xl space-y-6 pb-8">
+          {/* Progress Bar */}
           <div className="space-y-2 px-4">
             <Slider
               value={[currentTime]}
@@ -311,13 +306,13 @@ const FullScreenPlayer = () => {
             </div>
           </div>
 
-          {/* Main Controls with Better Spacing */}
-          <div className="flex items-center justify-center gap-8 px-4">
+          {/* Control Buttons */}
+          <div className="flex items-center justify-center gap-6 px-4">
             <Button
               size="icon"
               variant="ghost"
               onClick={toggleShuffle}
-              className={`hover:bg-background/80 rounded-full h-12 w-12 transition-all ${
+              className={`hover:bg-background/80 rounded-full h-11 w-11 transition-all ${
                 isShuffle ? "text-primary bg-primary/20 hover:bg-primary/30" : ""
               }`}
             >
@@ -328,20 +323,20 @@ const FullScreenPlayer = () => {
               size="icon"
               variant="ghost"
               onClick={playPrevious}
-              className="hover:bg-background/80 hover:scale-110 transition-all rounded-full h-14 w-14"
+              className="hover:bg-background/80 hover:scale-110 transition-all rounded-full h-12 w-12"
             >
-              <SkipBack className="w-7 h-7 fill-current" />
+              <SkipBack className="w-6 h-6 fill-current" />
             </Button>
 
             <Button
               size="icon"
-              className="h-20 w-20 bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 hover:scale-105 transition-all rounded-full shadow-2xl shadow-primary/50"
+              className="h-16 w-16 bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 hover:scale-105 transition-all rounded-full shadow-2xl shadow-primary/50"
               onClick={togglePlay}
             >
               {isPlaying ? (
-                <Pause className="w-9 h-9 fill-current" />
+                <Pause className="w-8 h-8 fill-current" />
               ) : (
-                <Play className="w-9 h-9 fill-current ml-1" />
+                <Play className="w-8 h-8 fill-current ml-1" />
               )}
             </Button>
 
@@ -349,16 +344,16 @@ const FullScreenPlayer = () => {
               size="icon"
               variant="ghost"
               onClick={playNext}
-              className="hover:bg-background/80 hover:scale-110 transition-all rounded-full h-14 w-14"
+              className="hover:bg-background/80 hover:scale-110 transition-all rounded-full h-12 w-12"
             >
-              <SkipForward className="w-7 h-7 fill-current" />
+              <SkipForward className="w-6 h-6 fill-current" />
             </Button>
 
             <Button
               size="icon"
               variant="ghost"
               onClick={toggleRepeat}
-              className={`hover:bg-background/80 rounded-full h-12 w-12 transition-all ${
+              className={`hover:bg-background/80 rounded-full h-11 w-11 transition-all ${
                 isRepeat ? "text-primary bg-primary/20 hover:bg-primary/30" : ""
               }`}
             >
@@ -366,16 +361,16 @@ const FullScreenPlayer = () => {
             </Button>
           </div>
 
-          {/* Like Button Centered */}
-          <div className="flex items-center justify-center px-4">
+          {/* Like Button */}
+          <div className="flex items-center justify-center">
             <Button
               size="icon"
               variant="ghost"
               onClick={handleLike}
               disabled={isLoading}
-              className="hover:bg-background/80 hover:scale-110 transition-all rounded-full h-14 w-14"
+              className="hover:bg-background/80 hover:scale-110 transition-all rounded-full h-12 w-12"
             >
-              <Heart className={`w-7 h-7 transition-all ${isLiked ? "fill-primary text-primary scale-110" : ""}`} />
+              <Heart className={`w-6 h-6 transition-all ${isLiked ? "fill-primary text-primary scale-110" : ""}`} />
             </Button>
           </div>
         </div>
