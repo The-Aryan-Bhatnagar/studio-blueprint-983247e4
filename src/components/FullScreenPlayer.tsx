@@ -116,7 +116,7 @@ export function FullScreenPlayer() {
           <div className="flex items-start gap-8 w-full max-w-7xl">
             {/* Left Side - Album Art (Small) */}
             <div className="flex-shrink-0">
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-xl overflow-hidden shadow-2xl">
+              <div className="w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-xl overflow-hidden shadow-2xl">
                 <img
                   src={currentSong.image}
                   alt={currentSong.title}
@@ -198,12 +198,12 @@ export function FullScreenPlayer() {
               <div 
                 className="rounded-xl border border-white/20 bg-background/10 backdrop-blur-md overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:border-pink-500/50"
                 style={{
-                  width: '9cm',
-                  height: '10cm',
-                  maxWidth: '28vw',
-                  maxHeight: '40vh',
-                  minWidth: '150px',
-                  minHeight: '180px',
+                  width: '10cm',
+                  height: '12cm',
+                  maxWidth: '32vw',
+                  maxHeight: '50vh',
+                  minWidth: '200px',
+                  minHeight: '240px',
                 }}
               >
                 <a 
