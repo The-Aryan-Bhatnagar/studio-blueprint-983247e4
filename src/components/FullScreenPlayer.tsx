@@ -75,12 +75,12 @@ export function FullScreenPlayer() {
           {/* Album Art & Controls */}
           <div className="flex-1 flex flex-col items-center justify-center px-4 py-6 md:px-16 md:py-8 lg:px-32">
             <div className="w-full max-w-5xl mx-auto space-y-4 md:space-y-6 lg:space-y-8">
-              {/* Album Art - Responsive sizes: 192px (phone), 256px (tablet), 320px (desktop) */}
-              <div className="w-48 h-48 sm:w-64 sm:h-64 lg:w-80 lg:h-80 mx-auto">
+              {/* Album Art - Responsive sizes: 208px (phone), 256px (tablet), 288px (laptop), 384px (desktop) */}
+              <div className="w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-96 lg:h-96 mx-auto bg-background rounded-lg shadow-2xl overflow-hidden">
                 <img
                   src={currentSong.image}
                   alt={currentSong.title}
-                  className="w-full h-full object-cover rounded-lg shadow-2xl"
+                  className="w-full h-full object-cover"
                 />
               </div>
 
@@ -175,8 +175,18 @@ export function FullScreenPlayer() {
           </div>
 
           {/* Right: Playlist - Hidden on mobile and tablet, shown on desktop */}
-          <div className="hidden lg:block w-96 border-l border-border bg-muted/30">
+          <div className="hidden lg:flex lg:flex-col lg:w-[33%] border-l border-border bg-muted/30">
             <PlaylistView />
+          </div>
+        </div>
+
+        {/* Ad Banner - Bottom */}
+        <div className="border-t border-border bg-muted/50 flex items-center justify-center p-4">
+          <div className="w-full max-w-[728px] h-[90px] hidden md:flex items-center justify-center bg-muted rounded border border-border">
+            <p className="text-xs text-muted-foreground">Advertisement Space 728x90</p>
+          </div>
+          <div className="w-full max-w-[320px] h-[50px] flex md:hidden items-center justify-center bg-muted rounded border border-border">
+            <p className="text-xs text-muted-foreground">Ad 320x50</p>
           </div>
         </div>
       </div>
