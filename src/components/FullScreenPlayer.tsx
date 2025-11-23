@@ -1,9 +1,14 @@
-import { X, Play, Pause, SkipBack, SkipForward, Shuffle, Repeat } from "lucide-react";
+import { X, Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Heart, MessageSquare } from "lucide-react";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "./player/ProgressBar";
 import { VolumeControl } from "./player/VolumeControl";
 import { PlaylistView } from "./player/PlaylistView";
+import { useSongLikes } from "@/hooks/useSongLikes";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import CommentsDialog from "./CommentsDialog";
+import { useState } from "react";
 
 export function FullScreenPlayer() {
   const {
@@ -19,6 +24,28 @@ export function FullScreenPlayer() {
     toggleShuffle,
     toggleRepeat,
   } = usePlayer();
+
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const { isLiked, toggleLike, isLoading } = useSongLikes(currentSong?.id?.toString());
+  const [showComments, setShowComments] = useState(false);
+
+  const handleLike = () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to like songs",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toggleLike();
+    toast({
+      title: isLiked ? "Removed from Liked Songs" : "Added to Liked Songs",
+      description: `${currentSong?.title} has been ${isLiked ? "removed from" : "added to"} your library`,
+    });
+  };
 
   if (!isFullScreenOpen || !currentSong) return null;
 
@@ -119,6 +146,27 @@ export function FullScreenPlayer() {
                 </Button>
               </div>
 
+              {/* Actions */}
+              <div className="flex items-center justify-center gap-3 md:gap-4">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleLike}
+                  disabled={isLoading}
+                  className="h-9 w-9 md:h-10 md:w-10"
+                >
+                  <Heart className={`h-5 w-5 md:h-6 md:w-6 ${isLiked ? "fill-primary text-primary" : ""}`} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowComments(true)}
+                  className="h-9 w-9 md:h-10 md:w-10"
+                >
+                  <MessageSquare className="h-5 w-5 md:h-6 md:w-6" />
+                </Button>
+              </div>
+
               {/* Volume */}
               <div className="flex justify-center">
                 <VolumeControl />
@@ -132,6 +180,16 @@ export function FullScreenPlayer() {
           </div>
         </div>
       </div>
+
+      {/* Comments Dialog */}
+      {currentSong && showComments && (
+        <CommentsDialog 
+          songId={currentSong.id.toString()} 
+          songTitle={currentSong.title}
+          open={showComments}
+          onOpenChange={setShowComments}
+        />
+      )}
     </div>
   );
 }
