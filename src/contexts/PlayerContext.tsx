@@ -22,6 +22,7 @@ interface PlayerContextType {
   isMuted: boolean;
   isRepeat: boolean;
   isShuffle: boolean;
+  isFullScreenOpen: boolean;
   playSong: (song: Song) => void;
   togglePlay: () => void;
   seekTo: (time: number) => void;
@@ -31,6 +32,7 @@ interface PlayerContextType {
   toggleShuffle: () => void;
   playNext: () => void;
   playPrevious: () => void;
+  setFullScreenOpen: (open: boolean) => void;
   queue: Song[];
   setQueue: (songs: Song[]) => void;
 }
@@ -46,6 +48,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isRepeat, setIsRepeat] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
+  const [isFullScreenOpen, setIsFullScreenOpen] = useState(false);
   const [queue, setQueue] = useState<Song[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioObjectUrlRef = useRef<string | null>(null);
@@ -247,6 +250,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         isMuted,
         isRepeat,
         isShuffle,
+        isFullScreenOpen,
         playSong,
         togglePlay,
         seekTo,
@@ -256,6 +260,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         toggleShuffle,
         playNext,
         playPrevious,
+        setFullScreenOpen: setIsFullScreenOpen,
         queue,
         setQueue,
       }}

@@ -53,8 +53,13 @@ const MusicPlayer = () => {
     });
   };
 
+  const { setFullScreenOpen } = usePlayer();
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border backdrop-blur-lg bg-opacity-95 z-50">
+    <div 
+      className="fixed bottom-0 left-0 right-0 bg-card border-t border-border backdrop-blur-lg bg-opacity-95 z-50 cursor-pointer hover:bg-card/80 transition-colors"
+      onClick={() => currentSong && setFullScreenOpen(true)}
+    >
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between gap-6">
           {/* Song Info */}
@@ -78,7 +83,10 @@ const MusicPlayer = () => {
                   size="icon"
                   variant="ghost"
                   className="flex-shrink-0 hover:text-primary"
-                  onClick={handleLike}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLike();
+                  }}
                   disabled={isLoading}
                 >
                   <Heart className={`w-5 h-5 ${isLiked ? "fill-primary text-primary" : ""}`} />
@@ -103,7 +111,7 @@ const MusicPlayer = () => {
           </div>
 
           {/* Player Controls */}
-          <div className="flex-1 max-w-2xl">
+          <div className="flex-1 max-w-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-center gap-4 mb-2">
               <Button 
                 size="icon" 
@@ -171,7 +179,7 @@ const MusicPlayer = () => {
           </div>
 
           {/* Volume Control */}
-          <div className="flex items-center gap-3 flex-1 justify-end">
+          <div className="flex items-center gap-3 flex-1 justify-end" onClick={(e) => e.stopPropagation()}>
             <Button
               size="icon"
               variant="ghost"
