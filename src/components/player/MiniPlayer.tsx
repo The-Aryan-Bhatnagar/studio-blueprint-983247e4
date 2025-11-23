@@ -1,8 +1,13 @@
-import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Maximize2 } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Maximize2, Heart, MessageSquare } from "lucide-react";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "./ProgressBar";
 import { VolumeControl } from "./VolumeControl";
+import { useSongLikes } from "@/hooks/useSongLikes";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import CommentsDialog from "../CommentsDialog";
+import { useState } from "react";
 
 export function MiniPlayer() {
   const {
@@ -17,6 +22,28 @@ export function MiniPlayer() {
     toggleRepeat,
     setFullScreenOpen,
   } = usePlayer();
+
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const { isLiked, toggleLike, isLoading } = useSongLikes(currentSong?.id?.toString());
+  const [showComments, setShowComments] = useState(false);
+
+  const handleLike = () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to like songs",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toggleLike();
+    toast({
+      title: isLiked ? "Removed from Liked Songs" : "Added to Liked Songs",
+      description: `${currentSong?.title} has been ${isLiked ? "removed from" : "added to"} your library`,
+    });
+  };
 
   if (!currentSong) return null;
 
@@ -35,6 +62,23 @@ export function MiniPlayer() {
               <p className="text-xs sm:text-sm font-medium truncate">{currentSong.title}</p>
               <p className="text-xs text-muted-foreground truncate">{currentSong.artist}</p>
             </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleLike}
+              disabled={isLoading}
+              className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0"
+            >
+              <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isLiked ? "fill-primary text-primary" : ""}`} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowComments(true)}
+              className="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0 hidden sm:flex"
+            >
+              <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </Button>
           </div>
 
           {/* Center: Player Controls */}
@@ -104,6 +148,16 @@ export function MiniPlayer() {
           </div>
         </div>
       </div>
+
+      {/* Comments Dialog */}
+      {currentSong && showComments && (
+        <CommentsDialog 
+          songId={currentSong.id.toString()} 
+          songTitle={currentSong.title}
+          open={showComments}
+          onOpenChange={setShowComments}
+        />
+      )}
     </div>
   );
 }
