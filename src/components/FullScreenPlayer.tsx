@@ -260,8 +260,18 @@ export function FullScreenPlayer() {
 
         {/* Right Sidebar - Ad Space & Actions */}
         <div className="absolute right-20 top-1/2 -translate-y-1/2 flex flex-col gap-6 items-center">
-          {/* Ad Showcase Area */}
-          <div className="w-80 h-96 rounded-2xl border-2 border-pink-500/30 bg-gradient-to-br from-pink-500/10 to-purple-500/10 backdrop-blur-sm overflow-hidden group hover:border-pink-500/50 transition-all">
+          {/* Ad Showcase Area - Responsive 9cm × 10cm */}
+          <div 
+            className="rounded-xl border border-white/20 bg-background/10 backdrop-blur-md overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:border-pink-500/50"
+            style={{
+              width: '9cm',
+              height: '10cm',
+              maxWidth: '28vw',
+              maxHeight: '40vh',
+              minWidth: '150px',
+              minHeight: '180px',
+            }}
+          >
             <a 
               href={activeAd.link_url} 
               target="_blank" 
