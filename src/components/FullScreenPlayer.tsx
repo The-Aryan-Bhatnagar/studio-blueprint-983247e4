@@ -86,87 +86,99 @@ export function FullScreenPlayer() {
   if (!isFullScreenOpen || !currentSong) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-gradient-to-br from-pink-500/30 via-background to-background">
-      <div className="absolute inset-0 bg-gradient-to-r from-[#2d3561] via-[#2d3561]/95 to-[#2d3561]/80" />
+    <div className="fixed inset-0 z-50 bg-background overflow-hidden">
+      {/* Animated Background Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/20" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(var(--primary),0.15),transparent_50%)]" />
       
-      <div className="relative h-full flex flex-col">
+      <div className="relative h-full flex flex-col animate-fade-in">
         {/* Header with Back Arrow */}
-        <div className="flex items-center justify-between p-4 md:p-6">
-          <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center justify-between p-4 md:p-6 backdrop-blur-sm">
+          <div className="flex items-center gap-2 md:gap-3">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setFullScreenOpen(false)}
-              className="h-10 w-10 rounded-full hover:bg-white/10"
+              className="h-10 w-10 rounded-full hover:bg-primary/10 hover:scale-110 transition-all duration-200"
             >
-              <ChevronLeft className="h-6 w-6 text-white" />
+              <ChevronLeft className="h-6 w-6 text-foreground" />
             </Button>
-            <span className="text-white text-sm md:text-base font-medium">Back</span>
+            <span className="text-foreground text-sm md:text-base font-medium">Now Playing</span>
           </div>
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 rounded-full hover:bg-white/10"
+            className="h-10 w-10 rounded-full hover:bg-primary/10 hover:scale-110 transition-all duration-200"
           >
-            <MoreVertical className="h-6 w-6 text-white" />
+            <MoreVertical className="h-6 w-6 text-muted-foreground" />
           </Button>
         </div>
 
         {/* Main Content - Two Column Layout */}
-        <div className="flex-1 flex flex-col md:flex-row gap-4 md:gap-6 lg:gap-8 px-4 md:px-6 lg:px-12 pb-4">
+        <div className="flex-1 flex flex-col md:flex-row gap-6 md:gap-8 lg:gap-12 px-4 md:px-8 lg:px-16 pb-4 overflow-auto">
           {/* Left Side - Album Cover */}
           <div className="w-full md:w-1/2 flex items-center justify-center">
-            <div className="relative w-full max-w-[400px] aspect-square rounded-2xl overflow-hidden shadow-2xl">
-              <img
-                src={currentSong.image}
-                alt={currentSong.title}
-                className="w-full h-full object-cover"
-              />
+            <div className="relative w-full max-w-[450px] group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-primary rounded-2xl blur-2xl opacity-30 group-hover:opacity-50 transition-opacity duration-500" />
+              <div className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl ring-1 ring-border/50 hover-scale">
+                <img
+                  src={currentSong.image}
+                  alt={currentSong.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
             </div>
           </div>
 
           {/* Right Side - Ad Showcase */}
-          <div className="w-full md:w-1/2 flex flex-col gap-4">
-            <h2 className="text-white text-lg md:text-xl font-semibold text-center md:text-left">Ads</h2>
+          <div className="w-full md:w-1/2 flex flex-col gap-4 md:gap-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-foreground text-lg md:text-xl font-bold flex items-center gap-2">
+                <span className="w-1 h-6 bg-primary rounded-full" />
+                Featured
+              </h2>
+            </div>
             <div className="flex-1 flex items-center justify-center">
-              <div 
-                className="rounded-xl border-4 border-white/30 bg-background/10 backdrop-blur-md overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:border-pink-500/50 w-full max-w-[350px]"
-                style={{
-                  aspectRatio: '9/10',
-                }}
-              >
-                <a 
-                  href={activeAd.link_url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="block w-full h-full relative"
+              <div className="relative w-full max-w-[400px] group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-accent via-primary to-accent rounded-2xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500" />
+                <div 
+                  className="relative rounded-2xl border-2 border-border/50 bg-card/50 backdrop-blur-md overflow-hidden group-hover:border-primary/50 transition-all duration-300 hover-scale shadow-xl"
+                  style={{ aspectRatio: '9/10' }}
                 >
-                  <img 
-                    src={activeAd.image_url} 
-                    alt={activeAd.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                    <div className="flex items-center gap-2 text-white">
-                      <span className="text-sm font-medium">{activeAd.title}</span>
-                      <ExternalLink className="w-4 h-4" />
+                  <a 
+                    href={activeAd.link_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block w-full h-full relative"
+                  >
+                    <img 
+                      src={activeAd.image_url} 
+                      alt={activeAd.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end p-4">
+                      <div className="flex items-center justify-between w-full">
+                        <span className="text-sm font-semibold text-foreground">{activeAd.title}</span>
+                        <ExternalLink className="w-4 h-4 text-primary" />
+                      </div>
                     </div>
-                  </div>
-                </a>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Center - Song Info & Controls Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#2d3561] via-[#2d3561]/95 to-transparent px-4 md:px-6 lg:px-12 pb-6 pt-16">
+        {/* Bottom Controls Section */}
+        <div className="relative bg-gradient-to-t from-background via-background/98 to-transparent backdrop-blur-xl border-t border-border/50 px-4 md:px-8 lg:px-16 py-6">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Song Info */}
-            <div className="text-center md:text-left">
-              <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
+            <div className="text-center md:text-left space-y-1">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground truncate">
                 {currentSong.title}
               </h1>
-              <p className="text-base md:text-xl text-pink-400/90">
+              <p className="text-base md:text-lg text-muted-foreground">
                 {currentSong.artist}
               </p>
             </div>
@@ -174,23 +186,23 @@ export function FullScreenPlayer() {
             {/* Progress Bar */}
             <div className="space-y-2">
               <div className="flex items-center gap-4">
-                <span className="text-xs md:text-sm text-white/60 min-w-[40px]">
+                <span className="text-xs md:text-sm text-muted-foreground min-w-[40px] tabular-nums">
                   {formatTime(currentTime)}
                 </span>
                 <div 
                   onClick={handleProgressClick} 
-                  className="flex-1 relative h-1.5 bg-white/20 rounded-full cursor-pointer group"
+                  className="flex-1 relative h-2 bg-secondary rounded-full cursor-pointer group overflow-hidden"
                 >
                   <div 
-                    className="absolute h-full bg-pink-500 rounded-full transition-all"
+                    className="absolute h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-150 shadow-lg shadow-primary/50"
                     style={{ width: `${progress}%` }}
                   />
                   <div 
-                    className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity border-2 border-background"
                     style={{ left: `${progress}%`, transform: 'translate(-50%, -50%)' }}
                   />
                 </div>
-                <span className="text-xs md:text-sm text-white/60 min-w-[40px] text-right">
+                <span className="text-xs md:text-sm text-muted-foreground min-w-[40px] text-right tabular-nums">
                   {formatTime(duration)}
                 </span>
               </div>
@@ -198,15 +210,15 @@ export function FullScreenPlayer() {
 
             {/* Controls */}
             <div className="flex items-center justify-between gap-4">
-              {/* Left Controls - Shuffle, Repeat, List */}
-              <div className="flex items-center gap-2 md:gap-4">
+              {/* Left Controls */}
+              <div className="flex items-center gap-1 md:gap-2">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={toggleShuffle}
                   className={cn(
-                    "h-8 w-8 md:h-10 md:w-10 hover:bg-white/10",
-                    isShuffle ? "text-pink-400" : "text-white/70"
+                    "h-9 w-9 md:h-10 md:w-10 rounded-full hover:bg-primary/10 transition-all duration-200",
+                    isShuffle ? "text-primary bg-primary/10" : "text-muted-foreground"
                   )}
                 >
                   <Shuffle className="h-4 w-4 md:h-5 md:w-5" />
@@ -216,8 +228,8 @@ export function FullScreenPlayer() {
                   size="icon"
                   onClick={toggleRepeat}
                   className={cn(
-                    "h-8 w-8 md:h-10 md:w-10 hover:bg-white/10",
-                    isRepeat ? "text-pink-400" : "text-white/70"
+                    "h-9 w-9 md:h-10 md:w-10 rounded-full hover:bg-primary/10 transition-all duration-200",
+                    isRepeat ? "text-primary bg-primary/10" : "text-muted-foreground"
                   )}
                 >
                   <Repeat className="h-4 w-4 md:h-5 md:w-5" />
@@ -225,51 +237,51 @@ export function FullScreenPlayer() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 md:h-10 md:w-10 text-white/70 hover:bg-white/10"
+                  className="h-9 w-9 md:h-10 md:w-10 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-foreground transition-all duration-200"
                 >
                   <List className="h-4 w-4 md:h-5 md:w-5" />
                 </Button>
               </div>
 
               {/* Center - Playback Controls */}
-              <div className="flex items-center gap-3 md:gap-6">
+              <div className="flex items-center gap-3 md:gap-5">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={playPrevious}
-                  className="h-10 w-10 md:h-12 md:w-12 text-white hover:bg-white/10"
+                  className="h-11 w-11 md:h-12 md:w-12 rounded-full text-foreground hover:bg-primary/10 hover:scale-110 transition-all duration-200"
                 >
-                  <SkipBack className="h-5 w-5 md:h-6 md:w-6" fill="white" />
+                  <SkipBack className="h-5 w-5 md:h-6 md:w-6" fill="currentColor" />
                 </Button>
                 <Button
                   size="icon"
                   onClick={togglePlay}
-                  className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-pink-500 hover:bg-pink-600 shadow-lg"
+                  className="h-14 w-14 md:h-16 md:w-16 rounded-full bg-gradient-to-br from-primary to-accent hover:from-primary/90 hover:to-accent/90 shadow-2xl shadow-primary/50 hover:scale-105 transition-all duration-200"
                 >
                   {isPlaying ? (
-                    <Pause className="h-6 w-6 md:h-7 md:w-7 text-white" fill="white" />
+                    <Pause className="h-6 w-6 md:h-7 md:w-7 text-primary-foreground" fill="currentColor" />
                   ) : (
-                    <Play className="h-6 w-6 md:h-7 md:w-7 text-white ml-1" fill="white" />
+                    <Play className="h-6 w-6 md:h-7 md:w-7 text-primary-foreground ml-1" fill="currentColor" />
                   )}
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={playNext}
-                  className="h-10 w-10 md:h-12 md:w-12 text-white hover:bg-white/10"
+                  className="h-11 w-11 md:h-12 md:w-12 rounded-full text-foreground hover:bg-primary/10 hover:scale-110 transition-all duration-200"
                 >
-                  <SkipForward className="h-5 w-5 md:h-6 md:w-6" fill="white" />
+                  <SkipForward className="h-5 w-5 md:h-6 md:w-6" fill="currentColor" />
                 </Button>
               </div>
 
-              {/* Right Controls - Volume, Like, Share */}
-              <div className="flex items-center gap-2 md:gap-4">
-                <div className="hidden md:flex items-center gap-2 max-w-[120px]">
+              {/* Right Controls */}
+              <div className="flex items-center gap-1 md:gap-2">
+                <div className="hidden lg:flex items-center gap-2 w-32">
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={toggleMute}
-                    className="h-8 w-8 text-white hover:bg-white/10"
+                    className="h-9 w-9 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-foreground transition-all duration-200"
                   >
                     {isMuted || volume === 0 ? (
                       <VolumeX className="h-4 w-4" />
@@ -282,7 +294,7 @@ export function FullScreenPlayer() {
                     onValueChange={([value]) => setVolume(value)}
                     max={100}
                     step={1}
-                    className="flex-1 cursor-pointer [&_[role=slider]]:bg-white [&_[role=slider]]:border-white"
+                    className="flex-1 cursor-pointer"
                   />
                 </div>
                 <Button
@@ -291,16 +303,16 @@ export function FullScreenPlayer() {
                   onClick={handleLike}
                   disabled={isLoading}
                   className={cn(
-                    "h-8 w-8 md:h-10 md:w-10 rounded-full hover:bg-white/10",
-                    isLiked ? "text-pink-500" : "text-white/70"
+                    "h-9 w-9 md:h-10 md:w-10 rounded-full hover:bg-primary/10 transition-all duration-200",
+                    isLiked ? "text-primary" : "text-muted-foreground"
                   )}
                 >
-                  <Heart className={cn("h-4 w-4 md:h-5 md:w-5", isLiked && "fill-pink-500")} />
+                  <Heart className={cn("h-4 w-4 md:h-5 md:w-5 transition-all", isLiked && "fill-primary scale-110")} />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 md:h-10 md:w-10 rounded-full text-white/70 hover:bg-white/10"
+                  className="h-9 w-9 md:h-10 md:w-10 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-foreground transition-all duration-200"
                 >
                   <Share2 className="h-4 w-4 md:h-5 md:w-5" />
                 </Button>
