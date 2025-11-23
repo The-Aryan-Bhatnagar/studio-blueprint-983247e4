@@ -259,7 +259,7 @@ export function FullScreenPlayer() {
         </div>
 
         {/* Right Sidebar - Ad Space & Actions */}
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col gap-6 items-center">
+        <div className="absolute right-20 top-1/2 -translate-y-1/2 flex flex-col gap-6 items-center">
           {/* Ad Showcase Area */}
           <div className="w-80 h-96 rounded-2xl border-2 border-pink-500/30 bg-gradient-to-br from-pink-500/10 to-purple-500/10 backdrop-blur-sm overflow-hidden group hover:border-pink-500/50 transition-all">
             <a 
