@@ -264,18 +264,18 @@ const FullScreenPlayer = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 container mx-auto px-8 h-[calc(100vh-120px)] flex flex-col items-center justify-center">
-        <div className="w-full max-w-2xl space-y-10">
-          {/* Album Art with Shadow Effect */}
-          <div className="relative mx-auto max-w-lg">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-secondary/30 rounded-3xl blur-3xl scale-95" />
-            <div className="relative aspect-square w-full rounded-3xl overflow-hidden shadow-2xl animate-scale-in ring-1 ring-white/10">
+      <div className="relative z-10 container mx-auto px-8 h-[calc(100vh-180px)] flex flex-col items-center justify-center">
+        <div className="w-full max-w-2xl space-y-8">
+          {/* Album Art with Enhanced Shadow Effect */}
+          <div className="relative mx-auto max-w-md">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-primary/30 to-secondary/40 rounded-3xl blur-3xl" />
+            <div className="relative aspect-square w-full rounded-2xl overflow-hidden shadow-2xl animate-scale-in ring-1 ring-white/10">
               <img
                 src={currentSong.image}
                 alt={currentSong.title}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             </div>
           </div>
 
@@ -288,16 +288,16 @@ const FullScreenPlayer = () => {
                 </Badge>
               )}
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground tracking-tight leading-tight">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight leading-tight">
               {currentSong.title}
             </h1>
-            <p className="text-2xl text-muted-foreground font-medium">
+            <p className="text-xl text-muted-foreground font-medium">
               {currentSong.artist}
             </p>
           </div>
 
           {/* Progress Bar with Enhanced Styling */}
-          <div className="space-y-3 px-4">
+          <div className="space-y-2 px-4">
             <Slider
               value={[currentTime]}
               onValueChange={([value]) => seekTo(value)}
