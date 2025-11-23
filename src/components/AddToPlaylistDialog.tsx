@@ -22,10 +22,12 @@ import { toast } from "@/hooks/use-toast";
 interface AddToPlaylistDialogProps {
   songId: string;
   trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export const AddToPlaylistDialog = ({ songId, trigger }: AddToPlaylistDialogProps) => {
-  const [open, setOpen] = useState(false);
+export const AddToPlaylistDialog = ({ songId, trigger, open: externalOpen, onOpenChange }: AddToPlaylistDialogProps) => {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -33,6 +35,10 @@ export const AddToPlaylistDialog = ({ songId, trigger }: AddToPlaylistDialogProp
   
   const { user } = useAuth();
   const { playlists, addSongToPlaylist, createPlaylist } = usePlaylists();
+
+  // Use external open state if provided, otherwise use internal
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
 
   const handleAddToPlaylist = async (playlistId: string) => {
     try {
