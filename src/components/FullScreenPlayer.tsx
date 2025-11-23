@@ -49,9 +49,9 @@ export function FullScreenPlayer() {
   // Sample ad for Sean Akhay (fallback if no ads from database)
   const sampleAd = {
     id: "sample-1",
-    title: "Sean Akhay - New Album",
-    image_url: "/images/sean-akhay-ad.jpg",
-    link_url: "#",
+    title: "Sean Akhay - Out Now",
+    image_url: "/images/sean-akhay-ad.png",
+    link_url: "https://www.hresigf.com",
   };
   
   const activeAd = ads?.[0] || sampleAd;
