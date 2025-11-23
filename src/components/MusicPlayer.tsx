@@ -1,11 +1,10 @@
-import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Shuffle, Repeat, MessageSquare } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Shuffle, Repeat, ListMusic, Maximize2, VolumeX } from "lucide-react";
 import { Button } from "./ui/button";
 import { Slider } from "./ui/slider";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSongLikes } from "@/hooks/useSongLikes";
 import { useAuth } from "@/contexts/AuthContext";
-import CommentsDialog from "./CommentsDialog";
 
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60);
@@ -56,90 +55,83 @@ const MusicPlayer = () => {
   const { setFullScreenOpen } = usePlayer();
 
   return (
-    <div 
-      className="fixed bottom-0 left-0 right-0 bg-card border-t border-border backdrop-blur-lg bg-opacity-95 z-50 cursor-pointer hover:bg-card/80 transition-colors"
-      onClick={() => currentSong && setFullScreenOpen(true)}
-    >
-      <div className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between gap-6">
-          {/* Song Info */}
-          <div className="flex items-center gap-4 flex-1 min-w-0">
+    <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border backdrop-blur-lg bg-opacity-95 z-50">
+      <div className="px-4 py-3">
+        <div className="grid grid-cols-[1fr_2fr_1fr] items-center gap-4">
+          {/* Left Section - Song Info */}
+          <div className="flex items-center gap-3 min-w-0">
             {currentSong ? (
               <>
                 <img
                   src={currentSong.image}
                   alt={currentSong.title}
-                  className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
+                  className="w-14 h-14 rounded object-cover flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => setFullScreenOpen(true)}
                 />
-                <div className="min-w-0">
-                  <h4 className="font-semibold text-foreground truncate">
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-medium text-sm text-foreground truncate cursor-pointer hover:underline" onClick={() => setFullScreenOpen(true)}>
                     {currentSong.title}
                   </h4>
-                  <p className="text-sm text-muted-foreground truncate">
+                  <p className="text-xs text-muted-foreground truncate">
                     {currentSong.artist}
                   </p>
                 </div>
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="flex-shrink-0 hover:text-primary"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleLike();
-                  }}
+                  className="flex-shrink-0 h-8 w-8 hover:text-primary"
+                  onClick={handleLike}
                   disabled={isLoading}
                 >
-                  <Heart className={`w-5 h-5 ${isLiked ? "fill-primary text-primary" : ""}`} />
+                  <Heart className={`w-4 h-4 ${isLiked ? "fill-primary text-primary" : ""}`} />
                 </Button>
-                {currentSong && (
-                  <CommentsDialog songId={currentSong.id.toString()} songTitle={currentSong.title} />
-                )}
               </>
             ) : (
               <>
-                <div className="w-14 h-14 rounded-lg bg-gradient-primary flex-shrink-0" />
-                <div className="min-w-0">
-                  <h4 className="font-semibold text-foreground truncate">
-                    Select a song to play
+                <div className="w-14 h-14 rounded bg-muted flex-shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-medium text-sm text-foreground truncate">
+                    No song playing
                   </h4>
-                  <p className="text-sm text-muted-foreground truncate">
-                    Browse the music library
+                  <p className="text-xs text-muted-foreground truncate">
+                    Select a song
                   </p>
                 </div>
               </>
             )}
           </div>
 
-          {/* Player Controls */}
-          <div className="flex-1 max-w-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-center gap-4 mb-2">
-              <Button 
-                size="icon" 
-                variant="ghost" 
+          {/* Center Section - Player Controls */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-center gap-2">
+              <Button
+                size="icon"
+                variant="ghost"
                 disabled={!currentSong}
                 onClick={toggleShuffle}
-                className={isShuffle ? "text-primary bg-primary/20 border border-primary/30" : ""}
+                className={`h-8 w-8 ${isShuffle ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
               >
-                <Shuffle className="w-4 h-4" />
+                <Shuffle className="w-3.5 h-3.5" />
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={playPrevious}
                 disabled={!currentSong}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
               >
-                <SkipBack className="w-5 h-5" />
+                <SkipBack className="w-4 h-4 fill-current" />
               </Button>
               <Button
                 size="icon"
-                className="h-10 w-10 bg-primary hover:bg-primary/90"
+                className="h-8 w-8 rounded-full bg-foreground hover:bg-foreground/90 text-background hover:scale-105 transition-transform"
                 onClick={togglePlay}
                 disabled={!currentSong}
               >
                 {isPlaying ? (
-                  <Pause className="w-5 h-5 fill-current" />
+                  <Pause className="w-4 h-4 fill-current" />
                 ) : (
-                  <Play className="w-5 h-5 fill-current" />
+                  <Play className="w-4 h-4 fill-current ml-0.5" />
                 )}
               </Button>
               <Button
@@ -147,21 +139,22 @@ const MusicPlayer = () => {
                 variant="ghost"
                 onClick={playNext}
                 disabled={!currentSong}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
               >
-                <SkipForward className="w-5 h-5" />
+                <SkipForward className="w-4 h-4 fill-current" />
               </Button>
-              <Button 
-                size="icon" 
-                variant="ghost" 
+              <Button
+                size="icon"
+                variant="ghost"
                 disabled={!currentSong}
                 onClick={toggleRepeat}
-                className={isRepeat ? "text-primary bg-primary/20 border border-primary/30" : ""}
+                className={`h-8 w-8 ${isRepeat ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
               >
-                <Repeat className="w-4 h-4" />
+                <Repeat className="w-3.5 h-3.5" />
               </Button>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-muted-foreground w-10 text-right">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground tabular-nums w-10 text-right">
                 {formatTime(currentTime)}
               </span>
               <Slider
@@ -172,29 +165,50 @@ const MusicPlayer = () => {
                 className="flex-1"
                 disabled={!currentSong}
               />
-              <span className="text-xs text-muted-foreground w-10">
+              <span className="text-xs text-muted-foreground tabular-nums w-10">
                 {duration ? formatTime(duration) : "0:00"}
               </span>
             </div>
           </div>
 
-          {/* Volume Control */}
-          <div className="flex items-center gap-3 flex-1 justify-end" onClick={(e) => e.stopPropagation()}>
+          {/* Right Section - Additional Controls */}
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              disabled={!currentSong}
+            >
+              <ListMusic className="w-4 h-4" />
+            </Button>
             <Button
               size="icon"
               variant="ghost"
               onClick={toggleMute}
-              className="flex-shrink-0"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
             >
-              <Volume2 className={`w-5 h-5 ${isMuted ? "text-muted-foreground/50" : "text-muted-foreground"}`} />
+              {isMuted || volume === 0 ? (
+                <VolumeX className="w-4 h-4" />
+              ) : (
+                <Volume2 className="w-4 h-4" />
+              )}
             </Button>
             <Slider
               value={[isMuted ? 0 : volume]}
               onValueChange={([value]) => setVolume(value)}
               max={100}
               step={1}
-              className="w-32"
+              className="w-24"
             />
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => currentSong && setFullScreenOpen(true)}
+              disabled={!currentSong}
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </div>
