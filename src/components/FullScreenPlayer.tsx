@@ -1,4 +1,4 @@
-import { X, Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Volume2, Heart, ChevronDown, MoreVertical, Share2, ListMusic } from "lucide-react";
+import { X, Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Volume2, Heart, ChevronDown, MoreVertical, Share2, ListMusic, VolumeX } from "lucide-react";
 import { Button } from "./ui/button";
 import { Slider } from "./ui/slider";
 import { usePlayer } from "@/contexts/PlayerContext";
@@ -7,6 +7,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { Badge } from "./ui/badge";
+import { AddToPlaylistDialog } from "./AddToPlaylistDialog";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60);
@@ -40,6 +42,8 @@ const FullScreenPlayer = () => {
   const { toast } = useToast();
   const { isLiked, toggleLike, isLoading } = useSongLikes(currentSong?.id?.toString());
   const [showAd, setShowAd] = useState(false);
+  const [showPlaylistDialog, setShowPlaylistDialog] = useState(false);
+  const [showVolumePopover, setShowVolumePopover] = useState(false);
 
   useEffect(() => {
     // Show ad every 3 songs (simulated)
@@ -66,6 +70,34 @@ const FullScreenPlayer = () => {
       title: isLiked ? "Removed from Liked Songs" : "Added to Liked Songs",
       description: `${currentSong?.title} has been ${isLiked ? "removed from" : "added to"} your library`,
     });
+  };
+
+  const handleShare = async () => {
+    const songUrl = `${window.location.origin}/?song=${currentSong?.id}`;
+    try {
+      await navigator.clipboard.writeText(songUrl);
+      toast({
+        title: "Link Copied!",
+        description: "Song link has been copied to clipboard",
+      });
+    } catch (err) {
+      toast({
+        title: "Share Link",
+        description: songUrl,
+      });
+    }
+  };
+
+  const handleAddToPlaylist = () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to add songs to playlists",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowPlaylistDialog(true);
   };
 
   if (!isFullScreenOpen || !currentSong) return null;
@@ -124,15 +156,110 @@ const FullScreenPlayer = () => {
         </Button>
 
         <div className="flex items-center gap-2">
-          <Button size="icon" variant="ghost" className="hover:bg-background/80 rounded-full h-10 w-10">
+          <Button 
+            size="icon" 
+            variant="ghost" 
+            onClick={handleShare}
+            className="hover:bg-background/80 rounded-full h-10 w-10"
+          >
             <Share2 className="w-5 h-5" />
           </Button>
-          <Button size="icon" variant="ghost" className="hover:bg-background/80 rounded-full h-10 w-10">
+          <Button 
+            size="icon" 
+            variant="ghost" 
+            onClick={handleAddToPlaylist}
+            className="hover:bg-background/80 rounded-full h-10 w-10"
+          >
             <ListMusic className="w-5 h-5" />
           </Button>
-          <Button size="icon" variant="ghost" className="hover:bg-background/80 rounded-full h-10 w-10">
-            <MoreVertical className="w-5 h-5" />
-          </Button>
+          
+          <Popover open={showVolumePopover} onOpenChange={setShowVolumePopover}>
+            <PopoverTrigger asChild>
+              <Button 
+                size="icon" 
+                variant="ghost" 
+                className="hover:bg-background/80 rounded-full h-10 w-10"
+              >
+                {isMuted || volume === 0 ? (
+                  <VolumeX className="w-5 h-5" />
+                ) : (
+                  <Volume2 className="w-5 h-5" />
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-4" align="end">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Volume</span>
+                  <span className="text-sm text-muted-foreground">{isMuted ? 0 : volume}%</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={toggleMute}
+                    className="h-8 w-8"
+                  >
+                    {isMuted || volume === 0 ? (
+                      <VolumeX className="w-4 h-4" />
+                    ) : (
+                      <Volume2 className="w-4 h-4" />
+                    )}
+                  </Button>
+                  <Slider
+                    value={[isMuted ? 0 : volume]}
+                    onValueChange={([value]) => {
+                      setVolume(value);
+                      if (isMuted && value > 0) toggleMute();
+                    }}
+                    max={100}
+                    step={1}
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button 
+                size="icon" 
+                variant="ghost" 
+                className="hover:bg-background/80 rounded-full h-10 w-10"
+              >
+                <MoreVertical className="w-5 h-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 p-2" align="end">
+              <div className="space-y-1">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start h-auto py-2 px-3"
+                  onClick={handleShare}
+                >
+                  <Share2 className="w-4 h-4 mr-3" />
+                  <span className="text-sm">Share Song</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start h-auto py-2 px-3"
+                  onClick={handleAddToPlaylist}
+                >
+                  <ListMusic className="w-4 h-4 mr-3" />
+                  <span className="text-sm">Add to Playlist</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start h-auto py-2 px-3"
+                  onClick={handleLike}
+                >
+                  <Heart className={`w-4 h-4 mr-3 ${isLiked ? "fill-primary text-primary" : ""}`} />
+                  <span className="text-sm">{isLiked ? "Remove from Liked" : "Like Song"}</span>
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
@@ -239,61 +366,29 @@ const FullScreenPlayer = () => {
             </Button>
           </div>
 
-          {/* Secondary Controls */}
-          <div className="flex items-center justify-between px-4">
-            <div className="flex items-center gap-2">
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={handleLike}
-                disabled={isLoading}
-                className="hover:bg-background/80 hover:scale-110 transition-all rounded-full h-12 w-12"
-              >
-                <Heart className={`w-6 h-6 transition-all ${isLiked ? "fill-primary text-primary scale-110" : ""}`} />
-              </Button>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={toggleMute}
-                className="hover:bg-background/80 rounded-full h-10 w-10"
-              >
-                <Volume2 className={`w-5 h-5 ${isMuted ? "text-muted-foreground/50" : ""}`} />
-              </Button>
-              <Slider
-                value={[isMuted ? 0 : volume]}
-                onValueChange={([value]) => setVolume(value)}
-                max={100}
-                step={1}
-                className="w-32"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Ad Section with Better Design */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-lg px-6 z-10">
-        <div className="relative overflow-hidden bg-gradient-to-r from-background/80 via-background/60 to-background/80 backdrop-blur-xl border border-border/50 rounded-2xl p-4 shadow-lg">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5" />
-          <div className="relative flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center">
-                <span className="text-xs font-bold text-primary">✨</span>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">Sponsored Content</p>
-                <p className="text-xs text-muted-foreground">Discover trending artists</p>
-              </div>
-            </div>
-            <Button size="sm" variant="outline" className="text-xs px-4 hover:bg-primary/10 hover:border-primary/50">
-              Learn More
+          {/* Like Button Centered */}
+          <div className="flex items-center justify-center px-4">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={handleLike}
+              disabled={isLoading}
+              className="hover:bg-background/80 hover:scale-110 transition-all rounded-full h-14 w-14"
+            >
+              <Heart className={`w-7 h-7 transition-all ${isLiked ? "fill-primary text-primary scale-110" : ""}`} />
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Add to Playlist Dialog */}
+      {showPlaylistDialog && currentSong && (
+        <AddToPlaylistDialog
+          open={showPlaylistDialog}
+          onOpenChange={setShowPlaylistDialog}
+          songId={currentSong.id.toString()}
+        />
+      )}
     </div>
   );
 };
