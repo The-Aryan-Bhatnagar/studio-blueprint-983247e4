@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import CommentsDialog from "./CommentsDialog";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useFullscreenAds } from "@/hooks/useFullscreenAds";
+import { ExternalLink } from "lucide-react";
 
 const formatTime = (seconds: number): string => {
   if (!isFinite(seconds) || seconds < 0) return "0:00";
@@ -42,6 +44,17 @@ export function FullScreenPlayer() {
   const { toast } = useToast();
   const { isLiked, toggleLike, isLoading } = useSongLikes(currentSong?.id?.toString());
   const [showComments, setShowComments] = useState(false);
+  const { data: ads } = useFullscreenAds();
+  
+  // Sample ad for Sean Akhay (fallback if no ads from database)
+  const sampleAd = {
+    id: "sample-1",
+    title: "Sean Akhay - New Album",
+    image_url: "/images/sean-akhay-ad.jpg",
+    link_url: "#",
+  };
+  
+  const activeAd = ads?.[0] || sampleAd;
 
   const handleLike = () => {
     if (!user) {
@@ -245,8 +258,31 @@ export function FullScreenPlayer() {
           </div>
         </div>
 
-        {/* Right Sidebar Actions */}
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col gap-6">
+        {/* Right Sidebar - Ad Space & Actions */}
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col gap-6 items-center">
+          {/* Ad Showcase Area */}
+          <div className="w-80 h-96 rounded-2xl border-2 border-pink-500/30 bg-gradient-to-br from-pink-500/10 to-purple-500/10 backdrop-blur-sm overflow-hidden group hover:border-pink-500/50 transition-all">
+            <a 
+              href={activeAd.link_url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block w-full h-full relative"
+            >
+              <img 
+                src={activeAd.image_url} 
+                alt={activeAd.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                <div className="flex items-center gap-2 text-white">
+                  <span className="text-sm font-medium">{activeAd.title}</span>
+                  <ExternalLink className="w-4 h-4" />
+                </div>
+              </div>
+            </a>
+          </div>
+          
+          {/* Action Buttons */}
           <Button
             variant="ghost"
             size="icon"
