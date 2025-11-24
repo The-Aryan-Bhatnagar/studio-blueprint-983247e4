@@ -70,18 +70,18 @@ const Home = () => {
   return (
     <div className="min-h-screen pb-32">
       {/* Welcome Section */}
-      <section className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Made For {userName}</h1>
-        <p className="text-muted-foreground">Your personalized music experience</p>
+      <section className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-4xl font-bold mb-2">Made For {userName}</h1>
+        <p className="text-sm md:text-base text-muted-foreground">Your personalized music experience</p>
       </section>
 
       {/* Your Top Mixes */}
-      <section className="mb-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-bold">Your Top Mixes</h2>
-          <Button variant="ghost" className="text-primary">
+      <section className="mb-8 md:mb-12">
+        <div className="flex items-center justify-between mb-4 md:mb-6">
+          <h2 className="text-xl md:text-3xl font-bold">Your Top Mixes</h2>
+          <Button variant="ghost" className="text-primary text-xs md:text-sm">
             See all
-            <ArrowRight className="ml-2 w-4 h-4" />
+            <ArrowRight className="ml-1 md:ml-2 w-3 h-3 md:w-4 md:h-4" />
           </Button>
         </div>
         {songsLoading ? (
@@ -102,12 +102,12 @@ const Home = () => {
       </section>
 
       {/* Popular Artists */}
-      <section className="mb-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-bold">Popular Artists</h2>
-          <Button variant="ghost" className="text-primary">
+      <section className="mb-8 md:mb-12">
+        <div className="flex items-center justify-between mb-4 md:mb-6">
+          <h2 className="text-xl md:text-3xl font-bold">Popular Artists</h2>
+          <Button variant="ghost" className="text-primary text-xs md:text-sm">
             See all
-            <ArrowRight className="ml-2 w-4 h-4" />
+            <ArrowRight className="ml-1 md:ml-2 w-3 h-3 md:w-4 md:h-4" />
           </Button>
         </div>
         {artistsLoading ? (
@@ -137,12 +137,12 @@ const Home = () => {
       </section>
 
       {/* Recently Played */}
-      <section className="mb-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-bold">Recently Played</h2>
-          <Button variant="ghost" className="text-primary">
+      <section className="mb-8 md:mb-12">
+        <div className="flex items-center justify-between mb-4 md:mb-6">
+          <h2 className="text-xl md:text-3xl font-bold">Recently Played</h2>
+          <Button variant="ghost" className="text-primary text-xs md:text-sm">
             See all
-            <ArrowRight className="ml-2 w-4 h-4" />
+            <ArrowRight className="ml-1 md:ml-2 w-3 h-3 md:w-4 md:h-4" />
           </Button>
         </div>
         {songsLoading ? (
