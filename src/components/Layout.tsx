@@ -1,5 +1,4 @@
 import Header from "./Header";
-import FullScreenPlayer from "./FullScreenPlayer";
 import { MiniPlayer } from "./player/MiniPlayer";
 
 interface LayoutProps {
@@ -12,7 +11,6 @@ const Layout = ({ children }: LayoutProps) => {
       <Header />
       <main className="pt-20 px-8 pb-32">{children}</main>
       <MiniPlayer />
-      <FullScreenPlayer />
     </div>
   );
 };

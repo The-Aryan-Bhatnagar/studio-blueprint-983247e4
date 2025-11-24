@@ -55,8 +55,6 @@ const MusicPlayer = () => {
     });
   };
 
-  const { setFullScreenOpen } = usePlayer();
-
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border backdrop-blur-lg bg-opacity-95 z-50">
       <div className="px-4 py-3">
@@ -68,11 +66,10 @@ const MusicPlayer = () => {
                 <img
                   src={currentSong.image}
                   alt={currentSong.title}
-                  className="w-14 h-14 rounded object-cover flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-                  onClick={() => setFullScreenOpen(true)}
+                  className="w-14 h-14 rounded object-cover flex-shrink-0"
                 />
                 <div className="min-w-0 flex-1">
-                  <h4 className="font-medium text-sm text-foreground truncate cursor-pointer hover:underline" onClick={() => setFullScreenOpen(true)}>
+                  <h4 className="font-medium text-sm text-foreground truncate">
                     {currentSong.title}
                   </h4>
                   <p className="text-xs text-muted-foreground truncate">
@@ -212,15 +209,6 @@ const MusicPlayer = () => {
               step={1}
               className="w-24"
             />
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => currentSong && setFullScreenOpen(true)}
-              disabled={!currentSong}
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
-            >
-              <Maximize2 className="w-4 h-4" />
-            </Button>
           </div>
         </div>
       </div>
