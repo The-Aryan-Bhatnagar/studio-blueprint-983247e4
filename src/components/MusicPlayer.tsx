@@ -252,6 +252,18 @@ const MusicPlayer = () => {
       {/* Mobile Layout */}
       {isMobile ? (
         <div className="w-full h-full flex flex-col px-6 py-8 max-w-md mx-auto">
+          {/* Back Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsFullscreen(false)}
+            className="h-10 w-10 text-white hover:bg-white/10 self-start mb-4"
+          >
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </Button>
+
           {/* Large Album Cover */}
           <div className="w-full aspect-square rounded-3xl overflow-hidden shadow-2xl mb-6">
             <img
