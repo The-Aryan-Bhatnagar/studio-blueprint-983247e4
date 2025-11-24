@@ -227,11 +227,11 @@ const MusicPlayer = () => {
         <X className="h-6 w-6" />
       </Button>
 
-      <div className="w-full max-w-6xl mx-auto flex flex-col items-center">
-        {/* Main Player Section */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 mb-8">
-          {/* Album Cover with Border */}
-          <div className="w-60 h-60 md:w-72 md:h-72 rounded-lg overflow-hidden border-4 border-gray-800 shadow-2xl flex-shrink-0">
+      <div className="w-full h-full flex flex-col items-center justify-center px-4 md:px-8">
+        {/* Main Player Section - Three columns */}
+        <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 mb-12">
+          {/* Album Cover with Thick Border */}
+          <div className="w-64 h-64 md:w-72 md:h-72 rounded-2xl overflow-hidden border-[6px] border-gray-900 shadow-2xl flex-shrink-0">
             <img
               src={currentSong.image}
               alt={currentSong.title}
@@ -239,62 +239,62 @@ const MusicPlayer = () => {
             />
           </div>
 
-          {/* Player Card */}
-          <div className="bg-gray-900/90 rounded-2xl p-8 w-full max-w-xs shadow-2xl">
+          {/* Player Card - Center */}
+          <div className="bg-[#1e2937] rounded-3xl p-8 w-full max-w-sm shadow-2xl flex-shrink-0">
             <div className="space-y-6">
               {/* Song Info */}
-              <div className="text-center space-y-1">
-                <h2 className="text-2xl font-bold text-white">
+              <div className="text-center space-y-2">
+                <h2 className="text-3xl font-bold text-white">
                   {currentSong.title}
                 </h2>
-                <p className="text-sm text-pink-400">
+                <p className="text-base text-pink-400">
                   {currentSong.artist}
                 </p>
               </div>
 
               {/* Play Controls */}
-              <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center justify-center gap-6 py-2">
                 <Button
                   size="icon"
                   variant="ghost"
                   onClick={playPrevious}
-                  className="h-10 w-10 text-white hover:bg-white/10"
+                  className="h-11 w-11 text-white hover:bg-white/10 rounded-lg"
                 >
                   <SkipBack className="h-5 w-5 fill-current" />
                 </Button>
                 <Button
                   size="icon"
-                  className="h-14 w-14 rounded-full bg-pink-500 hover:bg-pink-600 text-white shadow-lg hover:scale-105 transition-transform"
+                  className="h-16 w-16 rounded-full bg-pink-500 hover:bg-pink-600 text-white shadow-xl hover:scale-105 transition-transform"
                   onClick={togglePlay}
                 >
                   {isPlaying ? (
-                    <Pause className="h-6 w-6 fill-current" />
+                    <Pause className="h-7 w-7 fill-current" />
                   ) : (
-                    <Play className="h-6 w-6 fill-current ml-0.5" />
+                    <Play className="h-7 w-7 fill-current ml-0.5" />
                   )}
                 </Button>
                 <Button
                   size="icon"
                   variant="ghost"
                   onClick={playNext}
-                  className="h-10 w-10 text-white hover:bg-white/10"
+                  className="h-11 w-11 text-white hover:bg-white/10 rounded-lg"
                 >
                   <SkipForward className="h-5 w-5 fill-current" />
                 </Button>
               </div>
 
               {/* Volume Control */}
-              <div className="flex items-center justify-center gap-3">
+              <div className="flex items-center justify-center gap-3 px-2">
                 <Button
                   size="icon"
                   variant="ghost"
                   onClick={toggleMute}
-                  className="h-8 w-8 text-white hover:bg-white/10"
+                  className="h-9 w-9 text-white hover:bg-white/10 rounded-lg flex-shrink-0"
                 >
                   {isMuted || volume === 0 ? (
-                    <VolumeX className="h-4 w-4" />
+                    <VolumeX className="h-5 w-5" />
                   ) : (
-                    <Volume2 className="h-4 w-4" />
+                    <Volume2 className="h-5 w-5" />
                   )}
                 </Button>
                 <Slider
@@ -302,15 +302,15 @@ const MusicPlayer = () => {
                   onValueChange={([value]) => setVolume(value)}
                   max={100}
                   step={1}
-                  className="flex-1 [&_[role=slider]]:bg-pink-500 [&_[role=slider]]:border-pink-500"
+                  className="flex-1 [&_[role=slider]]:bg-pink-500 [&_[role=slider]]:border-pink-500 [&_>.relative]:bg-gray-600"
                 />
               </div>
             </div>
           </div>
 
-          {/* Ad Section */}
+          {/* Ad Section - Right */}
           {activeAd && (
-            <div className="w-56 h-72 rounded-xl overflow-hidden shadow-2xl flex-shrink-0">
+            <div className="w-52 h-72 md:w-60 md:h-80 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0">
               <a
                 href={activeAd.link_url || "#"}
                 target={activeAd.link_url ? "_blank" : undefined}
@@ -327,50 +327,55 @@ const MusicPlayer = () => {
           )}
         </div>
 
-        {/* Bottom Progress Bar */}
-        <div className="w-full max-w-4xl bg-gray-900/70 rounded-xl p-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-white/70 tabular-nums min-w-[45px]">
-              {formatTime(currentTime)}
-            </span>
-            <Slider
-              value={[currentTime]}
-              onValueChange={([value]) => seekTo(value)}
-              max={duration || 100}
-              step={1}
-              className="flex-1 [&_[role=slider]]:bg-pink-500 [&_[role=slider]]:border-pink-500"
-            />
-            <span className="text-sm text-white/70 tabular-nums min-w-[45px]">
-              {duration ? formatTime(duration) : "0:00"}
-            </span>
-          </div>
+        {/* Bottom Progress Bar Section */}
+        <div className="w-full max-w-4xl">
+          <div className="bg-[#1e2937]/80 rounded-2xl p-5 space-y-4 shadow-xl">
+            {/* Progress Bar with Times */}
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-white/80 tabular-nums font-medium min-w-[45px]">
+                {formatTime(currentTime)}
+              </span>
+              <div className="flex-1 h-1 bg-gray-700 rounded-full overflow-hidden">
+                <Slider
+                  value={[currentTime]}
+                  onValueChange={([value]) => seekTo(value)}
+                  max={duration || 100}
+                  step={1}
+                  className="w-full [&_[role=slider]]:bg-pink-500 [&_[role=slider]]:border-pink-500 [&_>.relative]:bg-transparent h-1"
+                />
+              </div>
+              <span className="text-sm text-white/80 tabular-nums font-medium min-w-[45px] text-right">
+                {duration ? formatTime(duration) : "0:00"}
+              </span>
+            </div>
 
-          {/* Bottom Icon Controls */}
-          <div className="flex items-center justify-center gap-8">
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={toggleShuffle}
-              className={`h-9 w-9 ${isShuffle ? "text-pink-400" : "text-white/50 hover:text-white"}`}
-            >
-              <Shuffle className="h-4 w-4" />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={toggleRepeat}
-              className={`h-9 w-9 ${isRepeat ? "text-pink-400" : "text-white/50 hover:text-white"}`}
-            >
-              <Repeat className="h-4 w-4" />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => setShowComments(true)}
-              className="h-9 w-9 text-white/50 hover:text-white"
-            >
-              <MessageSquare className="h-4 w-4" />
-            </Button>
+            {/* Bottom Icon Controls */}
+            <div className="flex items-center justify-center gap-12 py-1">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={toggleShuffle}
+                className={`h-10 w-10 ${isShuffle ? "text-pink-400" : "text-white/60 hover:text-white"}`}
+              >
+                <Shuffle className="h-5 w-5" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={toggleRepeat}
+                className={`h-10 w-10 ${isRepeat ? "text-pink-400" : "text-white/60 hover:text-white"}`}
+              >
+                <Repeat className="h-5 w-5" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setShowComments(true)}
+                className="h-10 w-10 text-white/60 hover:text-white"
+              >
+                <MessageSquare className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
