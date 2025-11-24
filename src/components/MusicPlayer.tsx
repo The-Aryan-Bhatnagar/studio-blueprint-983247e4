@@ -62,8 +62,171 @@ const MusicPlayer = () => {
 
   const activeAd = ads?.[0];
 
+  // Bottom Mini Player
+  if (!isFullscreen) {
+    return (
+      <>
+        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border backdrop-blur-lg bg-opacity-95 z-50">
+          <div className="px-4 py-3">
+            <div className="grid grid-cols-[1fr_2fr_1fr] items-center gap-4">
+              {/* Left Section - Song Info */}
+              <div className="flex items-center gap-3 min-w-0">
+                <img
+                  src={currentSong.image}
+                  alt={currentSong.title}
+                  className="w-14 h-14 rounded object-cover flex-shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-medium text-sm text-foreground truncate">
+                    {currentSong.title}
+                  </h4>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {currentSong.artist}
+                  </p>
+                </div>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="flex-shrink-0 h-8 w-8 hover:text-primary"
+                  onClick={handleLike}
+                  disabled={isLoading}
+                >
+                  <Heart className={`w-4 h-4 ${isLiked ? "fill-primary text-primary" : ""}`} />
+                </Button>
+              </div>
+
+              {/* Center Section - Player Controls */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-center gap-2">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={toggleShuffle}
+                    className={`h-8 w-8 ${isShuffle ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    <Shuffle className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={playPrevious}
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  >
+                    <SkipBack className="w-4 h-4 fill-current" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    className="h-8 w-8 rounded-full bg-foreground hover:bg-foreground/90 text-background hover:scale-105 transition-transform"
+                    onClick={togglePlay}
+                  >
+                    {isPlaying ? (
+                      <Pause className="w-4 h-4 fill-current" />
+                    ) : (
+                      <Play className="w-4 h-4 fill-current ml-0.5" />
+                    )}
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={playNext}
+                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  >
+                    <SkipForward className="w-4 h-4 fill-current" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={toggleRepeat}
+                    className={`h-8 w-8 ${isRepeat ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    <Repeat className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground tabular-nums w-10 text-right">
+                    {formatTime(currentTime)}
+                  </span>
+                  <Slider
+                    value={[currentTime]}
+                    onValueChange={([value]) => seekTo(value)}
+                    max={duration || 100}
+                    step={1}
+                    className="flex-1"
+                  />
+                  <span className="text-xs text-muted-foreground tabular-nums w-10">
+                    {duration ? formatTime(duration) : "0:00"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Right Section - Additional Controls */}
+              <div className="flex items-center justify-end gap-2">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowComments(true)}
+                >
+                  <MessageSquare className="w-4 h-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={toggleMute}
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                >
+                  {isMuted || volume === 0 ? (
+                    <VolumeX className="w-4 h-4" />
+                  ) : (
+                    <Volume2 className="w-4 h-4" />
+                  )}
+                </Button>
+                <Slider
+                  value={[isMuted ? 0 : volume]}
+                  onValueChange={([value]) => setVolume(value)}
+                  max={100}
+                  step={1}
+                  className="w-24"
+                />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  onClick={() => setIsFullscreen(true)}
+                >
+                  <Maximize2 className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Comments Dialog */}
+        {showComments && (
+          <CommentsDialog 
+            songId={currentSong.id.toString()} 
+            songTitle={currentSong.title}
+            open={showComments}
+            onOpenChange={setShowComments}
+          />
+        )}
+      </>
+    );
+  }
+
+  // Fullscreen Player
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 z-50 flex items-center justify-center p-8">
+      {/* Close Button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-4 right-4 h-10 w-10 rounded-full bg-black/30 hover:bg-black/50 text-white z-10"
+        onClick={() => setIsFullscreen(false)}
+      >
+        <X className="h-6 w-6" />
+      </Button>
+
       <div className="w-full max-w-6xl mx-auto flex flex-col items-center">
         {/* Main Player Section */}
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 mb-8">
