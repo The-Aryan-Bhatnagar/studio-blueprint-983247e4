@@ -6,8 +6,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useSongLikes } from "@/hooks/useSongLikes";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFullscreenAds } from "@/hooks/useFullscreenAds";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import CommentsDialog from "./CommentsDialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60);
@@ -38,8 +39,16 @@ const MusicPlayer = () => {
   const { user } = useAuth();
   const { isLiked, toggleLike, isLoading } = useSongLikes(currentSong?.id?.toString());
   const { data: ads } = useFullscreenAds();
+  const isMobile = useIsMobile();
   const [showComments, setShowComments] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Auto-open fullscreen on mobile when song is playing
+  useEffect(() => {
+    if (isMobile && currentSong) {
+      setIsFullscreen(true);
+    }
+  }, [isMobile, currentSong]);
 
   const handleLike = () => {
     if (!user) {
@@ -217,21 +226,23 @@ const MusicPlayer = () => {
   // Fullscreen Player
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 z-50 flex items-center justify-center p-8">
-      {/* Close Button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-4 right-4 h-10 w-10 rounded-full bg-black/30 hover:bg-black/50 text-white z-10"
-        onClick={() => setIsFullscreen(false)}
-      >
-        <X className="h-6 w-6" />
-      </Button>
+      {/* Close Button - Only show on desktop */}
+      {!isMobile && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-4 right-4 h-10 w-10 rounded-full bg-black/30 hover:bg-black/50 text-white z-10"
+          onClick={() => setIsFullscreen(false)}
+        >
+          <X className="h-6 w-6" />
+        </Button>
+      )}
 
       <div className="w-full h-full flex flex-col items-center justify-center px-4 py-6">
-        {/* Main Section - Album Cover and Ad Only */}
-        <div className="flex flex-row items-center justify-center gap-8 lg:gap-16 mb-8">
+        {/* Main Section - Responsive Layout */}
+        <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} items-center justify-center gap-6 lg:gap-16 mb-8`}>
           {/* Album Cover with Thick Border */}
-          <div className="w-64 h-64 lg:w-80 lg:h-80 rounded-2xl overflow-hidden border-[6px] border-gray-900 shadow-2xl flex-shrink-0">
+          <div className={`${isMobile ? 'w-64 h-64' : 'w-64 h-64 lg:w-80 lg:h-80'} rounded-2xl overflow-hidden border-[6px] border-gray-900 shadow-2xl flex-shrink-0`}>
             <img
               src={currentSong.image}
               alt={currentSong.title}
@@ -239,9 +250,9 @@ const MusicPlayer = () => {
             />
           </div>
 
-          {/* Ad Section - Right */}
+          {/* Ad Section */}
           {activeAd && (
-            <div className="w-52 h-72 lg:w-64 lg:h-80 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0">
+            <div className={`${isMobile ? 'w-56 h-64' : 'w-52 h-72 lg:w-64 lg:h-80'} rounded-2xl overflow-hidden shadow-2xl flex-shrink-0`}>
               <a
                 href={activeAd.link_url || "#"}
                 target={activeAd.link_url ? "_blank" : undefined}
