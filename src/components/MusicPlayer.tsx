@@ -238,11 +238,11 @@ const MusicPlayer = () => {
         </Button>
       )}
 
-      <div className="w-full h-full flex flex-col items-center justify-center px-4 py-6">
-        {/* Main Section - Responsive Layout */}
-        <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} items-center justify-center gap-6 lg:gap-16 mb-8`}>
-          {/* Album Cover with Thick Border */}
-          <div className={`${isMobile ? 'w-64 h-64' : 'w-64 h-64 lg:w-80 lg:h-80'} rounded-2xl overflow-hidden border-[6px] border-gray-900 shadow-2xl flex-shrink-0`}>
+      {/* Mobile Layout */}
+      {isMobile ? (
+        <div className="w-full h-full flex flex-col px-6 py-8 max-w-md mx-auto">
+          {/* Large Album Cover */}
+          <div className="w-full aspect-square rounded-3xl overflow-hidden shadow-2xl mb-6">
             <img
               src={currentSong.image}
               alt={currentSong.title}
@@ -250,155 +250,286 @@ const MusicPlayer = () => {
             />
           </div>
 
-          {/* Ad Section */}
-          {activeAd && (
-            <div className={`${isMobile ? 'w-56 h-64' : 'w-52 h-72 lg:w-64 lg:h-80'} rounded-2xl overflow-hidden shadow-2xl flex-shrink-0`}>
-              <a
-                href={activeAd.link_url || "#"}
-                target={activeAd.link_url ? "_blank" : undefined}
-                rel="noopener noreferrer"
-                className="block w-full h-full"
-              >
-                <img
-                  src={activeAd.image_url}
-                  alt={activeAd.title}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                />
-              </a>
+          {/* Song Info & Add Button */}
+          <div className="flex items-start justify-between mb-8">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-2xl font-bold text-white truncate mb-1">
+                {currentSong.title}
+              </h2>
+              <p className="text-base text-white/80 truncate">
+                {currentSong.artist}
+              </p>
             </div>
-          )}
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={handleLike}
+              disabled={isLoading}
+              className="h-12 w-12 text-white hover:bg-white/10 flex-shrink-0"
+            >
+              <Heart className={`h-6 w-6 ${isLiked ? "fill-white" : ""}`} />
+            </Button>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="mb-6">
+            <Slider
+              value={[currentTime]}
+              onValueChange={([value]) => seekTo(value)}
+              max={duration || 100}
+              step={1}
+              className="mb-2 [&_[role=slider]]:bg-white [&_[role=slider]]:border-white [&_>.relative]:bg-white/30"
+            />
+            <div className="flex items-center justify-between text-sm text-white/70">
+              <span>{formatTime(currentTime)}</span>
+              <span>{duration ? formatTime(duration) : "0:00"}</span>
+            </div>
+          </div>
+
+          {/* Main Playback Controls */}
+          <div className="flex items-center justify-between mb-8">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={toggleShuffle}
+              className={`h-12 w-12 ${isShuffle ? "text-white" : "text-white/60"}`}
+            >
+              <Shuffle className="h-5 w-5" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={playPrevious}
+              className="h-14 w-14 text-white hover:bg-white/10"
+            >
+              <SkipBack className="h-7 w-7 fill-current" />
+            </Button>
+            <Button
+              size="icon"
+              className="h-16 w-16 rounded-full bg-white hover:bg-white/90 text-gray-900 shadow-xl"
+              onClick={togglePlay}
+            >
+              {isPlaying ? (
+                <Pause className="h-8 w-8 fill-current" />
+              ) : (
+                <Play className="h-8 w-8 fill-current ml-0.5" />
+              )}
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={playNext}
+              className="h-14 w-14 text-white hover:bg-white/10"
+            >
+              <SkipForward className="h-7 w-7 fill-current" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={toggleRepeat}
+              className={`h-12 w-12 ${isRepeat ? "text-white" : "text-white/60"}`}
+            >
+              <Repeat className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Bottom Actions */}
+          <div className="flex items-center justify-around mt-auto">
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={toggleMute}
+              className="h-12 w-12 text-white/80 hover:text-white"
+            >
+              {isMuted || volume === 0 ? (
+                <VolumeX className="h-5 w-5" />
+              ) : (
+                <Volume2 className="h-5 w-5" />
+              )}
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => setShowComments(true)}
+              className="h-12 w-12 text-white/80 hover:text-white"
+            >
+              <MessageSquare className="h-5 w-5" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-12 w-12 text-white/80 hover:text-white"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </Button>
+          </div>
         </div>
+      ) : (
+        // Desktop Layout
+        <div className="w-full h-full flex flex-col items-center justify-center px-4 py-6">
+          {/* Main Section - Responsive Layout */}
+          <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} items-center justify-center gap-6 lg:gap-16 mb-8`}>
+            {/* Album Cover with Thick Border */}
+            <div className={`${isMobile ? 'w-64 h-64' : 'w-64 h-64 lg:w-80 lg:h-80'} rounded-2xl overflow-hidden border-[6px] border-gray-900 shadow-2xl flex-shrink-0`}>
+              <img
+                src={currentSong.image}
+                alt={currentSong.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
 
-        {/* Bottom Control Bar */}
-        <div className="w-full max-w-6xl">
-          <div className="bg-[#1a1d29] rounded-2xl px-6 py-4 shadow-2xl border border-gray-800">
-            <div className="flex items-center gap-4">
-              {/* Left: Album Thumbnail & Song Info */}
-              <div className="flex items-center gap-3 min-w-[200px]">
-                <img
-                  src={currentSong.image}
-                  alt={currentSong.title}
-                  className="w-12 h-12 rounded object-cover"
-                />
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-semibold text-white truncate">
-                    {currentSong.title}
-                  </h4>
-                  <p className="text-xs text-gray-400 truncate">
-                    {currentSong.artist}
-                  </p>
-                </div>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={handleLike}
-                  disabled={isLoading}
-                  className="h-8 w-8 text-white/60 hover:text-pink-400 flex-shrink-0"
+            {/* Ad Section */}
+            {activeAd && (
+              <div className={`${isMobile ? 'w-56 h-64' : 'w-52 h-72 lg:w-64 lg:h-80'} rounded-2xl overflow-hidden shadow-2xl flex-shrink-0`}>
+                <a
+                  href={activeAd.link_url || "#"}
+                  target={activeAd.link_url ? "_blank" : undefined}
+                  rel="noopener noreferrer"
+                  className="block w-full h-full"
                 >
-                  <Heart className={`h-4 w-4 ${isLiked ? "fill-pink-400 text-pink-400" : ""}`} />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => setShowComments(true)}
-                  className="h-8 w-8 text-white/60 hover:text-white flex-shrink-0"
-                >
-                  <MessageSquare className="h-4 w-4" />
-                </Button>
+                  <img
+                    src={activeAd.image_url}
+                    alt={activeAd.title}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </a>
               </div>
+            )}
+          </div>
 
-              {/* Center: Playback Controls */}
-              <div className="flex-1 flex flex-col gap-2 items-center min-w-0">
-                <div className="flex items-center gap-3">
+          {/* Bottom Control Bar */}
+          <div className="w-full max-w-6xl">
+            <div className="bg-[#1a1d29] rounded-2xl px-6 py-4 shadow-2xl border border-gray-800">
+              <div className="flex items-center gap-4">
+                {/* Left: Album Thumbnail & Song Info */}
+                <div className="flex items-center gap-3 min-w-[200px]">
+                  <img
+                    src={currentSong.image}
+                    alt={currentSong.title}
+                    className="w-12 h-12 rounded object-cover"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-semibold text-white truncate">
+                      {currentSong.title}
+                    </h4>
+                    <p className="text-xs text-gray-400 truncate">
+                      {currentSong.artist}
+                    </p>
+                  </div>
                   <Button
                     size="icon"
                     variant="ghost"
-                    onClick={toggleShuffle}
-                    className={`h-8 w-8 ${isShuffle ? "text-pink-400" : "text-white/60 hover:text-white"}`}
+                    onClick={handleLike}
+                    disabled={isLoading}
+                    className="h-8 w-8 text-white/60 hover:text-pink-400 flex-shrink-0"
                   >
-                    <Shuffle className="h-4 w-4" />
+                    <Heart className={`h-4 w-4 ${isLiked ? "fill-pink-400 text-pink-400" : ""}`} />
                   </Button>
                   <Button
                     size="icon"
                     variant="ghost"
-                    onClick={playPrevious}
-                    className="h-8 w-8 text-white hover:bg-white/10"
+                    onClick={() => setShowComments(true)}
+                    className="h-8 w-8 text-white/60 hover:text-white flex-shrink-0"
                   >
-                    <SkipBack className="h-4 w-4 fill-current" />
+                    <MessageSquare className="h-4 w-4" />
                   </Button>
+                </div>
+
+                {/* Center: Playback Controls */}
+                <div className="flex-1 flex flex-col gap-2 items-center min-w-0">
+                  <div className="flex items-center gap-3">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={toggleShuffle}
+                      className={`h-8 w-8 ${isShuffle ? "text-pink-400" : "text-white/60 hover:text-white"}`}
+                    >
+                      <Shuffle className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={playPrevious}
+                      className="h-8 w-8 text-white hover:bg-white/10"
+                    >
+                      <SkipBack className="h-4 w-4 fill-current" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      className="h-10 w-10 rounded-full bg-pink-500 hover:bg-pink-600 text-white shadow-lg hover:scale-105 transition-transform"
+                      onClick={togglePlay}
+                    >
+                      {isPlaying ? (
+                        <Pause className="h-5 w-5 fill-current" />
+                      ) : (
+                        <Play className="h-5 w-5 fill-current ml-0.5" />
+                      )}
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={playNext}
+                      className="h-8 w-8 text-white hover:bg-white/10"
+                    >
+                      <SkipForward className="h-4 w-4 fill-current" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={toggleRepeat}
+                      className={`h-8 w-8 ${isRepeat ? "text-pink-400" : "text-white/60 hover:text-white"}`}
+                    >
+                      <Repeat className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="flex items-center gap-3 w-full max-w-2xl">
+                    <span className="text-xs text-white/70 tabular-nums min-w-[40px]">
+                      {formatTime(currentTime)}
+                    </span>
+                    <Slider
+                      value={[currentTime]}
+                      onValueChange={([value]) => seekTo(value)}
+                      max={duration || 100}
+                      step={1}
+                      className="flex-1 [&_[role=slider]]:bg-pink-500 [&_[role=slider]]:border-pink-500 [&_>.relative]:bg-gray-700"
+                    />
+                    <span className="text-xs text-white/70 tabular-nums min-w-[40px] text-right">
+                      {duration ? formatTime(duration) : "0:00"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Right: Volume Control */}
+                <div className="flex items-center gap-2 min-w-[140px] justify-end">
                   <Button
                     size="icon"
-                    className="h-10 w-10 rounded-full bg-pink-500 hover:bg-pink-600 text-white shadow-lg hover:scale-105 transition-transform"
-                    onClick={togglePlay}
+                    variant="ghost"
+                    onClick={toggleMute}
+                    className="h-8 w-8 text-white/60 hover:text-white flex-shrink-0"
                   >
-                    {isPlaying ? (
-                      <Pause className="h-5 w-5 fill-current" />
+                    {isMuted || volume === 0 ? (
+                      <VolumeX className="h-4 w-4" />
                     ) : (
-                      <Play className="h-5 w-5 fill-current ml-0.5" />
+                      <Volume2 className="h-4 w-4" />
                     )}
                   </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={playNext}
-                    className="h-8 w-8 text-white hover:bg-white/10"
-                  >
-                    <SkipForward className="h-4 w-4 fill-current" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={toggleRepeat}
-                    className={`h-8 w-8 ${isRepeat ? "text-pink-400" : "text-white/60 hover:text-white"}`}
-                  >
-                    <Repeat className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                {/* Progress Bar */}
-                <div className="flex items-center gap-3 w-full max-w-2xl">
-                  <span className="text-xs text-white/70 tabular-nums min-w-[40px]">
-                    {formatTime(currentTime)}
-                  </span>
                   <Slider
-                    value={[currentTime]}
-                    onValueChange={([value]) => seekTo(value)}
-                    max={duration || 100}
+                    value={[isMuted ? 0 : volume]}
+                    onValueChange={([value]) => setVolume(value)}
+                    max={100}
                     step={1}
-                    className="flex-1 [&_[role=slider]]:bg-pink-500 [&_[role=slider]]:border-pink-500 [&_>.relative]:bg-gray-700"
+                    className="w-24 [&_[role=slider]]:bg-pink-500 [&_[role=slider]]:border-pink-500 [&_>.relative]:bg-gray-700"
                   />
-                  <span className="text-xs text-white/70 tabular-nums min-w-[40px] text-right">
-                    {duration ? formatTime(duration) : "0:00"}
-                  </span>
                 </div>
-              </div>
-
-              {/* Right: Volume Control */}
-              <div className="flex items-center gap-2 min-w-[140px] justify-end">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={toggleMute}
-                  className="h-8 w-8 text-white/60 hover:text-white flex-shrink-0"
-                >
-                  {isMuted || volume === 0 ? (
-                    <VolumeX className="h-4 w-4" />
-                  ) : (
-                    <Volume2 className="h-4 w-4" />
-                  )}
-                </Button>
-                <Slider
-                  value={[isMuted ? 0 : volume]}
-                  onValueChange={([value]) => setVolume(value)}
-                  max={100}
-                  step={1}
-                  className="w-24 [&_[role=slider]]:bg-pink-500 [&_[role=slider]]:border-pink-500 [&_>.relative]:bg-gray-700"
-                />
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Comments Dialog */}
       {showComments && (
