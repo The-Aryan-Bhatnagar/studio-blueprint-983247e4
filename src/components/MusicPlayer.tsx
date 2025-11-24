@@ -228,10 +228,10 @@ const MusicPlayer = () => {
       </Button>
 
       <div className="w-full h-full flex flex-col items-center justify-center px-4 py-6">
-        {/* Main Player Section - Always Horizontal/Landscape */}
-        <div className="flex flex-row items-center justify-center gap-6 lg:gap-10 mb-8">
+        {/* Main Section - Album Cover and Ad Only */}
+        <div className="flex flex-row items-center justify-center gap-8 lg:gap-16 mb-8">
           {/* Album Cover with Thick Border */}
-          <div className="w-56 h-56 lg:w-64 lg:h-64 rounded-2xl overflow-hidden border-[6px] border-gray-900 shadow-2xl flex-shrink-0">
+          <div className="w-64 h-64 lg:w-80 lg:h-80 rounded-2xl overflow-hidden border-[6px] border-gray-900 shadow-2xl flex-shrink-0">
             <img
               src={currentSong.image}
               alt={currentSong.title}
@@ -239,78 +239,9 @@ const MusicPlayer = () => {
             />
           </div>
 
-          {/* Player Card - Center */}
-          <div className="bg-[#1e2937] rounded-3xl p-6 lg:p-8 w-80 lg:w-96 shadow-2xl flex-shrink-0">
-            <div className="space-y-5 lg:space-y-6">
-              {/* Song Info */}
-              <div className="text-center space-y-2">
-                <h2 className="text-2xl lg:text-3xl font-bold text-white">
-                  {currentSong.title}
-                </h2>
-                <p className="text-sm lg:text-base text-pink-400">
-                  {currentSong.artist}
-                </p>
-              </div>
-
-              {/* Play Controls */}
-              <div className="flex items-center justify-center gap-5 lg:gap-6 py-2">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={playPrevious}
-                  className="h-10 w-10 lg:h-11 lg:w-11 text-white hover:bg-white/10 rounded-lg"
-                >
-                  <SkipBack className="h-5 w-5 fill-current" />
-                </Button>
-                <Button
-                  size="icon"
-                  className="h-14 w-14 lg:h-16 lg:w-16 rounded-full bg-pink-500 hover:bg-pink-600 text-white shadow-xl hover:scale-105 transition-transform"
-                  onClick={togglePlay}
-                >
-                  {isPlaying ? (
-                    <Pause className="h-6 w-6 lg:h-7 lg:w-7 fill-current" />
-                  ) : (
-                    <Play className="h-6 w-6 lg:h-7 lg:w-7 fill-current ml-0.5" />
-                  )}
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={playNext}
-                  className="h-10 w-10 lg:h-11 lg:w-11 text-white hover:bg-white/10 rounded-lg"
-                >
-                  <SkipForward className="h-5 w-5 fill-current" />
-                </Button>
-              </div>
-
-              {/* Volume Control */}
-              <div className="flex items-center justify-center gap-3 px-2">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={toggleMute}
-                  className="h-9 w-9 text-white hover:bg-white/10 rounded-lg flex-shrink-0"
-                >
-                  {isMuted || volume === 0 ? (
-                    <VolumeX className="h-5 w-5" />
-                  ) : (
-                    <Volume2 className="h-5 w-5" />
-                  )}
-                </Button>
-                <Slider
-                  value={[isMuted ? 0 : volume]}
-                  onValueChange={([value]) => setVolume(value)}
-                  max={100}
-                  step={1}
-                  className="flex-1 [&_[role=slider]]:bg-pink-500 [&_[role=slider]]:border-pink-500 [&_>.relative]:bg-gray-600"
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Ad Section - Right */}
           {activeAd && (
-            <div className="w-48 h-64 lg:w-56 lg:h-72 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0">
+            <div className="w-52 h-72 lg:w-64 lg:h-80 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0">
               <a
                 href={activeAd.link_url || "#"}
                 target={activeAd.link_url ? "_blank" : undefined}
@@ -327,54 +258,132 @@ const MusicPlayer = () => {
           )}
         </div>
 
-        {/* Bottom Progress Bar Section */}
-        <div className="w-full max-w-5xl">
-          <div className="bg-[#1e2937]/80 rounded-2xl p-4 lg:p-5 space-y-3 lg:space-y-4 shadow-xl">
-            {/* Progress Bar with Times */}
-            <div className="flex items-center gap-3 lg:gap-4">
-              <span className="text-xs lg:text-sm text-white/80 tabular-nums font-medium min-w-[40px] lg:min-w-[45px]">
-                {formatTime(currentTime)}
-              </span>
-              <div className="flex-1 h-1 bg-gray-700 rounded-full overflow-hidden">
+        {/* Bottom Control Bar */}
+        <div className="w-full max-w-6xl">
+          <div className="bg-[#1a1d29] rounded-2xl px-6 py-4 shadow-2xl border border-gray-800">
+            <div className="flex items-center gap-4">
+              {/* Left: Album Thumbnail & Song Info */}
+              <div className="flex items-center gap-3 min-w-[200px]">
+                <img
+                  src={currentSong.image}
+                  alt={currentSong.title}
+                  className="w-12 h-12 rounded object-cover"
+                />
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-semibold text-white truncate">
+                    {currentSong.title}
+                  </h4>
+                  <p className="text-xs text-gray-400 truncate">
+                    {currentSong.artist}
+                  </p>
+                </div>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={handleLike}
+                  disabled={isLoading}
+                  className="h-8 w-8 text-white/60 hover:text-pink-400 flex-shrink-0"
+                >
+                  <Heart className={`h-4 w-4 ${isLiked ? "fill-pink-400 text-pink-400" : ""}`} />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setShowComments(true)}
+                  className="h-8 w-8 text-white/60 hover:text-white flex-shrink-0"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Center: Playback Controls */}
+              <div className="flex-1 flex flex-col gap-2 items-center min-w-0">
+                <div className="flex items-center gap-3">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={toggleShuffle}
+                    className={`h-8 w-8 ${isShuffle ? "text-pink-400" : "text-white/60 hover:text-white"}`}
+                  >
+                    <Shuffle className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={playPrevious}
+                    className="h-8 w-8 text-white hover:bg-white/10"
+                  >
+                    <SkipBack className="h-4 w-4 fill-current" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    className="h-10 w-10 rounded-full bg-pink-500 hover:bg-pink-600 text-white shadow-lg hover:scale-105 transition-transform"
+                    onClick={togglePlay}
+                  >
+                    {isPlaying ? (
+                      <Pause className="h-5 w-5 fill-current" />
+                    ) : (
+                      <Play className="h-5 w-5 fill-current ml-0.5" />
+                    )}
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={playNext}
+                    className="h-8 w-8 text-white hover:bg-white/10"
+                  >
+                    <SkipForward className="h-4 w-4 fill-current" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={toggleRepeat}
+                    className={`h-8 w-8 ${isRepeat ? "text-pink-400" : "text-white/60 hover:text-white"}`}
+                  >
+                    <Repeat className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                {/* Progress Bar */}
+                <div className="flex items-center gap-3 w-full max-w-2xl">
+                  <span className="text-xs text-white/70 tabular-nums min-w-[40px]">
+                    {formatTime(currentTime)}
+                  </span>
+                  <Slider
+                    value={[currentTime]}
+                    onValueChange={([value]) => seekTo(value)}
+                    max={duration || 100}
+                    step={1}
+                    className="flex-1 [&_[role=slider]]:bg-pink-500 [&_[role=slider]]:border-pink-500 [&_>.relative]:bg-gray-700"
+                  />
+                  <span className="text-xs text-white/70 tabular-nums min-w-[40px] text-right">
+                    {duration ? formatTime(duration) : "0:00"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Right: Volume Control */}
+              <div className="flex items-center gap-2 min-w-[140px] justify-end">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={toggleMute}
+                  className="h-8 w-8 text-white/60 hover:text-white flex-shrink-0"
+                >
+                  {isMuted || volume === 0 ? (
+                    <VolumeX className="h-4 w-4" />
+                  ) : (
+                    <Volume2 className="h-4 w-4" />
+                  )}
+                </Button>
                 <Slider
-                  value={[currentTime]}
-                  onValueChange={([value]) => seekTo(value)}
-                  max={duration || 100}
+                  value={[isMuted ? 0 : volume]}
+                  onValueChange={([value]) => setVolume(value)}
+                  max={100}
                   step={1}
-                  className="w-full [&_[role=slider]]:bg-pink-500 [&_[role=slider]]:border-pink-500 [&_>.relative]:bg-transparent h-1"
+                  className="w-24 [&_[role=slider]]:bg-pink-500 [&_[role=slider]]:border-pink-500 [&_>.relative]:bg-gray-700"
                 />
               </div>
-              <span className="text-xs lg:text-sm text-white/80 tabular-nums font-medium min-w-[40px] lg:min-w-[45px] text-right">
-                {duration ? formatTime(duration) : "0:00"}
-              </span>
-            </div>
-
-            {/* Bottom Icon Controls */}
-            <div className="flex items-center justify-center gap-8 lg:gap-12 py-1">
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={toggleShuffle}
-                className={`h-9 w-9 lg:h-10 lg:w-10 ${isShuffle ? "text-pink-400" : "text-white/60 hover:text-white"}`}
-              >
-                <Shuffle className="h-4 w-4 lg:h-5 lg:w-5" />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={toggleRepeat}
-                className={`h-9 w-9 lg:h-10 lg:w-10 ${isRepeat ? "text-pink-400" : "text-white/60 hover:text-white"}`}
-              >
-                <Repeat className="h-4 w-4 lg:h-5 lg:w-5" />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setShowComments(true)}
-                className="h-9 w-9 lg:h-10 lg:w-10 text-white/60 hover:text-white"
-              >
-                <MessageSquare className="h-4 w-4 lg:h-5 lg:w-5" />
-              </Button>
             </div>
           </div>
         </div>
