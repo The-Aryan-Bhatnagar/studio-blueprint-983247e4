@@ -227,11 +227,11 @@ const MusicPlayer = () => {
         <X className="h-6 w-6" />
       </Button>
 
-      <div className="w-full h-full flex flex-col items-center justify-center px-4 md:px-8">
-        {/* Main Player Section - Three columns */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 mb-12">
+      <div className="w-full h-full flex flex-col items-center justify-center px-4 py-6">
+        {/* Main Player Section - Always Horizontal/Landscape */}
+        <div className="flex flex-row items-center justify-center gap-6 lg:gap-10 mb-8">
           {/* Album Cover with Thick Border */}
-          <div className="w-64 h-64 md:w-72 md:h-72 rounded-2xl overflow-hidden border-[6px] border-gray-900 shadow-2xl flex-shrink-0">
+          <div className="w-56 h-56 lg:w-64 lg:h-64 rounded-2xl overflow-hidden border-[6px] border-gray-900 shadow-2xl flex-shrink-0">
             <img
               src={currentSong.image}
               alt={currentSong.title}
@@ -240,44 +240,44 @@ const MusicPlayer = () => {
           </div>
 
           {/* Player Card - Center */}
-          <div className="bg-[#1e2937] rounded-3xl p-8 w-full max-w-sm shadow-2xl flex-shrink-0">
-            <div className="space-y-6">
+          <div className="bg-[#1e2937] rounded-3xl p-6 lg:p-8 w-80 lg:w-96 shadow-2xl flex-shrink-0">
+            <div className="space-y-5 lg:space-y-6">
               {/* Song Info */}
               <div className="text-center space-y-2">
-                <h2 className="text-3xl font-bold text-white">
+                <h2 className="text-2xl lg:text-3xl font-bold text-white">
                   {currentSong.title}
                 </h2>
-                <p className="text-base text-pink-400">
+                <p className="text-sm lg:text-base text-pink-400">
                   {currentSong.artist}
                 </p>
               </div>
 
               {/* Play Controls */}
-              <div className="flex items-center justify-center gap-6 py-2">
+              <div className="flex items-center justify-center gap-5 lg:gap-6 py-2">
                 <Button
                   size="icon"
                   variant="ghost"
                   onClick={playPrevious}
-                  className="h-11 w-11 text-white hover:bg-white/10 rounded-lg"
+                  className="h-10 w-10 lg:h-11 lg:w-11 text-white hover:bg-white/10 rounded-lg"
                 >
                   <SkipBack className="h-5 w-5 fill-current" />
                 </Button>
                 <Button
                   size="icon"
-                  className="h-16 w-16 rounded-full bg-pink-500 hover:bg-pink-600 text-white shadow-xl hover:scale-105 transition-transform"
+                  className="h-14 w-14 lg:h-16 lg:w-16 rounded-full bg-pink-500 hover:bg-pink-600 text-white shadow-xl hover:scale-105 transition-transform"
                   onClick={togglePlay}
                 >
                   {isPlaying ? (
-                    <Pause className="h-7 w-7 fill-current" />
+                    <Pause className="h-6 w-6 lg:h-7 lg:w-7 fill-current" />
                   ) : (
-                    <Play className="h-7 w-7 fill-current ml-0.5" />
+                    <Play className="h-6 w-6 lg:h-7 lg:w-7 fill-current ml-0.5" />
                   )}
                 </Button>
                 <Button
                   size="icon"
                   variant="ghost"
                   onClick={playNext}
-                  className="h-11 w-11 text-white hover:bg-white/10 rounded-lg"
+                  className="h-10 w-10 lg:h-11 lg:w-11 text-white hover:bg-white/10 rounded-lg"
                 >
                   <SkipForward className="h-5 w-5 fill-current" />
                 </Button>
@@ -310,7 +310,7 @@ const MusicPlayer = () => {
 
           {/* Ad Section - Right */}
           {activeAd && (
-            <div className="w-52 h-72 md:w-60 md:h-80 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0">
+            <div className="w-48 h-64 lg:w-56 lg:h-72 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0">
               <a
                 href={activeAd.link_url || "#"}
                 target={activeAd.link_url ? "_blank" : undefined}
@@ -328,11 +328,11 @@ const MusicPlayer = () => {
         </div>
 
         {/* Bottom Progress Bar Section */}
-        <div className="w-full max-w-4xl">
-          <div className="bg-[#1e2937]/80 rounded-2xl p-5 space-y-4 shadow-xl">
+        <div className="w-full max-w-5xl">
+          <div className="bg-[#1e2937]/80 rounded-2xl p-4 lg:p-5 space-y-3 lg:space-y-4 shadow-xl">
             {/* Progress Bar with Times */}
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-white/80 tabular-nums font-medium min-w-[45px]">
+            <div className="flex items-center gap-3 lg:gap-4">
+              <span className="text-xs lg:text-sm text-white/80 tabular-nums font-medium min-w-[40px] lg:min-w-[45px]">
                 {formatTime(currentTime)}
               </span>
               <div className="flex-1 h-1 bg-gray-700 rounded-full overflow-hidden">
@@ -344,36 +344,36 @@ const MusicPlayer = () => {
                   className="w-full [&_[role=slider]]:bg-pink-500 [&_[role=slider]]:border-pink-500 [&_>.relative]:bg-transparent h-1"
                 />
               </div>
-              <span className="text-sm text-white/80 tabular-nums font-medium min-w-[45px] text-right">
+              <span className="text-xs lg:text-sm text-white/80 tabular-nums font-medium min-w-[40px] lg:min-w-[45px] text-right">
                 {duration ? formatTime(duration) : "0:00"}
               </span>
             </div>
 
             {/* Bottom Icon Controls */}
-            <div className="flex items-center justify-center gap-12 py-1">
+            <div className="flex items-center justify-center gap-8 lg:gap-12 py-1">
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={toggleShuffle}
-                className={`h-10 w-10 ${isShuffle ? "text-pink-400" : "text-white/60 hover:text-white"}`}
+                className={`h-9 w-9 lg:h-10 lg:w-10 ${isShuffle ? "text-pink-400" : "text-white/60 hover:text-white"}`}
               >
-                <Shuffle className="h-5 w-5" />
+                <Shuffle className="h-4 w-4 lg:h-5 lg:w-5" />
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={toggleRepeat}
-                className={`h-10 w-10 ${isRepeat ? "text-pink-400" : "text-white/60 hover:text-white"}`}
+                className={`h-9 w-9 lg:h-10 lg:w-10 ${isRepeat ? "text-pink-400" : "text-white/60 hover:text-white"}`}
               >
-                <Repeat className="h-5 w-5" />
+                <Repeat className="h-4 w-4 lg:h-5 lg:w-5" />
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={() => setShowComments(true)}
-                className="h-10 w-10 text-white/60 hover:text-white"
+                className="h-9 w-9 lg:h-10 lg:w-10 text-white/60 hover:text-white"
               >
-                <MessageSquare className="h-5 w-5" />
+                <MessageSquare className="h-4 w-4 lg:h-5 lg:w-5" />
               </Button>
             </div>
           </div>
