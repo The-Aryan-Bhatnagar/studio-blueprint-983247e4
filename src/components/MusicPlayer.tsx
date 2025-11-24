@@ -42,6 +42,7 @@ const MusicPlayer = () => {
   const isMobile = useIsMobile();
   const [showComments, setShowComments] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 
   // Auto-open fullscreen on mobile when song is playing
   useEffect(() => {
@@ -65,6 +66,16 @@ const MusicPlayer = () => {
       title: isLiked ? "Removed from Liked Songs" : "Added to Liked Songs",
       description: `${currentSong?.title} has been ${isLiked ? "removed from" : "added to"} your library`,
     });
+  };
+
+  const handleVolumeClick = () => {
+    if (showVolumeSlider) {
+      // If slider is showing, toggle mute
+      toggleMute();
+    } else {
+      // Show the slider
+      setShowVolumeSlider(true);
+    }
   };
 
   if (!currentSong) return null;
@@ -334,19 +345,57 @@ const MusicPlayer = () => {
           </div>
 
           {/* Bottom Actions */}
-          <div className="flex items-center justify-around mt-auto">
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={toggleMute}
-              className="h-12 w-12 text-white/80 hover:text-white"
-            >
-              {isMuted || volume === 0 ? (
-                <VolumeX className="h-5 w-5" />
-              ) : (
-                <Volume2 className="h-5 w-5" />
+          <div className="flex items-center justify-around mt-auto relative">
+            <div className="relative">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={handleVolumeClick}
+                className="h-12 w-12 text-white/80 hover:text-white"
+              >
+                {isMuted || volume === 0 ? (
+                  <VolumeX className="h-5 w-5" />
+                ) : (
+                  <Volume2 className="h-5 w-5" />
+                )}
+              </Button>
+              
+              {/* Volume Slider Popup */}
+              {showVolumeSlider && (
+                <>
+                  {/* Backdrop to close slider */}
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setShowVolumeSlider(false)}
+                  />
+                  
+                  {/* Volume Slider */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-gray-900/95 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border border-white/10 z-50 w-48">
+                    <div className="flex flex-col items-center gap-3">
+                      <span className="text-xs text-white/70 font-medium">Volume</span>
+                      <div className="flex items-center gap-3 w-full">
+                        <VolumeX className="h-4 w-4 text-white/60" />
+                        <Slider
+                          value={[isMuted ? 0 : volume]}
+                          onValueChange={([value]) => {
+                            setVolume(value);
+                            if (value > 0 && isMuted) {
+                              toggleMute();
+                            }
+                          }}
+                          max={100}
+                          step={1}
+                          className="flex-1 [&_[role=slider]]:bg-white [&_[role=slider]]:border-white [&_>.relative]:bg-white/30"
+                        />
+                        <Volume2 className="h-4 w-4 text-white/60" />
+                      </div>
+                      <span className="text-sm text-white font-semibold">{isMuted ? 0 : volume}%</span>
+                    </div>
+                  </div>
+                </>
               )}
-            </Button>
+            </div>
+            
             <Button
               size="icon"
               variant="ghost"
