@@ -115,30 +115,30 @@ const UserProfile = () => {
   }
 
   return (
-    <div className="min-h-screen pb-32 px-6 py-8">
+    <div className="min-h-screen pb-32 px-4 md:px-6 py-4 md:py-8">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">My Account</h1>
+        <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-8">My Account</h1>
 
         {/* Profile Picture Section */}
-        <Card className="p-8 mb-6">
-          <div className="flex items-center gap-6 mb-6">
+        <Card className="p-4 md:p-8 mb-4 md:mb-6">
+          <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6 mb-4 md:mb-6">
             <AvatarUpload
               currentAvatarUrl={profile?.avatar_url}
               userName={fullName}
             />
-            <div>
-              <h2 className="text-2xl font-bold">{fullName || "User"}</h2>
-              <p className="text-muted-foreground">{user?.email}</p>
+            <div className="text-center sm:text-left">
+              <h2 className="text-xl md:text-2xl font-bold">{fullName || "User"}</h2>
+              <p className="text-sm md:text-base text-muted-foreground break-all">{user?.email}</p>
             </div>
           </div>
         </Card>
 
         {/* Profile Information */}
-        <Card className="p-8 mb-6">
-          <h3 className="text-xl font-bold mb-6">Profile Information</h3>
+        <Card className="p-4 md:p-8 mb-4 md:mb-6">
+          <h3 className="text-lg md:text-xl font-bold mb-4 md:mb-6">Profile Information</h3>
           <form onSubmit={handleSaveProfile} className="space-y-4">
             <div>
-              <Label htmlFor="fullName" className="flex items-center gap-2">
+              <Label htmlFor="fullName" className="flex items-center gap-2 text-sm md:text-base">
                 <User className="w-4 h-4" />
                 Full Name
               </Label>
@@ -147,11 +147,12 @@ const UserProfile = () => {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Enter your full name"
+                className="mt-1.5"
               />
             </div>
 
             <div>
-              <Label htmlFor="email" className="flex items-center gap-2">
+              <Label htmlFor="email" className="flex items-center gap-2 text-sm md:text-base">
                 <Mail className="w-4 h-4" />
                 Email
               </Label>
@@ -159,7 +160,7 @@ const UserProfile = () => {
                 id="email"
                 value={user?.email || ""}
                 disabled
-                className="bg-muted"
+                className="bg-muted mt-1.5"
               />
               <p className="text-xs text-muted-foreground mt-1">
                 Email cannot be changed
@@ -167,7 +168,7 @@ const UserProfile = () => {
             </div>
 
             <div>
-              <Label htmlFor="phone" className="flex items-center gap-2">
+              <Label htmlFor="phone" className="flex items-center gap-2 text-sm md:text-base">
                 <Phone className="w-4 h-4" />
                 Phone Number
               </Label>
@@ -177,6 +178,7 @@ const UserProfile = () => {
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 placeholder="+1234567890"
+                className="mt-1.5"
               />
             </div>
 
@@ -187,19 +189,19 @@ const UserProfile = () => {
         </Card>
 
         {/* Account Actions */}
-        <Card className="p-8">
-          <h3 className="text-xl font-bold mb-6">Account Actions</h3>
-          <div className="space-y-4">
+        <Card className="p-4 md:p-8">
+          <h3 className="text-lg md:text-xl font-bold mb-4 md:mb-6">Account Actions</h3>
+          <div className="space-y-3 md:space-y-4">
             <Button
               variant="outline"
-              className="w-full justify-start"
+              className="w-full justify-start text-sm md:text-base"
               onClick={() => navigate("/auth/forgot-password")}
             >
               Change Password
             </Button>
             <Button
               variant="destructive"
-              className="w-full justify-start"
+              className="w-full justify-start text-sm md:text-base"
               onClick={handleLogout}
             >
               <LogOut className="w-4 h-4 mr-2" />
