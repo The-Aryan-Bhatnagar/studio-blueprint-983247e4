@@ -10,6 +10,7 @@ import ArtistLayout from "./components/ArtistLayout";
 import UserLayout from "./components/UserLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Landing from "./pages/Landing";
+import Install from "./pages/Install";
 import Home from "./pages/Home";
 import Discover from "./pages/Discover";
 import Search from "./pages/Search";
@@ -44,6 +45,7 @@ import PlaylistDetail from "./pages/PlaylistDetail";
 import Community from "./pages/Community";
 import SongAnalytics from "./pages/artist/SongAnalytics";
 import NotFound from "./pages/NotFound";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -55,9 +57,11 @@ const App = () => (
           <PlayerProvider>
             <Toaster />
             <Sonner />
+            <PWAInstallPrompt />
             <Routes>
               {/* Auth Routes - No Layout */}
               <Route path="/welcome" element={<Landing />} />
+              <Route path="/install" element={<Install />} />
               <Route path="/auth/login" element={<Login />} />
               <Route path="/auth/signup" element={<Signup />} />
               <Route path="/auth/forgot-password" element={<ForgotPassword />} />

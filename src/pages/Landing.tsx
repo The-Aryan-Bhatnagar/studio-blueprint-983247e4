@@ -1,10 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Headphones, Radio, Users } from "lucide-react";
+import { Headphones, Radio, Users, Download } from "lucide-react";
 import { useTransparentLogo } from "@/hooks/useTransparentLogo";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
 
 const Landing = () => {
   const logo = useTransparentLogo();
+  const { isInstallable, isInstalled, isIOS, triggerInstall } = usePWAInstall();
+  const showInstallButton = (isInstallable || isIOS) && !isInstalled;
   
   return (
     <div className="min-h-screen bg-background">
@@ -17,12 +20,23 @@ const Landing = () => {
               GreenBox
             </span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {showInstallButton && (
+              <Link to="/install">
+                <Button variant="outline" size="sm" className="hidden sm:flex">
+                  <Download className="w-4 h-4 mr-2" />
+                  Install App
+                </Button>
+                <Button variant="outline" size="icon" className="sm:hidden">
+                  <Download className="w-4 h-4" />
+                </Button>
+              </Link>
+            )}
             <Link to="/auth/login">
-              <Button variant="ghost">Login</Button>
+              <Button variant="ghost" size="sm">Login</Button>
             </Link>
             <Link to="/auth/signup">
-              <Button>Sign Up</Button>
+              <Button size="sm">Sign Up</Button>
             </Link>
           </div>
         </div>
