@@ -3,7 +3,7 @@ import { usePlaylistSongs } from "@/hooks/usePlaylists";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Play, Trash2, Music, ListMusic, Heart, MessageCircle, Headphones } from "lucide-react";
+import { ArrowLeft, Play, Trash2, Music, ListMusic, Heart, MessageCircle, Headphones, SkipBack, SkipForward } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { usePlaylists } from "@/hooks/usePlaylists";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -213,18 +213,42 @@ const PlaylistDetail = () => {
                     </div>
                   </div>
 
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 flex-shrink-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveSong(song.id);
-                    }}
-                    disabled={removeSongFromPlaylist.isPending}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (index > 0) {
+                          handlePlaySong(songs[index - 1]);
+                        }
+                      }}
+                      className="p-1.5 rounded-full border border-border hover:bg-muted active:bg-muted/80 transition-colors"
+                    >
+                      <SkipBack className="w-4 h-4 text-foreground fill-current" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (index < songs.length - 1) {
+                          handlePlaySong(songs[index + 1]);
+                        }
+                      }}
+                      className="p-1.5 rounded-full border border-border hover:bg-muted active:bg-muted/80 transition-colors"
+                    >
+                      <SkipForward className="w-4 h-4 text-foreground fill-current" />
+                    </button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 flex-shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveSong(song.id);
+                      }}
+                      disabled={removeSongFromPlaylist.isPending}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </Card>
               ) : (
                 // Desktop Layout
