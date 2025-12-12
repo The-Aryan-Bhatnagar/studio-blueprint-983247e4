@@ -1,1 +1,4 @@
 project_id = "nabqdtmpczbilolzrbmo"
+
+[functions.publish-scheduled-songs]
+verify_jwt = false

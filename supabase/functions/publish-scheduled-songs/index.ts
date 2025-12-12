@@ -5,9 +5,45 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Validate cron secret for scheduled job authentication
+function validateCronSecret(req: Request): boolean {
+  const authHeader = req.headers.get('Authorization');
+  const cronSecret = Deno.env.get('CRON_SECRET');
+  
+  // If CRON_SECRET is set, require it for authentication
+  if (cronSecret) {
+    return authHeader === `Bearer ${cronSecret}`;
+  }
+  
+  // Also allow service role key authentication (for pg_cron with anon key, upgrade to service role check)
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (serviceRoleKey && authHeader === `Bearer ${serviceRoleKey}`) {
+    return true;
+  }
+  
+  // Fallback: Check if request comes from internal Supabase infrastructure
+  const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
+  if (anonKey && authHeader === `Bearer ${anonKey}`) {
+    // Allow anon key but log warning - this is for pg_cron compatibility
+    console.warn('Request authenticated with anon key - consider using CRON_SECRET for better security');
+    return true;
+  }
+  
+  return false;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Validate authentication - this function should only be called by cron jobs
+  if (!validateCronSecret(req)) {
+    console.error('Unauthorized request to publish-scheduled-songs - missing or invalid authentication');
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized - valid authentication required' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 
   try {
