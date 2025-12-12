@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { usePublicSongs, usePublicArtists } from "@/hooks/usePublicSongs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const { playSong, setQueue } = usePlayer();
@@ -67,11 +68,52 @@ const Home = () => {
     });
   };
 
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen pb-36 md:pb-32">
+      {/* Hero Banner Section */}
+      <section className="w-full p-6 md:p-[60px_40px] rounded-[20px] bg-gradient-to-br from-[hsl(270,100%,50%)] via-[hsl(290,100%,50%)] to-[hsl(320,100%,60%)] flex flex-col md:flex-row justify-between items-center mb-6 md:mb-10 gap-6 md:gap-10">
+        {/* Left Content */}
+        <div className="text-center md:text-left">
+          <h1 className="text-white text-2xl md:text-[42px] font-bold leading-tight">
+            Discover Amazing Artists
+          </h1>
+          <p className="text-white/90 mt-2.5 text-sm md:text-lg max-w-[480px]">
+            Connect with talented artists and stream music from around the world.
+          </p>
+          <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+            <Button
+              size="lg"
+              className="bg-white text-[hsl(270,100%,50%)] hover:bg-white/90 font-semibold px-6 py-3 rounded-[10px] border-none"
+              onClick={() => navigate("/search")}
+            >
+              Explore Now
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
+            <Button
+              size="lg"
+              className="bg-white/20 text-white hover:bg-white/30 font-semibold px-6 py-3 rounded-[10px] border border-white/40"
+              onClick={() => navigate("/artist/signup")}
+            >
+              Become an Artist
+            </Button>
+          </div>
+        </div>
+
+        {/* Right Image */}
+        <div className="w-full max-w-[280px] md:max-w-none md:w-auto">
+          <img
+            src="/placeholder.svg"
+            alt="Discover banner"
+            className="w-full md:h-[200px] md:w-auto rounded-[20px] object-cover"
+          />
+        </div>
+      </section>
+
       {/* Welcome Section */}
       <section className="mb-4 md:mb-8">
-        <h1 className="text-xl sm:text-2xl md:text-4xl font-bold mb-1 md:mb-2">Made For {userName}</h1>
+        <h2 className="text-xl sm:text-2xl md:text-4xl font-bold mb-1 md:mb-2">Made For {userName}</h2>
         <p className="text-xs sm:text-sm md:text-base text-muted-foreground">Your personalized music experience</p>
       </section>
 
