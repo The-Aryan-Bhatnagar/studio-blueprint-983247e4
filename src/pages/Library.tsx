@@ -53,37 +53,37 @@ const Library = () => {
   };
 
   return (
-    <div className="min-h-screen pb-32">
-      <h1 className="text-4xl font-bold mb-8">Your Library</h1>
+    <div className="min-h-screen pb-36 md:pb-32">
+      <h1 className="text-xl md:text-4xl font-bold mb-4 md:mb-8">Your Library</h1>
 
       <Tabs defaultValue="playlists" className="w-full">
-        <TabsList className="mb-8">
-          <TabsTrigger value="playlists">Playlists</TabsTrigger>
-          <TabsTrigger value="recent">Recently Played</TabsTrigger>
-          <TabsTrigger value="liked">Liked Songs</TabsTrigger>
+        <TabsList className="mb-4 md:mb-8 h-9 md:h-10">
+          <TabsTrigger value="playlists" className="text-xs md:text-sm px-2 md:px-3">Playlists</TabsTrigger>
+          <TabsTrigger value="recent" className="text-xs md:text-sm px-2 md:px-3">Recently Played</TabsTrigger>
+          <TabsTrigger value="liked" className="text-xs md:text-sm px-2 md:px-3">Liked Songs</TabsTrigger>
         </TabsList>
 
         <TabsContent value="playlists">
           {!user ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <p className="text-lg mb-2">Login to see your playlists</p>
+            <div className="text-center py-8 md:py-12 text-muted-foreground">
+              <p className="text-sm md:text-lg mb-2">Login to see your playlists</p>
             </div>
           ) : (
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-semibold">Your Playlists</h2>
+            <div className="space-y-4 md:space-y-6">
+              <div className="flex justify-between items-center gap-2">
+                <h2 className="text-lg md:text-2xl font-semibold">Your Playlists</h2>
                 <CreatePlaylistDialog />
               </div>
 
               {playlists.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Music className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg mb-2">No playlists yet</p>
-                  <p className="text-sm mb-4">Create your first playlist to organize your music</p>
+                <div className="text-center py-8 md:py-12 text-muted-foreground">
+                  <Music className="h-10 w-10 md:h-12 md:w-12 mx-auto mb-3 md:mb-4 opacity-50" />
+                  <p className="text-sm md:text-lg mb-2">No playlists yet</p>
+                  <p className="text-xs md:text-sm mb-4">Create your first playlist to organize your music</p>
                   <CreatePlaylistDialog />
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
                   {playlists.map((playlist) => (
                     <Card 
                       key={playlist.id} 
@@ -124,29 +124,29 @@ const Library = () => {
         </TabsContent>
 
         <TabsContent value="recent">
-          <div className="text-center py-12 text-muted-foreground">
-            <p className="text-lg mb-2">No recently played songs</p>
-            <p className="text-sm">Songs you play will appear here</p>
+          <div className="text-center py-8 md:py-12 text-muted-foreground">
+            <p className="text-sm md:text-lg mb-2">No recently played songs</p>
+            <p className="text-xs md:text-sm">Songs you play will appear here</p>
           </div>
         </TabsContent>
 
         <TabsContent value="liked">
           {!user ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <p className="text-lg mb-2">Login to see your liked songs</p>
-              <p className="text-sm">Like songs to save them to your library</p>
+            <div className="text-center py-8 md:py-12 text-muted-foreground">
+              <p className="text-sm md:text-lg mb-2">Login to see your liked songs</p>
+              <p className="text-xs md:text-sm">Like songs to save them to your library</p>
             </div>
           ) : isLoading ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <p className="text-lg">Loading your liked songs...</p>
+            <div className="text-center py-8 md:py-12 text-muted-foreground">
+              <p className="text-sm md:text-lg">Loading your liked songs...</p>
             </div>
           ) : likedSongsData.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <p className="text-lg mb-2">No liked songs yet</p>
-              <p className="text-sm">Like songs by clicking the heart icon while playing</p>
+            <div className="text-center py-8 md:py-12 text-muted-foreground">
+              <p className="text-sm md:text-lg mb-2">No liked songs yet</p>
+              <p className="text-xs md:text-sm">Like songs by clicking the heart icon while playing</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {likedSongsData.map((song: any) => (
                 <SongCard 
                   key={song.id} 

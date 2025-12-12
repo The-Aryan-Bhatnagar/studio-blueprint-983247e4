@@ -68,56 +68,56 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen pb-32">
+    <div className="min-h-screen pb-36 md:pb-32">
       {/* Welcome Section */}
-      <section className="mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-4xl font-bold mb-2">Made For {userName}</h1>
-        <p className="text-sm md:text-base text-muted-foreground">Your personalized music experience</p>
+      <section className="mb-4 md:mb-8">
+        <h1 className="text-xl sm:text-2xl md:text-4xl font-bold mb-1 md:mb-2">Made For {userName}</h1>
+        <p className="text-xs sm:text-sm md:text-base text-muted-foreground">Your personalized music experience</p>
       </section>
 
       {/* Your Top Mixes */}
-      <section className="mb-8 md:mb-12">
-        <div className="flex items-center justify-between mb-4 md:mb-6">
-          <h2 className="text-xl md:text-3xl font-bold">Your Top Mixes</h2>
-          <Button variant="ghost" className="text-primary text-xs md:text-sm">
+      <section className="mb-6 md:mb-12">
+        <div className="flex items-center justify-between mb-3 md:mb-6">
+          <h2 className="text-lg sm:text-xl md:text-3xl font-bold">Your Top Mixes</h2>
+          <Button variant="ghost" className="text-primary text-xs md:text-sm px-2 md:px-4">
             See all
             <ArrowRight className="ml-1 md:ml-2 w-3 h-3 md:w-4 md:h-4" />
           </Button>
         </div>
         {songsLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {[1, 2, 3, 4].map((i) => (
               <Skeleton key={i} className="aspect-square rounded-lg" />
             ))}
           </div>
         ) : topMixes.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {topMixes.map((song) => (
               <SongCard key={song.id} song={song} onPlay={handlePlaySong} />
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground text-center py-8">No songs available yet. Artists can upload music!</p>
+          <p className="text-muted-foreground text-center py-8 text-sm">No songs available yet. Artists can upload music!</p>
         )}
       </section>
 
       {/* Popular Artists */}
-      <section className="mb-8 md:mb-12">
-        <div className="flex items-center justify-between mb-4 md:mb-6">
-          <h2 className="text-xl md:text-3xl font-bold">Popular Artists</h2>
-          <Button variant="ghost" className="text-primary text-xs md:text-sm">
+      <section className="mb-6 md:mb-12">
+        <div className="flex items-center justify-between mb-3 md:mb-6">
+          <h2 className="text-lg sm:text-xl md:text-3xl font-bold">Popular Artists</h2>
+          <Button variant="ghost" className="text-primary text-xs md:text-sm px-2 md:px-4">
             See all
             <ArrowRight className="ml-1 md:ml-2 w-3 h-3 md:w-4 md:h-4" />
           </Button>
         </div>
         {artistsLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {[1, 2, 3, 4].map((i) => (
               <Skeleton key={i} className="aspect-square rounded-full" />
             ))}
           </div>
         ) : popularArtists.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {popularArtists.map((artist) => (
               <ArtistCard 
                 key={artist.id} 
@@ -132,27 +132,27 @@ const Home = () => {
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground text-center py-8">No artists yet.</p>
+          <p className="text-muted-foreground text-center py-8 text-sm">No artists yet.</p>
         )}
       </section>
 
       {/* Recently Played */}
-      <section className="mb-8 md:mb-12">
-        <div className="flex items-center justify-between mb-4 md:mb-6">
-          <h2 className="text-xl md:text-3xl font-bold">Recently Played</h2>
-          <Button variant="ghost" className="text-primary text-xs md:text-sm">
+      <section className="mb-6 md:mb-12">
+        <div className="flex items-center justify-between mb-3 md:mb-6">
+          <h2 className="text-lg sm:text-xl md:text-3xl font-bold">Recently Played</h2>
+          <Button variant="ghost" className="text-primary text-xs md:text-sm px-2 md:px-4">
             See all
             <ArrowRight className="ml-1 md:ml-2 w-3 h-3 md:w-4 md:h-4" />
           </Button>
         </div>
         {songsLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {[1, 2, 3, 4].map((i) => (
               <Skeleton key={i} className="aspect-square rounded-lg" />
             ))}
           </div>
         ) : recentlyPlayed.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {recentlyPlayed.map((song) => (
               <SongCard key={song.id} song={song} onPlay={handlePlaySong} />
             ))}
