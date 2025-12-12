@@ -7,7 +7,7 @@ import { usePlayer } from "@/contexts/PlayerContext";
 import { useToast } from "@/hooks/use-toast";
 import { usePublicSongs, usePublicArtists } from "@/hooks/usePublicSongs";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import AdsBannerCarousel from "@/components/AdsBannerCarousel";
 const Discover = () => {
   const navigate = useNavigate();
   const { playSong, setQueue } = usePlayer();
@@ -46,77 +46,8 @@ const Discover = () => {
 
   return (
     <div className="min-h-screen pb-32">
-      {/* Hero Banner Section */}
-      <section className="w-full p-6 sm:p-8 md:p-[60px_40px] rounded-[20px] bg-gradient-to-br from-[hsl(270,100%,50%)] via-[hsl(290,100%,50%)] to-[hsl(320,100%,60%)] flex flex-col items-center mb-6 md:mb-10 gap-4 md:gap-6">
-        {/* Content */}
-        <div className="text-center md:text-left md:flex md:justify-between md:items-center md:w-full md:gap-10">
-          <div className="flex-1">
-            <h1 className="text-white text-2xl sm:text-3xl md:text-[42px] font-bold leading-tight">
-              Discover Amazing Artists
-            </h1>
-            <p className="text-white/90 mt-2 text-sm sm:text-base md:text-lg max-w-[480px] mx-auto md:mx-0">
-              Connect with talented artists and stream music from around the world.
-            </p>
-            <div className="mt-4 md:mt-6 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-              <Button
-                size="lg"
-                className="bg-white text-[hsl(270,100%,50%)] hover:bg-white/90 font-semibold px-6 py-3 rounded-[10px] border-none"
-                onClick={() => navigate("/search")}
-              >
-                Explore Now
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-              <Button
-                size="lg"
-                className="bg-white/20 text-white hover:bg-white/30 font-semibold px-6 py-3 rounded-[10px] border border-white/40"
-                onClick={() => navigate("/artist/signup")}
-              >
-                Become an Artist
-              </Button>
-            </div>
-          </div>
-          
-          {/* Desktop Ad Image - hidden on mobile/tablet where we show separate banners */}
-          <div className="hidden lg:block">
-            <img
-              src="/placeholder.svg"
-              alt="Ad banner"
-              className="h-[200px] w-auto rounded-[20px] object-cover"
-            />
-          </div>
-        </div>
-        
-        {/* Mobile Ad Banner - Full width */}
-        <div className="block sm:hidden w-full">
-          <div className="w-full rounded-lg overflow-hidden">
-            <img
-              src="/images/phone-ad-banner.png"
-              alt="Ad banner"
-              className="w-full h-auto object-cover"
-            />
-          </div>
-        </div>
-        
-        {/* Tablet Ad Banner - 728x90 (landscape) or 300x250 (portrait) */}
-        <div className="hidden sm:flex lg:hidden justify-center w-full">
-          {/* 728x90 for wider tablets */}
-          <div className="hidden md:block w-[728px] h-[90px] bg-white/20 rounded-lg overflow-hidden">
-            <img
-              src="/placeholder.svg"
-              alt="Ad banner"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          {/* 300x250 for smaller tablets */}
-          <div className="block md:hidden w-[300px] h-[250px] bg-white/20 rounded-lg overflow-hidden">
-            <img
-              src="/placeholder.svg"
-              alt="Ad banner"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
-      </section>
+      {/* Ads Banner Carousel */}
+      <AdsBannerCarousel />
 
       {/* Featured Artists Section */}
       <section className="mb-12">
