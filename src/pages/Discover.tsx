@@ -90,7 +90,7 @@ const Discover = () => {
         <div className="block sm:hidden w-full flex justify-center px-4">
           <div className="w-full aspect-[1546/423] bg-white/20 rounded-lg flex items-center justify-center overflow-hidden">
             <img
-              src="/placeholder.svg"
+              src="/images/phone-ad-banner.png"
               alt="Ad banner"
               className="w-full h-full object-cover"
             />
