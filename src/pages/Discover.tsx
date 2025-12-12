@@ -86,13 +86,13 @@ const Discover = () => {
           </div>
         </div>
         
-        {/* Mobile Ad Banner - 1546x423 ratio */}
-        <div className="block sm:hidden w-full flex justify-center px-4">
-          <div className="w-full aspect-[1546/423] bg-white/20 rounded-lg flex items-center justify-center overflow-hidden">
+        {/* Mobile Ad Banner - Full width */}
+        <div className="block sm:hidden w-full">
+          <div className="w-full rounded-lg overflow-hidden">
             <img
               src="/images/phone-ad-banner.png"
               alt="Ad banner"
-              className="w-full h-full object-cover"
+              className="w-full h-auto object-cover"
             />
           </div>
         </div>
