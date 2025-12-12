@@ -112,9 +112,9 @@ const Home = () => {
           </div>
         </div>
         
-        {/* Mobile Ad Banner - 9.5cm x 8cm (360px x 300px) */}
-        <div className="block sm:hidden w-full flex justify-center">
-          <div className="w-[360px] h-[300px] bg-white/20 rounded-lg flex items-center justify-center overflow-hidden">
+        {/* Mobile Ad Banner - YouTube banner ratio (2560x1440 = 16:9) */}
+        <div className="block sm:hidden w-full flex justify-center px-4">
+          <div className="w-full max-w-[400px] aspect-video bg-white/20 rounded-lg flex items-center justify-center overflow-hidden">
             <img
               src="/placeholder.svg"
               alt="Ad banner"
