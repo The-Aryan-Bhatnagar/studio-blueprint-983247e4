@@ -129,23 +129,23 @@ const CommunityPostCard = ({ post, isArtist }: CommunityPostCardProps) => {
 
   return (
     <>
-      <Card className="p-6 space-y-4">
+      <Card className="p-3 md:p-6 space-y-3 md:space-y-4">
         <div className="flex items-start justify-between">
-          <div className="flex gap-3">
-            <Avatar>
+          <div className="flex gap-2 md:gap-3">
+            <Avatar className="h-8 w-8 md:h-10 md:w-10">
               <AvatarImage src={post.artist_profiles?.avatar_url} />
-              <AvatarFallback>
+              <AvatarFallback className="text-xs md:text-sm">
                 {post.artist_profiles?.stage_name?.[0]}
               </AvatarFallback>
             </Avatar>
             <div>
-              <div className="flex items-center gap-2">
-                <p className="font-semibold">{post.artist_profiles?.stage_name}</p>
+              <div className="flex items-center gap-1.5 md:gap-2">
+                <p className="font-semibold text-sm md:text-base">{post.artist_profiles?.stage_name}</p>
                 {post.is_pinned && (
-                  <Pin className="w-4 h-4 text-primary" />
+                  <Pin className="w-3 h-3 md:w-4 md:h-4 text-primary" />
                 )}
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
               </p>
             </div>
@@ -204,7 +204,7 @@ const CommunityPostCard = ({ post, isArtist }: CommunityPostCardProps) => {
             </div>
           </div>
         ) : (
-          <p className="whitespace-pre-wrap">{post.content}</p>
+          <p className="whitespace-pre-wrap text-sm md:text-base">{post.content}</p>
         )}
 
         {post.media_url && (
@@ -225,18 +225,18 @@ const CommunityPostCard = ({ post, isArtist }: CommunityPostCardProps) => {
           <PollCard poll={post.polls[0]} />
         )}
 
-        <div className="flex items-center gap-6 pt-2">
+        <div className="flex items-center gap-4 md:gap-6 pt-2">
           <Button
             variant="ghost"
             size="sm"
-            className="gap-2"
+            className="gap-1.5 md:gap-2 h-8 px-2 md:px-3"
             onClick={handleLike}
           >
             <Heart
-              className={`w-5 h-5 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
+              className={`w-4 h-4 md:w-5 md:h-5 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
             />
             <span
-              className="cursor-pointer hover:underline"
+              className="cursor-pointer hover:underline text-xs md:text-sm"
               onClick={(e) => {
                 e.stopPropagation();
                 setShowLikes(true);
@@ -249,15 +249,15 @@ const CommunityPostCard = ({ post, isArtist }: CommunityPostCardProps) => {
           <Button
             variant="ghost"
             size="sm"
-            className="gap-2"
+            className="gap-1.5 md:gap-2 h-8 px-2 md:px-3"
             onClick={() => setShowComments(!showComments)}
           >
-            <MessageCircle className="w-5 h-5" />
-            {commentsCount}
+            <MessageCircle className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="text-xs md:text-sm">{commentsCount}</span>
           </Button>
 
-          <Button variant="ghost" size="sm" className="gap-2">
-            <Share2 className="w-5 h-5" />
+          <Button variant="ghost" size="sm" className="gap-1.5 md:gap-2 h-8 px-2 md:px-3">
+            <Share2 className="w-4 h-4 md:w-5 md:h-5" />
           </Button>
         </div>
 

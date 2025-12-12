@@ -60,21 +60,21 @@ const Community = () => {
   ) || [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Community</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-xl md:text-3xl font-bold mb-1 md:mb-2">Community</h1>
+        <p className="text-xs md:text-base text-muted-foreground">
           See what your favorite artists are sharing
         </p>
       </div>
 
       <div className="relative">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-2.5 md:top-3 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search posts..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
+          className="pl-10 h-9 md:h-10 text-sm"
         />
       </div>
 

@@ -97,10 +97,10 @@ const ArtistProfilePublic = () => {
   }
 
   return (
-    <div className="min-h-screen pb-32">
+    <div className="min-h-screen pb-36 md:pb-32">
       {/* Cover Image */}
       <div 
-        className="h-64 bg-gradient-to-b from-primary/20 to-background"
+        className="h-32 md:h-64 bg-gradient-to-b from-primary/20 to-background"
         style={{
           backgroundImage: artist.cover_image_url ? `url(${artist.cover_image_url})` : undefined,
           backgroundSize: 'cover',
@@ -109,36 +109,37 @@ const ArtistProfilePublic = () => {
       />
 
       {/* Artist Info */}
-      <div className="container mx-auto px-6 -mt-20">
-        <div className="flex flex-col md:flex-row gap-6 items-start md:items-end mb-8">
-          <Avatar className="h-40 w-40 border-4 border-background shadow-xl">
+      <div className="container mx-auto px-3 md:px-6 -mt-12 md:-mt-20">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start md:items-end mb-6 md:mb-8">
+          <Avatar className="h-24 w-24 md:h-40 md:w-40 border-4 border-background shadow-xl">
             <AvatarImage src={artist.avatar_url || undefined} />
-            <AvatarFallback className="text-4xl bg-gradient-primary">
+            <AvatarFallback className="text-2xl md:text-4xl bg-gradient-primary">
               {artist.stage_name.charAt(0)}
             </AvatarFallback>
           </Avatar>
 
           <div className="flex-1">
-            <h1 className="text-4xl md:text-5xl font-bold mb-2">{artist.stage_name}</h1>
-            <div className="flex gap-4 text-muted-foreground mb-4">
+            <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-1 md:mb-2">{artist.stage_name}</h1>
+            <div className="flex gap-3 md:gap-4 text-xs md:text-base text-muted-foreground mb-3 md:mb-4">
               <span>{artist.total_followers || 0} followers</span>
               <span>{songs?.length || 0} songs</span>
             </div>
 
-            <div className="flex gap-3 mb-4">
+            <div className="flex flex-wrap gap-2 md:gap-3 mb-3 md:mb-4">
               <Button 
                 onClick={handleFollow}
                 disabled={isPending}
-                size="lg"
+                size="default"
+                className="text-sm md:text-base h-9 md:h-10"
               >
                 {isFollowing ? (
                   <>
-                    <UserMinus className="mr-2 h-5 w-5" />
+                    <UserMinus className="mr-1.5 md:mr-2 h-4 w-4 md:h-5 md:w-5" />
                     Unfollow
                   </>
                 ) : (
                   <>
-                    <UserPlus className="mr-2 h-5 w-5" />
+                    <UserPlus className="mr-1.5 md:mr-2 h-4 w-4 md:h-5 md:w-5" />
                     Follow
                   </>
                 )}
@@ -151,9 +152,10 @@ const ArtistProfilePublic = () => {
                     variant="outline"
                     size="icon"
                     asChild
+                    className="h-8 w-8 md:h-10 md:w-10"
                   >
                     <a href={artist.instagram_url} target="_blank" rel="noopener noreferrer">
-                      <Instagram className="h-5 w-5" />
+                      <Instagram className="h-4 w-4 md:h-5 md:w-5" />
                     </a>
                   </Button>
                 )}

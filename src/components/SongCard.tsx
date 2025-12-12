@@ -37,16 +37,16 @@ const SongCard = ({ song, onPlay }: SongCardProps) => {
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <Button
           size="icon"
-          className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 bg-primary hover:bg-primary/90 shadow-glow"
+          className="absolute bottom-2 right-2 md:bottom-4 md:right-4 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 bg-primary hover:bg-primary/90 shadow-glow h-8 w-8 md:h-10 md:w-10"
           onClick={() => onPlay?.(song)}
         >
-          <Play className="w-5 h-5 fill-current" />
+          <Play className="w-4 h-4 md:w-5 md:h-5 fill-current" />
         </Button>
       </div>
-      <div className="p-4">
-        <h3 className="font-semibold text-foreground truncate mb-1">{song.title}</h3>
-        <p className="text-sm text-muted-foreground truncate">{artistName}</p>
-        <p className="text-xs text-muted-foreground mt-2">
+      <div className="p-2 md:p-4">
+        <h3 className="font-semibold text-foreground truncate mb-0.5 md:mb-1 text-sm md:text-base">{song.title}</h3>
+        <p className="text-xs md:text-sm text-muted-foreground truncate">{artistName}</p>
+        <p className="text-[10px] md:text-xs text-muted-foreground mt-1 md:mt-2">
           {plays.toLocaleString()} plays
         </p>
       </div>
