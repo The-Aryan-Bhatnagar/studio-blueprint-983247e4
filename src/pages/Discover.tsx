@@ -86,9 +86,9 @@ const Discover = () => {
           </div>
         </div>
         
-        {/* Mobile Ad Banner - 320x50 */}
+        {/* Mobile Ad Banner - 320x160 */}
         <div className="block sm:hidden w-full flex justify-center">
-          <div className="w-[320px] h-[50px] bg-white/20 rounded-lg flex items-center justify-center overflow-hidden">
+          <div className="w-[320px] h-[160px] bg-white/20 rounded-lg flex items-center justify-center overflow-hidden">
             <img
               src="/placeholder.svg"
               alt="Ad banner"
