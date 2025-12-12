@@ -85,15 +85,15 @@ const Home = () => {
           </Button>
         </div>
         {songsLoading ? (
-          <div className="flex flex-col gap-2 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-20 md:aspect-square rounded-lg" />
+              <Skeleton key={i} className="aspect-square rounded-lg" />
             ))}
           </div>
         ) : topMixes.length > 0 ? (
-          <div className="flex flex-col gap-2 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6">
-            {topMixes.map((song, idx) => (
-              <SongCard key={song.id} song={song} onPlay={handlePlaySong} index={idx + 1} />
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+            {topMixes.map((song) => (
+              <SongCard key={song.id} song={song} onPlay={handlePlaySong} />
             ))}
           </div>
         ) : (
@@ -146,15 +146,15 @@ const Home = () => {
           </Button>
         </div>
         {songsLoading ? (
-          <div className="flex flex-col gap-2 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-20 md:aspect-square rounded-lg" />
+              <Skeleton key={i} className="aspect-square rounded-lg" />
             ))}
           </div>
         ) : recentlyPlayed.length > 0 ? (
-          <div className="flex flex-col gap-2 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6">
-            {recentlyPlayed.map((song, idx) => (
-              <SongCard key={song.id} song={song} onPlay={handlePlaySong} index={idx + 1} />
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+            {recentlyPlayed.map((song) => (
+              <SongCard key={song.id} song={song} onPlay={handlePlaySong} />
             ))}
           </div>
         ) : null}

@@ -12,6 +12,7 @@ import { useCommunityPosts } from "@/hooks/useCommunityPosts";
 import CommunityPostCard from "@/components/CommunityPostCard";
 import { useArtistEvents } from "@/hooks/useEvents";
 import { format } from "date-fns";
+import ArtistSongListItem from "@/components/ArtistSongListItem";
 
 const ArtistProfilePublic = () => {
   const { artistId } = useParams<{ artistId: string }>();
@@ -298,62 +299,77 @@ const ArtistProfilePublic = () => {
 
         {/* Songs */}
         <div>
-          <h2 className="text-2xl font-bold mb-6">Popular Songs</h2>
+          <h2 className="text-lg md:text-2xl font-bold mb-4 md:mb-6">Popular Songs</h2>
           {songsLoading ? (
             <div className="text-center py-8">
-              <div className="animate-pulse">Loading songs...</div>
+              <div className="animate-pulse text-sm">Loading songs...</div>
             </div>
           ) : songs?.length === 0 ? (
-            <Card className="p-8 text-center">
-              <p className="text-muted-foreground">No published songs yet</p>
+            <Card className="p-6 md:p-8 text-center">
+              <p className="text-muted-foreground text-sm">No published songs yet</p>
             </Card>
           ) : (
-            <div className="grid gap-4">
-              {songs?.map((song, index) => (
-                <Card 
-                  key={song.id}
-                  className="p-4 hover:bg-muted/50 transition-colors cursor-pointer group"
-                  onClick={() => handlePlaySong(song)}
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-muted-foreground w-8 text-center">{index + 1}</span>
-                    
-                    <div className="relative">
-                      <img
-                        src={song.cover_image_url || "/placeholder.svg"}
-                        alt={song.title}
-                        className="w-14 h-14 rounded object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded">
-                        <Play className="h-6 w-6 text-white" />
-                      </div>
-                    </div>
+            <>
+              {/* Mobile Layout - List Style */}
+              <div className="md:hidden flex flex-col gap-2">
+                {songs?.map((song, index) => (
+                  <ArtistSongListItem
+                    key={song.id}
+                    song={song}
+                    index={index + 1}
+                    onPlay={handlePlaySong}
+                  />
+                ))}
+              </div>
 
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold truncate">{song.title}</h3>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {song.genre || "Music"}
-                      </p>
-                    </div>
+              {/* Desktop Layout - Original Card Style */}
+              <div className="hidden md:grid gap-4">
+                {songs?.map((song, index) => (
+                  <Card 
+                    key={song.id}
+                    className="p-4 hover:bg-muted/50 transition-colors cursor-pointer group"
+                    onClick={() => handlePlaySong(song)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="text-muted-foreground w-8 text-center">{index + 1}</span>
+                      
+                      <div className="relative">
+                        <img
+                          src={song.cover_image_url || "/placeholder.svg"}
+                          alt={song.title}
+                          className="w-14 h-14 rounded object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded">
+                          <Play className="h-6 w-6 text-white" />
+                        </div>
+                      </div>
 
-                    <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Headphones className="h-4 w-4" />
-                        <span>{song.song_analytics?.total_plays ?? 0}</span>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold truncate">{song.title}</h3>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {song.genre || "Music"}
+                        </p>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Heart className="h-4 w-4" />
-                        <span>{song.song_analytics?.total_likes ?? 0}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <MessageCircle className="h-4 w-4" />
-                        <span>{song.song_analytics?.total_comments ?? 0}</span>
+
+                      <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Headphones className="h-4 w-4" />
+                          <span>{song.song_analytics?.total_plays ?? 0}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Heart className="h-4 w-4" />
+                          <span>{song.song_analytics?.total_likes ?? 0}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <MessageCircle className="h-4 w-4" />
+                          <span>{song.song_analytics?.total_comments ?? 0}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
+                  </Card>
+                ))}
+              </div>
+            </>
           )}
         </div>
 
