@@ -3,7 +3,7 @@ import { useArtistPublicProfile, useArtistSongs, useArtistFollow } from "@/hooks
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserPlus, UserMinus, Music, Heart, Play, Instagram, Youtube, MessageCircle, Headphones, Calendar, MapPin, Music2, Pin } from "lucide-react";
+import { UserPlus, UserMinus, Music, Heart, Play, Instagram, Youtube, MessageCircle, Headphones, Calendar, MapPin, Music2, Pin, ListMusic } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { toast } from "@/hooks/use-toast";
@@ -299,7 +299,36 @@ const ArtistProfilePublic = () => {
 
         {/* Songs */}
         <div>
-          <h2 className="text-lg md:text-2xl font-bold mb-4 md:mb-6">Popular Songs</h2>
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <h2 className="text-lg md:text-2xl font-bold">Popular Songs</h2>
+            {songs && songs.length > 0 && (
+              <Button
+                onClick={() => {
+                  if (songs && songs.length > 0) {
+                    const queue = songs.map((s: any) => ({
+                      id: s.id,
+                      title: s.title,
+                      artist: artist?.stage_name || "Unknown Artist",
+                      image: s.cover_image_url || "/placeholder.svg",
+                      audioUrl: s.audio_url,
+                      plays: s.song_analytics?.total_plays || 0,
+                    }));
+                    setQueue(queue);
+                    playSong(queue[0]);
+                    toast({
+                      title: "Playing All",
+                      description: `Playing ${songs.length} songs`,
+                    });
+                  }
+                }}
+                size="sm"
+                className="gap-2"
+              >
+                <ListMusic className="h-4 w-4" />
+                Play All
+              </Button>
+            )}
+          </div>
           {songsLoading ? (
             <div className="text-center py-8">
               <div className="animate-pulse text-sm">Loading songs...</div>
