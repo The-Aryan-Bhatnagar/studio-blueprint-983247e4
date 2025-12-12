@@ -7,13 +7,45 @@ import { Users, Activity, Clock, Shield, ArrowLeft, Search, MoreVertical, Ban, T
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
-import { useAdminUsers } from "@/hooks/useAdminData";
+import { useAdminUsers, useAdminAnalytics, useAdminReports } from "@/hooks/useAdminData";
 import { useTransparentLogo } from "@/hooks/useTransparentLogo";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+
+const formatNumber = (num: number): string => {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+  if (num >= 1000) return (num / 1000).toFixed(1) + "K";
+  return num.toString();
+};
 
 const UserDashboard = () => {
   const navigate = useNavigate();
-  const { data: users, isLoading } = useAdminUsers();
+  const { data: users = [], isLoading: usersLoading } = useAdminUsers();
+  const { data: analytics } = useAdminAnalytics();
+  const { data: reports = [] } = useAdminReports();
   const logo = useTransparentLogo();
+  const queryClient = useQueryClient();
+
+  // Real-time subscriptions
+  useEffect(() => {
+    const channel = supabase
+      .channel("admin-users-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "reports" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-reports"] });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  const isLoading = usersLoading;
+  const pendingReports = reports.filter((r: any) => r.status === "pending").length;
 
   if (isLoading) {
     return (
@@ -35,12 +67,12 @@ const UserDashboard = () => {
             <img src={logo} alt="GREENBOXX Logo" className="w-10 h-10 object-contain" />
             <div>
               <h1 className="text-3xl font-bold">User Dashboard</h1>
-              <p className="text-muted-foreground">Monitor and manage user activities</p>
+              <p className="text-muted-foreground">Monitor and manage user activities • Real-time data</p>
             </div>
           </div>
         </div>
 
-        {/* Stats Overview */}
+        {/* Stats Overview - Real data */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -48,41 +80,41 @@ const UserDashboard = () => {
               <Users className="w-5 h-5 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">8,456</div>
-              <p className="text-xs text-emerald-500 mt-1">+18.2% from last month</p>
+              <div className="text-3xl font-bold">{formatNumber(users.length)}</div>
+              <p className="text-xs text-muted-foreground mt-1">Registered users</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Active Sessions</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Plays</CardTitle>
               <Activity className="w-5 h-5 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">3,421</div>
-              <p className="text-xs text-emerald-500 mt-1">+5.7% from last month</p>
+              <div className="text-3xl font-bold">{formatNumber(analytics?.totalPlays || 0)}</div>
+              <p className="text-xs text-muted-foreground mt-1">All-time streams</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Avg. Session Time</CardTitle>
-              <Clock className="w-5 h-5 text-blue-500" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Events</CardTitle>
+              <Calendar className="w-5 h-5 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">24m</div>
-              <p className="text-xs text-emerald-500 mt-1">+3.4% from last month</p>
+              <div className="text-3xl font-bold">{formatNumber(analytics?.totalEvents || 0)}</div>
+              <p className="text-xs text-muted-foreground mt-1">Created events</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Security Alerts</CardTitle>
-              <Shield className="w-5 h-5 text-blue-500" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">Pending Reports</CardTitle>
+              <Shield className="w-5 h-5 text-yellow-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">12</div>
-              <p className="text-xs text-destructive mt-1">-25.0% from last month</p>
+              <div className="text-3xl font-bold">{pendingReports}</div>
+              <p className="text-xs text-muted-foreground mt-1">Needs review</p>
             </CardContent>
           </Card>
         </div>
@@ -120,56 +152,38 @@ const UserDashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">John Doe</TableCell>
-                      <TableCell>john@example.com</TableCell>
-                      <TableCell><Badge className="bg-emerald-500">Active</Badge></TableCell>
-                      <TableCell>Jan 15, 2024</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem><Edit className="w-4 h-4 mr-2" />Edit Profile</DropdownMenuItem>
-                            <DropdownMenuItem><Music className="w-4 h-4 mr-2" />View Playlists</DropdownMenuItem>
-                            <DropdownMenuItem><Heart className="w-4 h-4 mr-2" />Liked Songs</DropdownMenuItem>
-                            <DropdownMenuItem><UserPlus className="w-4 h-4 mr-2" />Following</DropdownMenuItem>
-                            <DropdownMenuItem><Clock className="w-4 h-4 mr-2" />Listening History</DropdownMenuItem>
-                            <DropdownMenuItem><Ban className="w-4 h-4 mr-2" />Block User</DropdownMenuItem>
-                            <DropdownMenuItem><RefreshCcw className="w-4 h-4 mr-2" />Reset Login</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive"><Trash2 className="w-4 h-4 mr-2" />Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Jane Smith</TableCell>
-                      <TableCell>jane@example.com</TableCell>
-                      <TableCell><Badge className="bg-emerald-500">Active</Badge></TableCell>
-                      <TableCell>Feb 20, 2024</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem><Edit className="w-4 h-4 mr-2" />Edit Profile</DropdownMenuItem>
-                            <DropdownMenuItem><Music className="w-4 h-4 mr-2" />View Playlists</DropdownMenuItem>
-                            <DropdownMenuItem><Heart className="w-4 h-4 mr-2" />Liked Songs</DropdownMenuItem>
-                            <DropdownMenuItem><UserPlus className="w-4 h-4 mr-2" />Following</DropdownMenuItem>
-                            <DropdownMenuItem><Clock className="w-4 h-4 mr-2" />Listening History</DropdownMenuItem>
-                            <DropdownMenuItem><Ban className="w-4 h-4 mr-2" />Block User</DropdownMenuItem>
-                            <DropdownMenuItem><RefreshCcw className="w-4 h-4 mr-2" />Reset Login</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive"><Trash2 className="w-4 h-4 mr-2" />Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
+                    {users.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                          No users found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      users.map((user: any) => (
+                        <TableRow key={user.id}>
+                          <TableCell className="font-medium">{user.full_name || "Unknown"}</TableCell>
+                          <TableCell>{user.phone_number || "-"}</TableCell>
+                          <TableCell><Badge className="bg-emerald-500">Active</Badge></TableCell>
+                          <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem><Edit className="w-4 h-4 mr-2" />Edit Profile</DropdownMenuItem>
+                                <DropdownMenuItem><Music className="w-4 h-4 mr-2" />View Playlists</DropdownMenuItem>
+                                <DropdownMenuItem><Heart className="w-4 h-4 mr-2" />Liked Songs</DropdownMenuItem>
+                                <DropdownMenuItem><Ban className="w-4 h-4 mr-2" />Block User</DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive"><Trash2 className="w-4 h-4 mr-2" />Delete</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>

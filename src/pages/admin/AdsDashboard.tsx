@@ -6,17 +6,62 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Eye, MousePointerClick, DollarSign, TrendingUp, ArrowLeft, Search, MoreVertical, Plus, Edit, Trash2, PlayCircle, PauseCircle, BarChart3, Target, Calendar, MapPin, Users } from "lucide-react";
+import { Eye, MousePointerClick, TrendingUp, ArrowLeft, Search, MoreVertical, Plus, Edit, Trash2, PlayCircle, PauseCircle, BarChart3, Smartphone, Monitor, Tablet, ImagePlus } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
-import { useAdminAds } from "@/hooks/useAdminData";
 import { useTransparentLogo } from "@/hooks/useTransparentLogo";
+import { useAdsWithStats } from "@/hooks/useAdsWithStats";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+
+const formatNumber = (num: number): string => {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+  if (num >= 1000) return (num / 1000).toFixed(1) + "K";
+  return num.toString();
+};
 
 const AdsDashboard = () => {
   const navigate = useNavigate();
-  const { data: ads, isLoading } = useAdminAds();
+  const { ads, stats, isLoading } = useAdsWithStats();
   const logo = useTransparentLogo();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const [newAd, setNewAd] = useState({
+    title: "",
+    link_url: "",
+    position: "banner",
+    priority: "medium",
+    image: null as File | null,
+  });
+
+  const handleToggleAdStatus = async (adId: string, currentStatus: boolean) => {
+    const { error } = await supabase
+      .from("ads")
+      .update({ is_active: !currentStatus })
+      .eq("id", adId);
+    
+    if (error) {
+      toast({ title: "Error", description: "Failed to update ad status", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: `Ad ${!currentStatus ? "activated" : "paused"}` });
+      queryClient.invalidateQueries({ queryKey: ["ads-with-stats"] });
+    }
+  };
+
+  const handleDeleteAd = async (adId: string) => {
+    const { error } = await supabase.from("ads").delete().eq("id", adId);
+    
+    if (error) {
+      toast({ title: "Error", description: "Failed to delete ad", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: "Ad deleted successfully" });
+      queryClient.invalidateQueries({ queryKey: ["ads-with-stats"] });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -38,21 +83,25 @@ const AdsDashboard = () => {
             <img src={logo} alt="GREENBOXX Logo" className="w-10 h-10 object-contain" />
             <div>
               <h1 className="text-3xl font-bold">Ads Management Dashboard</h1>
-              <p className="text-muted-foreground">Monitor and manage advertising campaigns</p>
+              <p className="text-muted-foreground">Monitor and manage advertising campaigns • Real-time data</p>
             </div>
           </div>
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* Stats Overview - Real-time data */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Impressions</CardTitle>
               <Eye className="w-5 h-5 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">1.2M</div>
-              <p className="text-xs text-emerald-500 mt-1">+22.5% from last month</p>
+              <div className="text-3xl font-bold">{formatNumber(stats.totalImpressions)}</div>
+              <div className="flex gap-2 mt-2 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1"><Smartphone className="w-3 h-3" />{formatNumber(stats.mobileViews)}</span>
+                <span className="flex items-center gap-1"><Monitor className="w-3 h-3" />{formatNumber(stats.webViews)}</span>
+                <span className="flex items-center gap-1"><Tablet className="w-3 h-3" />{formatNumber(stats.tabletViews)}</span>
+              </div>
             </CardContent>
           </Card>
 
@@ -62,19 +111,19 @@ const AdsDashboard = () => {
               <MousePointerClick className="w-5 h-5 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">48,234</div>
-              <p className="text-xs text-emerald-500 mt-1">+18.3% from last month</p>
+              <div className="text-3xl font-bold">{formatNumber(stats.totalClicks)}</div>
+              <p className="text-xs text-muted-foreground mt-1">From {stats.totalAds} ads</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Ad Revenue</CardTitle>
-              <DollarSign className="w-5 h-5 text-blue-500" />
+              <CardTitle className="text-sm font-medium text-muted-foreground">Active Ads</CardTitle>
+              <ImagePlus className="w-5 h-5 text-emerald-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">$28,450</div>
-              <p className="text-xs text-emerald-500 mt-1">+12.7% from last month</p>
+              <div className="text-3xl font-bold">{stats.activeAds} / {stats.totalAds}</div>
+              <p className="text-xs text-muted-foreground mt-1">Currently running</p>
             </CardContent>
           </Card>
 
@@ -84,8 +133,8 @@ const AdsDashboard = () => {
               <TrendingUp className="w-5 h-5 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">4.02%</div>
-              <p className="text-xs text-emerald-500 mt-1">+2.1% from last month</p>
+              <div className="text-3xl font-bold">{stats.averageCtr.toFixed(2)}%</div>
+              <p className="text-xs text-muted-foreground mt-1">Click-through rate</p>
             </CardContent>
           </Card>
         </div>
@@ -103,11 +152,11 @@ const AdsDashboard = () => {
           <TabsContent value="campaigns" className="space-y-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>All Ad Campaigns</CardTitle>
+                <CardTitle>All Ad Banners ({ads.length})</CardTitle>
                 <div className="flex gap-2">
                   <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search campaigns..." className="pl-8 w-[300px]" />
+                    <Input placeholder="Search ads..." className="pl-8 w-[300px]" />
                   </div>
                 </div>
               </CardHeader>
@@ -115,89 +164,77 @@ const AdsDashboard = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Campaign Name</TableHead>
-                      <TableHead>Type</TableHead>
+                      <TableHead>Preview</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Position</TableHead>
                       <TableHead>Impressions</TableHead>
                       <TableHead>Clicks</TableHead>
                       <TableHead>CTR</TableHead>
-                      <TableHead>Revenue</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">Summer Festival Promo</TableCell>
-                      <TableCell><Badge variant="outline">Banner</Badge></TableCell>
-                      <TableCell>245K</TableCell>
-                      <TableCell>9.8K</TableCell>
-                      <TableCell>4.0%</TableCell>
-                      <TableCell>$4,890</TableCell>
-                      <TableCell><Badge className="bg-emerald-500">Active</Badge></TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem><Edit className="w-4 h-4 mr-2" />Edit Campaign</DropdownMenuItem>
-                            <DropdownMenuItem><BarChart3 className="w-4 h-4 mr-2" />View Analytics</DropdownMenuItem>
-                            <DropdownMenuItem><PauseCircle className="w-4 h-4 mr-2" />Pause Campaign</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive"><Trash2 className="w-4 h-4 mr-2" />Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">New Album Launch</TableCell>
-                      <TableCell><Badge variant="outline">Video</Badge></TableCell>
-                      <TableCell>189K</TableCell>
-                      <TableCell>7.2K</TableCell>
-                      <TableCell>3.8%</TableCell>
-                      <TableCell>$3,600</TableCell>
-                      <TableCell><Badge className="bg-emerald-500">Active</Badge></TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem><Edit className="w-4 h-4 mr-2" />Edit Campaign</DropdownMenuItem>
-                            <DropdownMenuItem><BarChart3 className="w-4 h-4 mr-2" />View Analytics</DropdownMenuItem>
-                            <DropdownMenuItem><PauseCircle className="w-4 h-4 mr-2" />Pause Campaign</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive"><Trash2 className="w-4 h-4 mr-2" />Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Artist Spotlight</TableCell>
-                      <TableCell><Badge variant="outline">Audio</Badge></TableCell>
-                      <TableCell>156K</TableCell>
-                      <TableCell>5.9K</TableCell>
-                      <TableCell>3.8%</TableCell>
-                      <TableCell>$2,950</TableCell>
-                      <TableCell><Badge className="bg-yellow-500">Paused</Badge></TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem><PlayCircle className="w-4 h-4 mr-2" />Resume Campaign</DropdownMenuItem>
-                            <DropdownMenuItem><Edit className="w-4 h-4 mr-2" />Edit Campaign</DropdownMenuItem>
-                            <DropdownMenuItem><BarChart3 className="w-4 h-4 mr-2" />View Analytics</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive"><Trash2 className="w-4 h-4 mr-2" />Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
+                    {ads.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                          No ads found. Create your first ad banner!
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      ads.map((ad) => {
+                        const ctr = ad.total_impressions > 0 
+                          ? ((ad.total_clicks / ad.total_impressions) * 100).toFixed(2) 
+                          : "0.00";
+                        return (
+                          <TableRow key={ad.id}>
+                            <TableCell>
+                              <img 
+                                src={ad.image_url} 
+                                alt={ad.title} 
+                                className="w-20 h-12 object-cover rounded"
+                              />
+                            </TableCell>
+                            <TableCell className="font-medium">{ad.title}</TableCell>
+                            <TableCell><Badge variant="outline">{ad.position}</Badge></TableCell>
+                            <TableCell>{formatNumber(ad.total_impressions || 0)}</TableCell>
+                            <TableCell>{formatNumber(ad.total_clicks || 0)}</TableCell>
+                            <TableCell>{ctr}%</TableCell>
+                            <TableCell>
+                              <Badge className={ad.is_active ? "bg-emerald-500" : "bg-yellow-500"}>
+                                {ad.is_active ? "Active" : "Paused"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon">
+                                    <MoreVertical className="w-4 h-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem><Edit className="w-4 h-4 mr-2" />Edit Ad</DropdownMenuItem>
+                                  <DropdownMenuItem><BarChart3 className="w-4 h-4 mr-2" />View Analytics</DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleToggleAdStatus(ad.id, ad.is_active)}>
+                                    {ad.is_active ? (
+                                      <><PauseCircle className="w-4 h-4 mr-2" />Pause Ad</>
+                                    ) : (
+                                      <><PlayCircle className="w-4 h-4 mr-2" />Activate Ad</>
+                                    )}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    className="text-destructive"
+                                    onClick={() => handleDeleteAd(ad.id)}
+                                  >
+                                    <Trash2 className="w-4 h-4 mr-2" />Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -415,7 +452,7 @@ const AdsDashboard = () => {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">Average CPM</CardTitle>
-                  <DollarSign className="w-5 h-5 text-blue-500" />
+                  <TrendingUp className="w-5 h-5 text-blue-500" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">$23.75</div>
@@ -437,7 +474,7 @@ const AdsDashboard = () => {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
-                  <DollarSign className="w-5 h-5 text-blue-500" />
+                  <BarChart3 className="w-5 h-5 text-blue-500" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">$128,450</div>

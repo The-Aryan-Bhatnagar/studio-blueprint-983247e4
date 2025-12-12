@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_analytics: {
+        Row: {
+          ad_id: string
+          created_at: string
+          device_type: string | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          referrer: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          ad_id: string
+          created_at?: string
+          device_type?: string | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          ad_id?: string
+          created_at?: string
+          device_type?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_analytics_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "ads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ads: {
         Row: {
           created_at: string
@@ -22,11 +66,16 @@ export type Database = {
           image_url: string
           is_active: boolean | null
           link_url: string | null
+          mobile_views: number | null
           position: string
           priority: string
           start_date: string | null
+          tablet_views: number | null
           title: string
+          total_clicks: number | null
+          total_impressions: number | null
           updated_at: string
+          web_views: number | null
         }
         Insert: {
           created_at?: string
@@ -35,11 +84,16 @@ export type Database = {
           image_url: string
           is_active?: boolean | null
           link_url?: string | null
+          mobile_views?: number | null
           position: string
           priority?: string
           start_date?: string | null
+          tablet_views?: number | null
           title: string
+          total_clicks?: number | null
+          total_impressions?: number | null
           updated_at?: string
+          web_views?: number | null
         }
         Update: {
           created_at?: string
@@ -48,11 +102,16 @@ export type Database = {
           image_url?: string
           is_active?: boolean | null
           link_url?: string | null
+          mobile_views?: number | null
           position?: string
           priority?: string
           start_date?: string | null
+          tablet_views?: number | null
           title?: string
+          total_clicks?: number | null
+          total_impressions?: number | null
           updated_at?: string
+          web_views?: number | null
         }
         Relationships: []
       }

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useAdTracking } from "@/hooks/useAdTracking";
 
 interface Ad {
   id: string;
@@ -12,6 +13,7 @@ interface Ad {
 
 const AdsBannerCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { trackView, trackClick } = useAdTracking();
 
   const { data: ads = [] } = useQuery({
     queryKey: ["banner-ads"],
@@ -42,9 +44,17 @@ const AdsBannerCarousel = () => {
     return () => clearInterval(interval);
   }, [ads.length, nextSlide]);
 
-  const handleAdClick = (linkUrl: string | null) => {
-    if (linkUrl) {
-      window.open(linkUrl, "_blank", "noopener,noreferrer");
+  // Track view when ad becomes visible
+  useEffect(() => {
+    if (ads.length > 0 && ads[currentIndex]) {
+      trackView(ads[currentIndex].id);
+    }
+  }, [currentIndex, ads, trackView]);
+
+  const handleAdClick = (ad: Ad) => {
+    trackClick(ad.id);
+    if (ad.link_url) {
+      window.open(ad.link_url, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -80,7 +90,7 @@ const AdsBannerCarousel = () => {
           {ads.map((ad, index) => (
             <div
               key={ad.id}
-              onClick={() => handleAdClick(ad.link_url)}
+              onClick={() => handleAdClick(ad)}
               className={cn(
                 "absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out cursor-pointer",
                 index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
