@@ -294,38 +294,14 @@ const PlaylistDetail = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (index > 0) {
-                            handlePlaySong(songs[index - 1]);
-                          }
-                        }}
-                        className="p-1.5 rounded-full border border-border hover:bg-muted active:bg-muted/80 transition-colors"
-                      >
-                        <SkipBack className="w-4 h-4 text-foreground fill-current" />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (index < songs.length - 1) {
-                            handlePlaySong(songs[index + 1]);
-                          }
-                        }}
-                        className="p-1.5 rounded-full border border-border hover:bg-muted active:bg-muted/80 transition-colors"
-                      >
-                        <SkipForward className="w-4 h-4 text-foreground fill-current" />
-                      </button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveSong(song.id)}
-                        disabled={removeSongFromPlaylist.isPending}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveSong(song.id)}
+                      disabled={removeSongFromPlaylist.isPending}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </Card>
               )
