@@ -347,6 +347,16 @@ const ArtistProfilePublic = () => {
                     song={song}
                     index={index + 1}
                     onPlay={handlePlaySong}
+                    onPrevious={() => {
+                      if (index > 0 && songs) {
+                        handlePlaySong(songs[index - 1]);
+                      }
+                    }}
+                    onNext={() => {
+                      if (songs && index < songs.length - 1) {
+                        handlePlaySong(songs[index + 1]);
+                      }
+                    }}
                   />
                 ))}
               </div>
