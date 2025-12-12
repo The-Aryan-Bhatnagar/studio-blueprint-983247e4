@@ -392,17 +392,33 @@ const MusicPlayer = () => {
 
             {/* Mobile Layout */}
             {isMobile ? (
-              <div className="w-full h-full flex flex-col justify-center px-6 py-8 max-w-md mx-auto">
+              <div className="w-full h-full flex flex-col justify-between px-4 py-6 max-w-md mx-auto overflow-y-auto">
+                {/* Mobile Ad Banner - 320x50 or 300x50 */}
+                {activeAd && (
+                  <a
+                    href={activeAd.link_url || "#"}
+                    target={activeAd.link_url ? "_blank" : undefined}
+                    rel="noopener noreferrer"
+                    className="flex justify-center mb-4 flex-shrink-0"
+                  >
+                    <img
+                      src={activeAd.image_url}
+                      alt={activeAd.title}
+                      className="w-[320px] h-[50px] sm:w-[300px] sm:h-[50px] object-cover rounded-lg shadow-lg border border-white/10"
+                    />
+                  </a>
+                )}
+                
                 {/* Frosted Glass Card */}
-                <div className="bg-white/10 backdrop-blur-xl rounded-[2rem] p-8 border border-white/20 shadow-2xl">
+                <div className="bg-white/10 backdrop-blur-xl rounded-[2rem] p-6 sm:p-8 border border-white/20 shadow-2xl flex-1 flex flex-col justify-center">
                   {/* Circular Artwork with Glow */}
-                  <div className="flex justify-center mb-8">
+                  <div className="flex justify-center mb-6 sm:mb-8">
                     <div className="relative">
                       <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full blur-2xl opacity-50" />
                       <img
                         src={currentSong.image}
                         alt={currentSong.title}
-                        className="relative w-48 h-48 rounded-full object-cover border-4 border-white/20 shadow-[0_0_40px_rgba(168,85,247,0.3)]"
+                        className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full object-cover border-4 border-white/20 shadow-[0_0_40px_rgba(168,85,247,0.3)]"
                       />
                     </div>
                   </div>
@@ -590,14 +606,15 @@ const MusicPlayer = () => {
                     </div>
                   </div>
 
-                  {/* Ad Section */}
+                  {/* Ad Section - Tablet: 300x250 or 728x90 */}
                   {activeAd && (
-                    <div className="w-60 h-80 lg:w-72 lg:h-96 rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                    <div className="hidden md:flex flex-col items-center gap-4">
+                      {/* Tablet vertical ad: 300x250 */}
                       <a
                         href={activeAd.link_url || "#"}
                         target={activeAd.link_url ? "_blank" : undefined}
                         rel="noopener noreferrer"
-                        className="block w-full h-full"
+                        className="block w-[300px] h-[250px] rounded-2xl overflow-hidden shadow-2xl border border-white/10"
                       >
                         <img
                           src={activeAd.image_url}

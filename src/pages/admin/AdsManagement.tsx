@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react";
+import { Edit, Trash2, Eye, EyeOff, ExternalLink } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDistanceToNow } from "date-fns";
 import { useAdminAds, useDeleteContent } from "@/hooks/useAdminData";
+import CreateAdDialog from "@/components/admin/CreateAdDialog";
 
 const AdsManagement = () => {
   const { data: ads, isLoading } = useAdminAds();
@@ -35,10 +36,7 @@ const AdsManagement = () => {
           <h1 className="text-3xl font-bold mb-2">Ads Management</h1>
           <p className="text-muted-foreground">Control and monitor advertising campaigns</p>
         </div>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
-          Create Ad
-        </Button>
+        <CreateAdDialog />
       </div>
 
       {/* Stats Overview */}
@@ -85,12 +83,12 @@ const AdsManagement = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Preview</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead>Position</TableHead>
                 <TableHead>Priority</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Start Date</TableHead>
-                <TableHead>End Date</TableHead>
+                <TableHead>Link</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -105,6 +103,13 @@ const AdsManagement = () => {
               ) : (
                 ads?.map((ad: any) => (
                   <TableRow key={ad.id}>
+                    <TableCell>
+                      <img
+                        src={ad.image_url}
+                        alt={ad.title}
+                        className="w-16 h-10 object-cover rounded"
+                      />
+                    </TableCell>
                     <TableCell className="font-medium">{ad.title}</TableCell>
                     <TableCell>
                       <Badge variant="outline">{ad.position}</Badge>
@@ -127,11 +132,20 @@ const AdsManagement = () => {
                         {ad.is_active ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {ad.start_date ? new Date(ad.start_date).toLocaleDateString() : "Not set"}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {ad.end_date ? new Date(ad.end_date).toLocaleDateString() : "No end date"}
+                    <TableCell>
+                      {ad.link_url ? (
+                        <a
+                          href={ad.link_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          Link
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {formatDistanceToNow(new Date(ad.created_at), { addSuffix: true })}
