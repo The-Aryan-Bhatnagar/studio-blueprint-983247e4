@@ -3,17 +3,51 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Users, Music, TrendingUp, DollarSign, ArrowLeft, Search, MoreVertical, Check, X, Ban, Trash2, Edit, Eye, EyeOff, Calendar, MessageSquare, Image, Video, Award, UserCheck } from "lucide-react";
+import { Users, Music, TrendingUp, ArrowLeft, Search, MoreVertical, Check, X, Ban, Trash2, Edit, Eye, EyeOff, Calendar, MessageSquare, Image, Video, Award, UserCheck } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
-import { useAdminArtists } from "@/hooks/useAdminData";
+import { useAdminArtists, useAdminSongs, useAdminAnalytics } from "@/hooks/useAdminData";
 import { useTransparentLogo } from "@/hooks/useTransparentLogo";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+
+const formatNumber = (num: number): string => {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+  if (num >= 1000) return (num / 1000).toFixed(1) + "K";
+  return num.toString();
+};
 
 const ArtistDashboard = () => {
   const navigate = useNavigate();
-  const { data: artists, isLoading } = useAdminArtists();
+  const { data: artists = [], isLoading: artistsLoading } = useAdminArtists();
+  const { data: songs = [], isLoading: songsLoading } = useAdminSongs();
+  const { data: analytics } = useAdminAnalytics();
   const logo = useTransparentLogo();
+  const queryClient = useQueryClient();
+
+  // Real-time subscriptions
+  useEffect(() => {
+    const channel = supabase
+      .channel("admin-artists-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "artist_profiles" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-artists"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "songs" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-songs"] });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  const isLoading = artistsLoading || songsLoading;
+  const totalStreams = songs.reduce((sum: number, song: any) => 
+    sum + (song.song_analytics?.total_plays || 0), 0
+  );
 
   if (isLoading) {
     return (
@@ -35,12 +69,12 @@ const ArtistDashboard = () => {
             <img src={logo} alt="GREENBOXX Logo" className="w-10 h-10 object-contain" />
             <div>
               <h1 className="text-3xl font-bold">Artist Dashboard</h1>
-              <p className="text-muted-foreground">Manage and monitor artist activities</p>
+              <p className="text-muted-foreground">Manage and monitor artist activities • Real-time data</p>
             </div>
           </div>
         </div>
 
-        {/* Stats Overview */}
+        {/* Stats Overview - Real data */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -48,8 +82,8 @@ const ArtistDashboard = () => {
               <Users className="w-5 h-5 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">1,234</div>
-              <p className="text-xs text-emerald-500 mt-1">+12.5% from last month</p>
+              <div className="text-3xl font-bold">{formatNumber(artists.length)}</div>
+              <p className="text-xs text-muted-foreground mt-1">Registered artists</p>
             </CardContent>
           </Card>
 
@@ -59,8 +93,8 @@ const ArtistDashboard = () => {
               <Music className="w-5 h-5 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">5,678</div>
-              <p className="text-xs text-emerald-500 mt-1">+8.2% from last month</p>
+              <div className="text-3xl font-bold">{formatNumber(songs.length)}</div>
+              <p className="text-xs text-muted-foreground mt-1">Published songs</p>
             </CardContent>
           </Card>
 
@@ -70,8 +104,8 @@ const ArtistDashboard = () => {
               <TrendingUp className="w-5 h-5 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">2.4M</div>
-              <p className="text-xs text-emerald-500 mt-1">+15.3% from last month</p>
+              <div className="text-3xl font-bold">{formatNumber(totalStreams)}</div>
+              <p className="text-xs text-muted-foreground mt-1">All-time plays</p>
             </CardContent>
           </Card>
 
@@ -81,8 +115,8 @@ const ArtistDashboard = () => {
               <UserCheck className="w-5 h-5 text-yellow-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">23</div>
-              <p className="text-xs text-muted-foreground mt-1">Artists & Songs</p>
+              <div className="text-3xl font-bold">{songs.filter((s: any) => !s.is_published).length}</div>
+              <p className="text-xs text-muted-foreground mt-1">Drafts & scheduled</p>
             </CardContent>
           </Card>
         </div>
