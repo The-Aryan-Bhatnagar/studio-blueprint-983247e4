@@ -1,13 +1,16 @@
-import { Play, Heart, MessageCircle, Headphones } from "lucide-react";
+import { Play, Heart, MessageCircle, Headphones, SkipBack, SkipForward } from "lucide-react";
 import { Card } from "./ui/card";
 
 interface ArtistSongListItemProps {
   song: any;
   index: number;
   onPlay?: (song: any) => void;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  showNavigation?: boolean;
 }
 
-const ArtistSongListItem = ({ song, index, onPlay }: ArtistSongListItemProps) => {
+const ArtistSongListItem = ({ song, index, onPlay, onPrevious, onNext, showNavigation = false }: ArtistSongListItemProps) => {
   if (!song) return null;
 
   const coverImage = song.cover_image_url || "/placeholder.svg";
@@ -15,6 +18,7 @@ const ArtistSongListItem = ({ song, index, onPlay }: ArtistSongListItemProps) =>
   const likes = song.song_analytics?.total_likes || 0;
   const comments = song.song_analytics?.total_comments || 0;
   const category = song.genre || song.category || null;
+  const artistName = song.artist_profiles?.stage_name || song.artist || null;
 
   return (
     <Card 
@@ -41,9 +45,9 @@ const ArtistSongListItem = ({ song, index, onPlay }: ArtistSongListItemProps) =>
       {/* Song Info */}
       <div className="flex-1 min-w-0">
         <h3 className="font-semibold text-foreground truncate text-sm">{song.title}</h3>
-        {category && (
-          <p className="text-xs text-muted-foreground truncate">{category}</p>
-        )}
+        <p className="text-xs text-muted-foreground truncate">
+          {artistName || category || "Music"}
+        </p>
         
         {/* Stats Row */}
         <div className="flex items-center gap-3 mt-1.5">
@@ -61,6 +65,30 @@ const ArtistSongListItem = ({ song, index, onPlay }: ArtistSongListItemProps) =>
           </div>
         </div>
       </div>
+
+      {/* Navigation Buttons */}
+      {showNavigation && (
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onPrevious?.();
+            }}
+            className="p-2 rounded-full hover:bg-muted active:bg-muted/80 transition-colors"
+          >
+            <SkipBack className="w-4 h-4 text-muted-foreground" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onNext?.();
+            }}
+            className="p-2 rounded-full hover:bg-muted active:bg-muted/80 transition-colors"
+          >
+            <SkipForward className="w-4 h-4 text-muted-foreground" />
+          </button>
+        </div>
+      )}
     </Card>
   );
 };
