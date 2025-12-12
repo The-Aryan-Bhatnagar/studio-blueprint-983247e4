@@ -46,20 +46,20 @@ const Discover = () => {
 
   return (
     <div className="min-h-screen pb-32">
-      {/* Hero Section */}
-      <section className="relative h-96 overflow-hidden rounded-2xl mb-12 bg-gradient-hero">
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/50 to-transparent" />
-        <div className="relative h-full flex flex-col justify-center px-12">
-          <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+      {/* Hero Banner Section */}
+      <section className="w-full p-10 md:p-[60px_40px] rounded-[20px] bg-gradient-to-br from-[hsl(270,100%,50%)] via-[hsl(290,100%,50%)] to-[hsl(320,100%,60%)] flex flex-col md:flex-row justify-between items-center mb-10 gap-6 md:gap-10">
+        {/* Left Content */}
+        <div className="text-center md:text-left">
+          <h1 className="text-white text-3xl md:text-[42px] font-bold leading-tight">
             Discover Amazing Artists
           </h1>
-          <p className="text-xl text-muted-foreground mb-6 max-w-2xl">
-            Connect with talented artists and stream their music from around the world
+          <p className="text-white/90 mt-2.5 text-base md:text-lg max-w-[480px]">
+            Connect with talented artists and stream music from around the world.
           </p>
-          <div className="flex gap-4">
+          <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
             <Button
               size="lg"
-              className="bg-gradient-primary hover:shadow-glow transition-all"
+              className="bg-white text-[hsl(270,100%,50%)] hover:bg-white/90 font-semibold px-6 py-3 rounded-[10px] border-none"
               onClick={() => navigate("/search")}
             >
               Explore Now
@@ -67,12 +67,21 @@ const Discover = () => {
             </Button>
             <Button
               size="lg"
-              variant="secondary"
+              className="bg-white/20 text-white hover:bg-white/30 font-semibold px-6 py-3 rounded-[10px] border border-white/40"
               onClick={() => navigate("/artist/signup")}
             >
               Become an Artist
             </Button>
           </div>
+        </div>
+
+        {/* Right Image */}
+        <div className="w-full max-w-[350px] md:max-w-none md:w-auto">
+          <img
+            src="/placeholder.svg"
+            alt="Discover banner"
+            className="w-full md:h-[200px] md:w-auto rounded-[20px] object-cover"
+          />
         </div>
       </section>
 
