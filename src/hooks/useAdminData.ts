@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-// User Management - Fetch profiles with roles and last login
+// User Management - Fetch profiles with roles and last login (excluding artists)
 export const useAdminUsers = () => {
   return useQuery({
     queryKey: ["admin-users"],
@@ -14,6 +14,16 @@ export const useAdminUsers = () => {
         .order("created_at", { ascending: false });
 
       if (profilesError) throw profilesError;
+
+      // Fetch artist profiles to exclude artists from user list
+      const { data: artistProfiles, error: artistError } = await supabase
+        .from("artist_profiles")
+        .select("user_id");
+
+      if (artistError) throw artistError;
+
+      // Create set of artist user_ids for quick lookup
+      const artistUserIds = new Set(artistProfiles?.map(ap => ap.user_id) || []);
 
       // Fetch all user roles
       const { data: roles, error: rolesError } = await supabase
@@ -30,6 +40,22 @@ export const useAdminUsers = () => {
 
       if (loginError) throw loginError;
 
+      // Fetch user emails from edge function
+      let emailMap: Record<string, string> = {};
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          const response = await supabase.functions.invoke("get-user-emails", {
+            headers: { Authorization: `Bearer ${session.access_token}` },
+          });
+          if (response.data?.emails) {
+            emailMap = response.data.emails;
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch emails:", err);
+      }
+
       // Create maps for quick lookup
       const rolesMap = new Map<string, string[]>();
       roles?.forEach((r) => {
@@ -45,12 +71,15 @@ export const useAdminUsers = () => {
         }
       });
 
-      // Merge data
-      const enrichedProfiles = profiles?.map((profile) => ({
-        ...profile,
-        user_roles: rolesMap.get(profile.user_id)?.map(role => ({ role })) || [],
-        last_login: loginMap.get(profile.user_id) || null,
-      }));
+      // Filter out artists and merge data
+      const enrichedProfiles = profiles
+        ?.filter((profile) => !artistUserIds.has(profile.user_id))
+        .map((profile) => ({
+          ...profile,
+          email: profile.email || emailMap[profile.user_id] || null,
+          user_roles: rolesMap.get(profile.user_id)?.map(role => ({ role })) || [],
+          last_login: loginMap.get(profile.user_id) || null,
+        }));
 
       return enrichedProfiles || [];
     },
