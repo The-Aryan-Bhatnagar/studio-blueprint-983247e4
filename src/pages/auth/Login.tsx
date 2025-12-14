@@ -19,12 +19,39 @@ const Login = () => {
   const { toast } = useToast();
   const logo = useTransparentLogo();
 
+  // Function to record login history
+  const recordLoginHistory = async (userId: string) => {
+    try {
+      const userAgent = navigator.userAgent;
+      const isMobile = /Mobile|Android|iPhone|iPad/.test(userAgent);
+      const isTablet = /iPad|Tablet/.test(userAgent);
+      const deviceType = isMobile ? (isTablet ? "tablet" : "mobile") : "desktop";
+      
+      // Extract browser name
+      let browser = "Unknown";
+      if (userAgent.includes("Chrome")) browser = "Chrome";
+      else if (userAgent.includes("Firefox")) browser = "Firefox";
+      else if (userAgent.includes("Safari")) browser = "Safari";
+      else if (userAgent.includes("Edge")) browser = "Edge";
+      
+      await supabase.from("login_history").insert({
+        user_id: userId,
+        device_type: deviceType,
+        browser: browser,
+        ip_address: null, // Would need server-side to get real IP
+        location: null,
+      });
+    } catch (err) {
+      console.error("Failed to record login history:", err);
+    }
+  };
+
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -41,6 +68,11 @@ const Login = () => {
           return;
         }
         throw error;
+      }
+
+      // Record login history
+      if (data.user) {
+        await recordLoginHistory(data.user.id);
       }
 
       toast({
@@ -74,7 +106,8 @@ const Login = () => {
         title: "OTP Sent",
         description: "Please check your phone for the verification code",
       });
-      navigate("/auth/verify-otp", { state: { phone, type: "sms" } });
+      // Login history will be recorded after OTP verification
+      navigate("/auth/verify-otp", { state: { phone, type: "sms", recordLogin: true } });
     } catch (error: any) {
       toast({
         title: "Login Failed",

@@ -179,13 +179,14 @@ const UserDashboard = () => {
                       <TableHead>Phone</TableHead>
                       <TableHead>Location</TableHead>
                       <TableHead>Joined</TableHead>
+                      <TableHead>Last Login</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredUsers.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                           No users found
                         </TableCell>
                       </TableRow>
@@ -225,6 +226,21 @@ const UserDashboard = () => {
                               <Clock className="w-3 h-3" />
                               {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
                             </div>
+                          </TableCell>
+                          <TableCell>
+                            {user.last_login ? (
+                              <div className="text-sm">
+                                <div className="flex items-center gap-1 text-muted-foreground">
+                                  <Activity className="w-3 h-3" />
+                                  {formatDistanceToNow(new Date(user.last_login.logged_in_at), { addSuffix: true })}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {user.last_login.device_type} • {user.last_login.browser}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">Never</span>
+                            )}
                           </TableCell>
                           <TableCell>
                             <DropdownMenu>
