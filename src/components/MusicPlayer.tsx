@@ -397,7 +397,6 @@ const MusicPlayer = () => {
                 {activeAd && (
                   <a
                     href={activeAd.link_url || "#"}
-                    target={activeAd.link_url ? "_blank" : undefined}
                     rel="noopener noreferrer"
                     className="flex justify-center mb-4 flex-shrink-0"
                   >
@@ -513,52 +512,7 @@ const MusicPlayer = () => {
                 </div>
 
                 {/* Bottom Actions */}
-                <div className="flex items-center justify-around mt-8">
-                  <div className="relative">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={handleVolumeClick}
-                      className="h-12 w-12 text-white/60 hover:text-white"
-                    >
-                      {isMuted || volume === 0 ? (
-                        <VolumeX className="h-5 w-5" />
-                      ) : (
-                        <Volume2 className="h-5 w-5" />
-                      )}
-                    </Button>
-                    
-                    {/* Volume Slider Popup */}
-                    {showVolumeSlider && (
-                      <>
-                        <div 
-                          className="fixed inset-0 z-40" 
-                          onClick={() => setShowVolumeSlider(false)}
-                        />
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-black/90 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border border-white/10 z-50 w-48">
-                          <div className="flex flex-col items-center gap-3">
-                            <span className="text-xs text-white/70 font-medium">Volume</span>
-                            <div className="flex items-center gap-3 w-full">
-                              <VolumeX className="h-4 w-4 text-white/60" />
-                              <Slider
-                                value={[isMuted ? 0 : volume]}
-                                onValueChange={([value]) => {
-                                  setVolume(value);
-                                  if (value > 0 && isMuted) toggleMute();
-                                }}
-                                max={100}
-                                step={1}
-                                className="flex-1 [&_[role=slider]]:bg-purple-500 [&_[role=slider]]:border-purple-500"
-                              />
-                              <Volume2 className="h-4 w-4 text-white/60" />
-                            </div>
-                            <span className="text-sm text-white font-semibold">{isMuted ? 0 : volume}%</span>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  
+                <div className="flex items-center justify-center gap-8 mt-8">
                   <Button
                     size="icon"
                     variant="ghost"
@@ -612,7 +566,6 @@ const MusicPlayer = () => {
                       {/* Tablet vertical ad: 300x250 */}
                       <a
                         href={activeAd.link_url || "#"}
-                        target={activeAd.link_url ? "_blank" : undefined}
                         rel="noopener noreferrer"
                         className="block w-[300px] h-[250px] rounded-2xl overflow-hidden shadow-2xl border border-white/10"
                       >

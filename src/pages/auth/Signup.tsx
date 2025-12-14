@@ -370,16 +370,25 @@ const Signup = () => {
 
               <div>
                 <Label htmlFor="phoneNumber">Phone Number</Label>
-                <Input
-                  id="phoneNumber"
-                  type="tel"
-                  placeholder="+1234567890"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
-                />
+                <div className="flex gap-2">
+                  <div className="flex items-center justify-center bg-muted px-3 rounded-md border border-input text-sm font-medium">
+                    +91
+                  </div>
+                  <Input
+                    id="phoneNumber"
+                    type="tel"
+                    placeholder="9876543210"
+                    value={phone.replace("+91", "")}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                      setPhone(digits ? `+91${digits}` : "");
+                    }}
+                    className="flex-1"
+                    required
+                  />
+                </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Include country code (e.g., +1 for US)
+                  Enter your 10-digit mobile number
                 </p>
               </div>
 
