@@ -13,7 +13,7 @@ const MobileBottomNav = () => {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[60px] bg-card border-t border-border z-50 flex items-center justify-around px-4">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[60px] bg-card border-t border-border z-[60] flex items-center justify-around px-4 pointer-events-auto">
       {navItems.map((item) => (
         <Link
           key={item.path}
