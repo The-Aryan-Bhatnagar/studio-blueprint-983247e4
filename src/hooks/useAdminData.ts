@@ -2,21 +2,74 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-// User Management
+// User Management - Fetch profiles with roles and last login
 export const useAdminUsers = () => {
   return useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const { data: profiles, error } = await supabase
+      // Fetch profiles
+      const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select(`
-          *,
-          user_roles(role)
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
 
+      if (profilesError) throw profilesError;
+
+      // Fetch all user roles
+      const { data: roles, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("user_id, role");
+
+      if (rolesError) throw rolesError;
+
+      // Fetch login history (latest login per user)
+      const { data: loginHistory, error: loginError } = await supabase
+        .from("login_history")
+        .select("user_id, logged_in_at, device_type, browser, location")
+        .order("logged_in_at", { ascending: false });
+
+      if (loginError) throw loginError;
+
+      // Create maps for quick lookup
+      const rolesMap = new Map<string, string[]>();
+      roles?.forEach((r) => {
+        const existing = rolesMap.get(r.user_id) || [];
+        existing.push(r.role);
+        rolesMap.set(r.user_id, existing);
+      });
+
+      const loginMap = new Map<string, any>();
+      loginHistory?.forEach((l) => {
+        if (!loginMap.has(l.user_id)) {
+          loginMap.set(l.user_id, l);
+        }
+      });
+
+      // Merge data
+      const enrichedProfiles = profiles?.map((profile) => ({
+        ...profile,
+        user_roles: rolesMap.get(profile.user_id)?.map(role => ({ role })) || [],
+        last_login: loginMap.get(profile.user_id) || null,
+      }));
+
+      return enrichedProfiles || [];
+    },
+  });
+};
+
+// Login History
+export const useAdminLoginHistory = () => {
+  return useQuery({
+    queryKey: ["admin-login-history"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("login_history")
+        .select("*")
+        .order("logged_in_at", { ascending: false })
+        .limit(100);
+
       if (error) throw error;
-      return profiles;
+      return data;
     },
   });
 };
