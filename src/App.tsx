@@ -47,6 +47,7 @@ import Community from "./pages/Community";
 import SongAnalytics from "./pages/artist/SongAnalytics";
 import NotFound from "./pages/NotFound";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
+import PlayerFullscreen from "./pages/PlayerFullscreen";
 
 const queryClient = new QueryClient();
 
@@ -99,6 +100,7 @@ const App = () => (
               <Route path="/community" element={<Layout><ProtectedRoute><Community /></ProtectedRoute></Layout>} />
               <Route path="/events" element={<Layout><ProtectedRoute><Events /></ProtectedRoute></Layout>} />
               <Route path="/artist/:artistId" element={<Layout><ProtectedRoute><ArtistProfilePublic /></ProtectedRoute></Layout>} />
+              <Route path="/player" element={<ProtectedRoute><PlayerFullscreen /></ProtectedRoute>} />
               
               {/* Artist Routes - Artist Layout (No Music Player) */}
               <Route path="/artist" element={<Layout><ProtectedRoute><ArtistProfile /></ProtectedRoute></Layout>} />
