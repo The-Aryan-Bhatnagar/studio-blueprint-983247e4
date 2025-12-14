@@ -60,13 +60,14 @@ const Signup = () => {
 
       if (error) throw error;
 
-      // Create user profile
+      // Create user profile with email
       if (data.user) {
         const { error: profileError } = await supabase
           .from('profiles')
           .insert({
             user_id: data.user.id,
             full_name: fullName,
+            email: email,
             phone_number: phone,
             city: city,
             country: country,

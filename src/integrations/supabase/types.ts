@@ -810,6 +810,7 @@ export type Database = {
           country: string | null
           created_at: string
           date_of_birth: string | null
+          email: string | null
           full_name: string
           id: string
           phone_number: string | null
@@ -822,6 +823,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           date_of_birth?: string | null
+          email?: string | null
           full_name: string
           id?: string
           phone_number?: string | null
@@ -834,6 +836,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           date_of_birth?: string | null
+          email?: string | null
           full_name?: string
           id?: string
           phone_number?: string | null
