@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFullscreenAds } from "@/hooks/useFullscreenAds";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import CommentsDialog from "@/components/CommentsDialog";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import MobileBottomNav from "@/components/MobileBottomNav";
 
 const sampleLyrics = [
@@ -24,6 +24,8 @@ const formatTime = (seconds: number) => {
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
+
+const SWIPE_THRESHOLD = 100; // Minimum distance for swipe detection
 
 const PlayerFullscreen = () => {
   const navigate = useNavigate();
@@ -52,21 +54,45 @@ const PlayerFullscreen = () => {
   const isMobile = useIsMobile();
   const [showComments, setShowComments] = useState(false);
   const [showLyrics, setShowLyrics] = useState(false);
+  
+  // Swipe gesture state
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const touchStartY = useRef<number | null>(null);
+  const isSwipingDown = useRef(false);
 
   // Handle back navigation
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     navigate(-1);
-  };
+  }, [navigate]);
 
-  // Handle hardware back button on mobile (Android)
-  useEffect(() => {
-    const handlePopState = () => {
-      // Browser back was pressed, navigation will happen automatically
-    };
-    
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+  // Touch handlers for swipe-down gesture
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+    isSwipingDown.current = false;
   }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (touchStartY.current === null) return;
+    
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - touchStartY.current;
+    
+    // Only track downward swipes
+    if (deltaY > 0) {
+      isSwipingDown.current = true;
+      setSwipeOffset(Math.min(deltaY, 200)); // Cap at 200px
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (isSwipingDown.current && swipeOffset > SWIPE_THRESHOLD) {
+      handleBack();
+    }
+    // Reset state
+    touchStartY.current = null;
+    isSwipingDown.current = false;
+    setSwipeOffset(0);
+  }, [swipeOffset, handleBack]);
 
   const handleLike = () => {
     if (!user) {
@@ -96,15 +122,33 @@ const PlayerFullscreen = () => {
 
   const activeAd = ads?.[0];
 
+  // Calculate opacity based on swipe offset for visual feedback
+  const swipeOpacity = Math.max(0, 1 - swipeOffset / 200);
+  const swipeTransform = `translateY(${swipeOffset}px)`;
+
   return (
-    <div className="fixed inset-0 z-40 overflow-hidden bg-background">
+    <div 
+      className="fixed inset-0 z-40 overflow-hidden bg-background transition-opacity duration-150"
+      style={{ opacity: swipeOpacity }}
+      onTouchStart={isMobile ? handleTouchStart : undefined}
+      onTouchMove={isMobile ? handleTouchMove : undefined}
+      onTouchEnd={isMobile ? handleTouchEnd : undefined}
+    >
+      {/* Swipe indicator */}
+      {isMobile && swipeOffset > 20 && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center animate-fade-in">
+          <div className="w-10 h-1 bg-white/40 rounded-full mb-1" />
+          <span className="text-xs text-white/60">Swipe down to close</span>
+        </div>
+      )}
+      
       {/* Blurred Background Artwork */}
       <div 
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center transition-transform duration-150"
         style={{ 
           backgroundImage: `url(${currentSong.image})`,
           filter: 'blur(40px)',
-          transform: 'scale(1.2)',
+          transform: `scale(1.2) ${isMobile ? swipeTransform : ''}`,
         }}
       />
       
