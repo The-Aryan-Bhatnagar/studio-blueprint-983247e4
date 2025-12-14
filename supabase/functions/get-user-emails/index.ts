@@ -15,6 +15,7 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     
     // Get the authorization header
     const authHeader = req.headers.get("Authorization");
@@ -25,26 +26,34 @@ serve(async (req) => {
       });
     }
 
-    // Create client with user's token to verify they're admin
-    const userClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    const { data: { user } } = await userClient.auth.getUser();
-    if (!user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    // Extract JWT token
+    const token = authHeader.replace("Bearer ", "");
+    
+    // Use service role client to verify the user
+    const adminClient = createClient(supabaseUrl, serviceRoleKey);
+    
+    // Get user from JWT token
+    const { data: { user }, error: userError } = await adminClient.auth.getUser(token);
+    
+    if (userError || !user) {
+      console.error("Auth error:", userError);
+      return new Response(JSON.stringify({ error: "Unauthorized", details: userError?.message }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Check if user is admin
-    const { data: roleData } = await userClient
+    // Check if user is admin using service role client
+    const { data: roleData, error: roleError } = await adminClient
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
       .eq("role", "admin")
       .maybeSingle();
+
+    if (roleError) {
+      console.error("Role check error:", roleError);
+    }
 
     if (!roleData) {
       return new Response(JSON.stringify({ error: "Admin access required" }), {
@@ -52,9 +61,6 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    // Use service role to get auth users
-    const adminClient = createClient(supabaseUrl, serviceRoleKey);
     
     // Get all auth users
     const { data: { users }, error } = await adminClient.auth.admin.listUsers({
