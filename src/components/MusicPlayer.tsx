@@ -6,9 +6,8 @@ import { usePlayer } from "@/contexts/PlayerContext";
 import { useToast } from "@/hooks/use-toast";
 import { useSongLikes } from "@/hooks/useSongLikes";
 import { useAuth } from "@/contexts/AuthContext";
-import { useIsMobile } from "@/hooks/useIsMobile";
 import CommentsDialog from "./CommentsDialog";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60);
@@ -40,15 +39,7 @@ const MusicPlayer = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { isLiked, toggleLike, isLoading } = useSongLikes(currentSong?.id?.toString());
-  const isMobile = useIsMobile();
   const [showComments, setShowComments] = useState(false);
-
-  // Auto-navigate to fullscreen player on mobile when song starts
-  useEffect(() => {
-    if (isMobile && currentSong && location.pathname !== "/player") {
-      navigate("/player");
-    }
-  }, [isMobile, currentSong, navigate, location.pathname]);
 
   const handleLike = () => {
     if (!user) {
