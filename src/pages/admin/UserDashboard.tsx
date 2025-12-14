@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Users, Activity, Clock, Shield, ArrowLeft, Search, MoreVertical, Ban, Trash2, Edit, Music, Heart, UserPlus, MessageSquare, Flag, TrendingUp, Globe, Calendar } from "lucide-react";
+import { Users, Activity, Clock, Shield, ArrowLeft, Search, MoreVertical, Ban, Trash2, Edit, Music, Heart, UserPlus, MessageSquare, Flag, TrendingUp, Globe, Calendar, Eye, Mail } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,8 @@ import { useTransparentLogo } from "@/hooks/useTransparentLogo";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
+import UserActivityDialog from "@/components/admin/UserActivityDialog";
 
 const formatNumber = (num: number): string => {
   if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
@@ -31,6 +32,8 @@ const UserDashboard = () => {
   const logo = useTransparentLogo();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [activityDialogOpen, setActivityDialogOpen] = useState(false);
 
   // Real-time subscriptions
   useEffect(() => {
@@ -176,9 +179,10 @@ const UserDashboard = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>User</TableHead>
+                      <TableHead>Email</TableHead>
                       <TableHead>Phone</TableHead>
+                      <TableHead>DOB</TableHead>
                       <TableHead>Location</TableHead>
-                      <TableHead>Joined</TableHead>
                       <TableHead>Last Login</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
@@ -186,7 +190,7 @@ const UserDashboard = () => {
                   <TableBody>
                     {filteredUsers.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                           No users found
                         </TableCell>
                       </TableRow>
@@ -214,17 +218,24 @@ const UserDashboard = () => {
                               </div>
                             </div>
                           </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1 text-sm">
+                              <Mail className="w-3 h-3 text-muted-foreground" />
+                              <span className="truncate max-w-[150px]">{user.email || "-"}</span>
+                            </div>
+                          </TableCell>
                           <TableCell>{user.phone_number || "-"}</TableCell>
+                          <TableCell>
+                            {user.date_of_birth ? (
+                              <div className="text-sm">
+                                {format(new Date(user.date_of_birth), "MMM d, yyyy")}
+                              </div>
+                            ) : "-"}
+                          </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-1 text-sm">
                               <Globe className="w-3 h-3 text-muted-foreground" />
                               {user.city && user.country ? `${user.city}, ${user.country}` : user.country || "-"}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                              <Clock className="w-3 h-3" />
-                              {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
                             </div>
                           </TableCell>
                           <TableCell>
@@ -243,20 +254,37 @@ const UserDashboard = () => {
                             )}
                           </TableCell>
                           <TableCell>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <MoreVertical className="w-4 h-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem><Edit className="w-4 h-4 mr-2" />Edit Profile</DropdownMenuItem>
-                                <DropdownMenuItem><Music className="w-4 h-4 mr-2" />View Playlists</DropdownMenuItem>
-                                <DropdownMenuItem><Heart className="w-4 h-4 mr-2" />Liked Songs</DropdownMenuItem>
-                                <DropdownMenuItem><Ban className="w-4 h-4 mr-2" />Block User</DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive"><Trash2 className="w-4 h-4 mr-2" />Delete</DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <div className="flex items-center gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => {
+                                  setSelectedUser(user);
+                                  setActivityDialogOpen(true);
+                                }}
+                                title="View Activity"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon">
+                                    <MoreVertical className="w-4 h-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => {
+                                    setSelectedUser(user);
+                                    setActivityDialogOpen(true);
+                                  }}><Eye className="w-4 h-4 mr-2" />View Activity</DropdownMenuItem>
+                                  <DropdownMenuItem><Edit className="w-4 h-4 mr-2" />Edit Profile</DropdownMenuItem>
+                                  <DropdownMenuItem><Music className="w-4 h-4 mr-2" />View Playlists</DropdownMenuItem>
+                                  <DropdownMenuItem><Heart className="w-4 h-4 mr-2" />Liked Songs</DropdownMenuItem>
+                                  <DropdownMenuItem><Ban className="w-4 h-4 mr-2" />Block User</DropdownMenuItem>
+                                  <DropdownMenuItem className="text-destructive"><Trash2 className="w-4 h-4 mr-2" />Delete</DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))
@@ -472,6 +500,13 @@ const UserDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* User Activity Dialog */}
+      <UserActivityDialog 
+        user={selectedUser} 
+        open={activityDialogOpen} 
+        onOpenChange={setActivityDialogOpen} 
+      />
     </div>
   );
 };
