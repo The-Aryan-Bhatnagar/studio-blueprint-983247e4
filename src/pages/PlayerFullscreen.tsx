@@ -56,43 +56,76 @@ const PlayerFullscreen = () => {
   const [showLyrics, setShowLyrics] = useState(false);
   
   // Swipe gesture state
-  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [swipeOffsetY, setSwipeOffsetY] = useState(0);
+  const [swipeOffsetX, setSwipeOffsetX] = useState(0);
   const touchStartY = useRef<number | null>(null);
-  const isSwipingDown = useRef(false);
+  const touchStartX = useRef<number | null>(null);
+  const swipeDirection = useRef<'none' | 'horizontal' | 'vertical'>('none');
 
   // Handle back navigation
   const handleBack = useCallback(() => {
     navigate(-1);
   }, [navigate]);
 
-  // Touch handlers for swipe-down gesture
+  // Touch handlers for swipe gestures
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
-    isSwipingDown.current = false;
+    touchStartX.current = e.touches[0].clientX;
+    swipeDirection.current = 'none';
   }, []);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (touchStartY.current === null) return;
+    if (touchStartY.current === null || touchStartX.current === null) return;
     
     const currentY = e.touches[0].clientY;
+    const currentX = e.touches[0].clientX;
     const deltaY = currentY - touchStartY.current;
+    const deltaX = currentX - touchStartX.current;
     
-    // Only track downward swipes
-    if (deltaY > 0) {
-      isSwipingDown.current = true;
-      setSwipeOffset(Math.min(deltaY, 200)); // Cap at 200px
+    // Determine swipe direction on first significant movement
+    if (swipeDirection.current === 'none') {
+      if (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10) {
+        swipeDirection.current = Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical';
+      }
+    }
+    
+    // Handle vertical swipe (down to close)
+    if (swipeDirection.current === 'vertical' && deltaY > 0) {
+      setSwipeOffsetY(Math.min(deltaY, 200));
+      setSwipeOffsetX(0);
+    }
+    
+    // Handle horizontal swipe (left/right to skip)
+    if (swipeDirection.current === 'horizontal') {
+      setSwipeOffsetX(Math.max(-150, Math.min(150, deltaX)));
+      setSwipeOffsetY(0);
     }
   }, []);
 
   const handleTouchEnd = useCallback(() => {
-    if (isSwipingDown.current && swipeOffset > SWIPE_THRESHOLD) {
+    // Handle vertical swipe - close player
+    if (swipeDirection.current === 'vertical' && swipeOffsetY > SWIPE_THRESHOLD) {
       handleBack();
     }
+    
+    // Handle horizontal swipe - skip songs
+    if (swipeDirection.current === 'horizontal') {
+      if (swipeOffsetX < -80) {
+        // Swipe left - next song
+        playNext();
+      } else if (swipeOffsetX > 80) {
+        // Swipe right - previous song
+        playPrevious();
+      }
+    }
+    
     // Reset state
     touchStartY.current = null;
-    isSwipingDown.current = false;
-    setSwipeOffset(0);
-  }, [swipeOffset, handleBack]);
+    touchStartX.current = null;
+    swipeDirection.current = 'none';
+    setSwipeOffsetY(0);
+    setSwipeOffsetX(0);
+  }, [swipeOffsetY, swipeOffsetX, handleBack, playNext, playPrevious]);
 
   const handleLike = () => {
     if (!user) {
@@ -122,9 +155,10 @@ const PlayerFullscreen = () => {
 
   const activeAd = ads?.[0];
 
-  // Calculate opacity based on swipe offset for visual feedback
-  const swipeOpacity = Math.max(0, 1 - swipeOffset / 200);
-  const swipeTransform = `translateY(${swipeOffset}px)`;
+  // Calculate opacity and transform based on swipe offset for visual feedback
+  const swipeOpacity = Math.max(0, 1 - swipeOffsetY / 200);
+  const swipeTransformY = `translateY(${swipeOffsetY}px)`;
+  const swipeTransformX = `translateX(${swipeOffsetX}px)`;
 
   return (
     <div 
@@ -134,11 +168,34 @@ const PlayerFullscreen = () => {
       onTouchMove={isMobile ? handleTouchMove : undefined}
       onTouchEnd={isMobile ? handleTouchEnd : undefined}
     >
-      {/* Swipe indicator */}
-      {isMobile && swipeOffset > 20 && (
+      {/* Swipe down indicator */}
+      {isMobile && swipeOffsetY > 20 && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center animate-fade-in">
           <div className="w-10 h-1 bg-white/40 rounded-full mb-1" />
           <span className="text-xs text-white/60">Swipe down to close</span>
+        </div>
+      )}
+      
+      {/* Swipe horizontal indicator */}
+      {isMobile && Math.abs(swipeOffsetX) > 30 && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex items-center justify-center animate-fade-in">
+          <div className="bg-black/60 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2">
+            {swipeOffsetX < 0 ? (
+              <>
+                <span className="text-white text-sm">Next</span>
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="text-white text-sm">Previous</span>
+              </>
+            )}
+          </div>
         </div>
       )}
       
@@ -148,7 +205,7 @@ const PlayerFullscreen = () => {
         style={{ 
           backgroundImage: `url(${currentSong.image})`,
           filter: 'blur(40px)',
-          transform: `scale(1.2) ${isMobile ? swipeTransform : ''}`,
+          transform: `scale(1.2) ${isMobile ? swipeTransformY : ''}`,
         }}
       />
       
