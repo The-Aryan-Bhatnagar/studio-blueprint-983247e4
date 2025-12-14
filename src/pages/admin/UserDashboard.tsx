@@ -3,15 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Users, Activity, Clock, Shield, ArrowLeft, Search, MoreVertical, Ban, Trash2, Edit, RefreshCcw, Music, Heart, UserPlus, MessageSquare, Flag, TrendingUp, Globe, Calendar } from "lucide-react";
+import { Users, Activity, Clock, Shield, ArrowLeft, Search, MoreVertical, Ban, Trash2, Edit, Music, Heart, UserPlus, MessageSquare, Flag, TrendingUp, Globe, Calendar } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
-import { useAdminUsers, useAdminAnalytics, useAdminReports } from "@/hooks/useAdminData";
+import { useAdminUsers, useAdminAnalytics, useAdminReports, useAdminComments, useAdminUserLocations, useAdminNewUsersThisWeek } from "@/hooks/useAdminData";
 import { useTransparentLogo } from "@/hooks/useTransparentLogo";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { formatDistanceToNow } from "date-fns";
 
 const formatNumber = (num: number): string => {
   if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
@@ -24,8 +25,12 @@ const UserDashboard = () => {
   const { data: users = [], isLoading: usersLoading } = useAdminUsers();
   const { data: analytics } = useAdminAnalytics();
   const { data: reports = [] } = useAdminReports();
+  const { data: comments = [] } = useAdminComments();
+  const { data: locations = [] } = useAdminUserLocations();
+  const { data: newUsersThisWeek = 0 } = useAdminNewUsersThisWeek();
   const logo = useTransparentLogo();
   const queryClient = useQueryClient();
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Real-time subscriptions
   useEffect(() => {
@@ -33,9 +38,14 @@ const UserDashboard = () => {
       .channel("admin-users-realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => {
         queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+        queryClient.invalidateQueries({ queryKey: ["admin-user-locations"] });
+        queryClient.invalidateQueries({ queryKey: ["admin-new-users-week"] });
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "reports" }, () => {
         queryClient.invalidateQueries({ queryKey: ["admin-reports"] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "song_comments" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-comments"] });
       })
       .subscribe();
 
@@ -46,6 +56,22 @@ const UserDashboard = () => {
 
   const isLoading = usersLoading;
   const pendingReports = reports.filter((r: any) => r.status === "pending").length;
+
+  // Filter users based on search
+  const filteredUsers = users.filter((user: any) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      user.full_name?.toLowerCase().includes(query) ||
+      user.phone_number?.toLowerCase().includes(query) ||
+      user.city?.toLowerCase().includes(query) ||
+      user.country?.toLowerCase().includes(query)
+    );
+  });
+
+  // Calculate top country
+  const topCountry = locations.length > 0 ? locations[0] : null;
+  const totalLocatedUsers = locations.reduce((sum: number, loc: any) => sum + loc.count, 0);
 
   if (isLoading) {
     return (
@@ -132,11 +158,16 @@ const UserDashboard = () => {
           <TabsContent value="users" className="space-y-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>All Users</CardTitle>
+                <CardTitle>All Users ({filteredUsers.length})</CardTitle>
                 <div className="flex gap-2">
                   <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search users..." className="pl-8 w-[300px]" />
+                    <Input 
+                      placeholder="Search users..." 
+                      className="pl-8 w-[300px]"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                   </div>
                 </div>
               </CardHeader>
@@ -145,26 +176,56 @@ const UserDashboard = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>User</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>Phone</TableHead>
+                      <TableHead>Location</TableHead>
                       <TableHead>Joined</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.length === 0 ? (
+                    {filteredUsers.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                           No users found
                         </TableCell>
                       </TableRow>
                     ) : (
-                      users.map((user: any) => (
+                      filteredUsers.map((user: any) => (
                         <TableRow key={user.id}>
-                          <TableCell className="font-medium">{user.full_name || "Unknown"}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              {user.avatar_url ? (
+                                <img src={user.avatar_url} alt={user.full_name} className="w-10 h-10 rounded-full object-cover" />
+                              ) : (
+                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                  <Users className="w-5 h-5 text-primary" />
+                                </div>
+                              )}
+                              <div>
+                                <div className="font-medium">{user.full_name || "Unknown"}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {user.user_roles?.[0]?.role ? (
+                                    <Badge variant="outline" className="text-xs">{user.user_roles[0].role}</Badge>
+                                  ) : (
+                                    <Badge variant="secondary" className="text-xs">user</Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </TableCell>
                           <TableCell>{user.phone_number || "-"}</TableCell>
-                          <TableCell><Badge className="bg-emerald-500">Active</Badge></TableCell>
-                          <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1 text-sm">
+                              <Globe className="w-3 h-3 text-muted-foreground" />
+                              {user.city && user.country ? `${user.city}, ${user.country}` : user.country || "-"}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                              <Clock className="w-3 h-3" />
+                              {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
+                            </div>
+                          </TableCell>
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
@@ -194,40 +255,54 @@ const UserDashboard = () => {
           <TabsContent value="activity" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>User Comments & Activity</CardTitle>
+                <CardTitle>Recent Comments ({comments.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>User</TableHead>
-                      <TableHead>Comment/Activity</TableHead>
-                      <TableHead>Song/Post</TableHead>
+                      <TableHead>Comment</TableHead>
+                      <TableHead>Song</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">Bob Johnson</TableCell>
-                      <TableCell className="max-w-md truncate">Great track! Love the energy...</TableCell>
-                      <TableCell>Song Name - Artist</TableCell>
-                      <TableCell>2 hours ago</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem><MessageSquare className="w-4 h-4 mr-2" />View Full Comment</DropdownMenuItem>
-                            <DropdownMenuItem><Ban className="w-4 h-4 mr-2" />Block from Commenting</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive"><Trash2 className="w-4 h-4 mr-2" />Delete Comment</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
+                    {comments.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                          No comments yet
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      comments.map((comment: any) => (
+                        <TableRow key={comment.id}>
+                          <TableCell className="font-medium">
+                            {comment.profiles?.full_name || "Unknown User"}
+                          </TableCell>
+                          <TableCell className="max-w-md truncate">{comment.content}</TableCell>
+                          <TableCell>{comment.songs?.title || "Unknown Song"}</TableCell>
+                          <TableCell>
+                            {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem><MessageSquare className="w-4 h-4 mr-2" />View Full Comment</DropdownMenuItem>
+                                <DropdownMenuItem><Ban className="w-4 h-4 mr-2" />Block from Commenting</DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive"><Trash2 className="w-4 h-4 mr-2" />Delete Comment</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -243,37 +318,39 @@ const UserDashboard = () => {
                   <UserPlus className="w-5 h-5 text-blue-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">234</div>
-                  <p className="text-xs text-emerald-500 mt-1">+12% from last week</p>
+                  <div className="text-3xl font-bold">{newUsersThisWeek}</div>
+                  <p className="text-xs text-muted-foreground mt-1">In the last 7 days</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">User Retention Rate</CardTitle>
+                  <CardTitle className="text-sm font-medium">Total Artists</CardTitle>
                   <TrendingUp className="w-5 h-5 text-blue-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">78%</div>
-                  <p className="text-xs text-emerald-500 mt-1">+3% from last month</p>
+                  <div className="text-3xl font-bold">{analytics?.totalArtists || 0}</div>
+                  <p className="text-xs text-muted-foreground mt-1">Registered artists</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Top Country</CardTitle>
+                  <CardTitle className="text-sm font-medium">Top Location</CardTitle>
                   <Globe className="w-5 h-5 text-blue-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">USA</div>
-                  <p className="text-xs text-muted-foreground mt-1">45% of all users</p>
+                  <div className="text-3xl font-bold">{topCountry?.country || "N/A"}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {topCountry ? `${Math.round((topCountry.count / totalLocatedUsers) * 100)}% of located users` : "No data"}
+                  </p>
                 </CardContent>
               </Card>
             </div>
 
             <Card>
               <CardHeader>
-                <CardTitle>Top Countries & Cities</CardTitle>
+                <CardTitle>Users by Location</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -286,24 +363,22 @@ const UserDashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell>USA</TableCell>
-                      <TableCell>New York</TableCell>
-                      <TableCell>1,234</TableCell>
-                      <TableCell>14.6%</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>UK</TableCell>
-                      <TableCell>London</TableCell>
-                      <TableCell>856</TableCell>
-                      <TableCell>10.1%</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Canada</TableCell>
-                      <TableCell>Toronto</TableCell>
-                      <TableCell>654</TableCell>
-                      <TableCell>7.7%</TableCell>
-                    </TableRow>
+                    {locations.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                          No location data available
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      locations.slice(0, 10).map((location: any, index: number) => (
+                        <TableRow key={index}>
+                          <TableCell>{location.country}</TableCell>
+                          <TableCell>{location.city || "-"}</TableCell>
+                          <TableCell>{location.count}</TableCell>
+                          <TableCell>{((location.count / totalLocatedUsers) * 100).toFixed(1)}%</TableCell>
+                        </TableRow>
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -314,40 +389,66 @@ const UserDashboard = () => {
           <TabsContent value="reports" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>User Reports</CardTitle>
+                <CardTitle>User Reports ({reports.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Reporter</TableHead>
+                      <TableHead>Type</TableHead>
                       <TableHead>Reason</TableHead>
-                      <TableHead>Reported Content</TableHead>
+                      <TableHead>Description</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell>User123</TableCell>
-                      <TableCell>Inappropriate content</TableCell>
-                      <TableCell>Comment on Song X</TableCell>
-                      <TableCell><Badge className="bg-yellow-500">Pending</Badge></TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem><Flag className="w-4 h-4 mr-2" />Review Report</DropdownMenuItem>
-                            <DropdownMenuItem><Ban className="w-4 h-4 mr-2" />Take Action</DropdownMenuItem>
-                            <DropdownMenuItem>Dismiss Report</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
+                    {reports.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                          No reports yet
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      reports.map((report: any) => (
+                        <TableRow key={report.id}>
+                          <TableCell>
+                            <Badge variant="outline">{report.reported_type}</Badge>
+                          </TableCell>
+                          <TableCell className="font-medium">{report.reason}</TableCell>
+                          <TableCell className="max-w-xs truncate">{report.description || "-"}</TableCell>
+                          <TableCell>
+                            <Badge 
+                              className={
+                                report.status === "pending" ? "bg-yellow-500" :
+                                report.status === "resolved" ? "bg-green-500" :
+                                "bg-red-500"
+                              }
+                            >
+                              {report.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem><Flag className="w-4 h-4 mr-2" />Review Report</DropdownMenuItem>
+                                <DropdownMenuItem><Ban className="w-4 h-4 mr-2" />Take Action</DropdownMenuItem>
+                                <DropdownMenuItem>Dismiss Report</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>

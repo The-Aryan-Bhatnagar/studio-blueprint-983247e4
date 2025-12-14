@@ -138,13 +138,61 @@ export const useAdminComments = () => {
         .select(`
           *,
           songs(title),
-          profiles(full_name)
+          profiles!song_comments_user_id_fkey(full_name)
         `)
         .order("created_at", { ascending: false })
         .limit(100);
 
       if (error) throw error;
       return data;
+    },
+  });
+};
+
+// User Location Analytics
+export const useAdminUserLocations = () => {
+  return useQuery({
+    queryKey: ["admin-user-locations"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("country, city")
+        .not("country", "is", null);
+
+      if (error) throw error;
+
+      // Aggregate locations
+      const locationMap = new Map<string, { country: string; city: string; count: number }>();
+      data?.forEach((profile) => {
+        const key = `${profile.country}-${profile.city}`;
+        const existing = locationMap.get(key);
+        if (existing) {
+          existing.count++;
+        } else {
+          locationMap.set(key, { country: profile.country || "", city: profile.city || "", count: 1 });
+        }
+      });
+
+      return Array.from(locationMap.values()).sort((a, b) => b.count - a.count);
+    },
+  });
+};
+
+// New Users This Week
+export const useAdminNewUsersThisWeek = () => {
+  return useQuery({
+    queryKey: ["admin-new-users-week"],
+    queryFn: async () => {
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      
+      const { count, error } = await supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true })
+        .gte("created_at", weekAgo.toISOString());
+
+      if (error) throw error;
+      return count || 0;
     },
   });
 };
