@@ -6,6 +6,22 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function decodeJwt(token: string): { sub?: string } | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length < 2) return null;
+
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(base64.length + (4 - (base64.length % 4 || 4)) % 4, "=");
+    const json = atob(padded);
+    return JSON.parse(json);
+  } catch (e) {
+    console.error("Failed to decode JWT:", e);
+    return null;
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
@@ -15,8 +31,7 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    
+
     // Get the authorization header
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -27,27 +42,24 @@ serve(async (req) => {
     }
 
     // Extract JWT token
-    const token = authHeader.replace("Bearer ", "");
-    
-    // Use service role client to verify the user
-    const adminClient = createClient(supabaseUrl, serviceRoleKey);
-    
-    // Get user from JWT token
-    const { data: { user }, error: userError } = await adminClient.auth.getUser(token);
-    
-    if (userError || !user) {
-      console.error("Auth error:", userError);
-      return new Response(JSON.stringify({ error: "Unauthorized", details: userError?.message }), {
+    const token = authHeader.replace("Bearer", "").trim();
+    const payload = decodeJwt(token);
+    const userId = payload?.sub ?? null;
+
+    if (!userId) {
+      return new Response(JSON.stringify({ error: "Unauthorized", details: "Invalid or missing user id in token" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Check if user is admin using service role client
+    // Use service role client to check admin role and list users
+    const adminClient = createClient(supabaseUrl, serviceRoleKey);
+
     const { data: roleData, error: roleError } = await adminClient
       .from("user_roles")
       .select("role")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("role", "admin")
       .maybeSingle();
 
@@ -61,7 +73,7 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    
+
     // Get all auth users
     const { data: { users }, error } = await adminClient.auth.admin.listUsers({
       perPage: 1000,
