@@ -25,6 +25,7 @@ import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+import VerifyOtp from "./pages/auth/VerifyOtp";
 import ArtistLogin from "./pages/artist/ArtistLogin";
 import ArtistSignup from "./pages/artist/ArtistSignup";
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -66,6 +67,7 @@ const App = () => (
               <Route path="/auth/signup" element={<Signup />} />
               <Route path="/auth/forgot-password" element={<ForgotPassword />} />
               <Route path="/auth/reset-password" element={<ResetPassword />} />
+              <Route path="/auth/verify-otp" element={<VerifyOtp />} />
               <Route path="/artist/login" element={<ArtistLogin />} />
               <Route path="/artist/signup" element={<ArtistSignup />} />
               <Route path="/admin/login" element={<AdminLogin />} />

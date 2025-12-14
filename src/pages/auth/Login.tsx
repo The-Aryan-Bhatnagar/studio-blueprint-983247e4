@@ -182,20 +182,29 @@ const Login = () => {
             <form onSubmit={handlePhoneLogin} className="space-y-4">
               <div>
                 <Label htmlFor="phoneLogin">Phone Number</Label>
-                <Input
-                  id="phoneLogin"
-                  type="tel"
-                  placeholder="+1234567890"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
-                />
+                <div className="flex gap-2">
+                  <div className="flex items-center justify-center bg-muted px-3 rounded-md border border-input text-sm font-medium">
+                    +91
+                  </div>
+                  <Input
+                    id="phoneLogin"
+                    type="tel"
+                    placeholder="9876543210"
+                    value={phone.replace("+91", "")}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                      setPhone(digits ? `+91${digits}` : "");
+                    }}
+                    className="flex-1"
+                    required
+                  />
+                </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   You'll receive an OTP to login
                 </p>
               </div>
 
-              <Button type="submit" disabled={loading} className="w-full bg-gradient-primary">
+              <Button type="submit" disabled={loading || phone.length < 13} className="w-full bg-gradient-primary">
                 {loading ? "Sending OTP..." : "Login with Phone"}
               </Button>
             </form>
